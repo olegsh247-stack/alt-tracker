@@ -10,7 +10,7 @@ export async function GET() {
     .from('pairs')
     .select('*')
     .eq('user_id', userId)
-    .order('created_at', { ascending: true });
+    .order('sort_order', { ascending: true });
 
   if (error) return NextResponse.json({ error: 'Ошибка базы данных' }, { status: 500 });
   return NextResponse.json({ pairs: data });
@@ -20,12 +20,20 @@ export async function POST(req) {
   const userId = getUserId();
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
-  const { asset1, exchange1, asset2, exchange2 } = await req.json();
+  const { asset1, exchange1, asset2, exchange2, alertAbove, alertBelow } = await req.json();
   const validExchanges = ['BINANCE', 'BYBIT', 'OKX'];
 
   if (!asset1 || !asset2 || !validExchanges.includes(exchange1) || !validExchanges.includes(exchange2)) {
     return NextResponse.json({ error: 'Заполните оба актива и биржи' }, { status: 400 });
   }
+
+  const { data: existing } = await supabase
+    .from('pairs')
+    .select('sort_order')
+    .eq('user_id', userId)
+    .order('sort_order', { ascending: false })
+    .limit(1);
+  const nextOrder = existing && existing.length > 0 ? (existing[0].sort_order || 0) + 1 : 0;
 
   const { data, error } = await supabase
     .from('pairs')
@@ -35,6 +43,9 @@ export async function POST(req) {
       exchange1,
       asset2: asset2.toUpperCase(),
       exchange2,
+      sort_order: nextOrder,
+      alert_above: alertAbove || null,
+      alert_below: alertBelow || null,
     })
     .select()
     .single();
