@@ -38,19 +38,30 @@ a { color: inherit; }
 /* Планшеты и телефоны */
 @media (max-width: 640px) {
   .page-wrap { padding: 12px !important; }
+
   .pair-row {
-    flex-wrap: wrap;
-    row-gap: 6px;
+    display: grid !important;
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-areas:
+      "order icons name actions"
+      "order icons exchange actions"
+      "price1 price1 price2 price2"
+      "ratio ratio pct pct";
+    row-gap: 4px;
+    column-gap: 8px;
+    align-items: center;
     padding: 12px 6px !important;
   }
-  .pair-row .cell-order { order: -1; }
-  .pair-row .cell-icons { order: 0; }
-  .pair-row .cell-name { order: 1; flex: 1 1 auto; }
 
-  .pair-row .cell-price { order: 2; flex: 1 1 45%; text-align: left !important; font-size: 13px; min-width: 0 !important; }
-  .pair-row .cell-exchange { order: 3; flex: 1 1 45%; text-align: right; font-size: 12px; min-width: 0 !important; }
+  .pair-row .cell-order { grid-area: order; flex-direction: row !important; gap: 2px; }
+  .pair-row .cell-icons { grid-area: icons; }
+  .pair-row .cell-name { grid-area: name; min-width: 0 !important; font-weight: 600; }
+  .pair-row .cell-exchange { grid-area: exchange; text-align: left; font-size: 12px; min-width: 0 !important; }
+  .pair-row .cell-actions { grid-area: actions; justify-self: end; align-self: start; }
 
-  .pair-row .cell-ratio { order: 4; flex: 1 1 45%; text-align: left !important; font-size: 13px; min-width: 0 !important; }
-  .pair-row .cell-pct { order: 5; flex: 0 0 auto; text-align: left !important; }
-  .pair-row .cell-actions { order: 6; margin-left: auto; }
+  .pair-row .cell-price:not(.second) { grid-area: price1; text-align: left !important; min-width: 0 !important; font-size: 13px; }
+  .pair-row .cell-price.second { grid-area: price2; text-align: right !important; min-width: 0 !important; font-size: 13px; }
+
+  .pair-row .cell-ratio { grid-area: ratio; text-align: left !important; min-width: 0 !important; font-size: 13px; }
+  .pair-row .cell-pct { grid-area: pct; text-align: right !important; min-width: 0 !important; }
 }
