@@ -26,7 +26,7 @@ html[data-theme='light'] {
 
 body {
   margin: 0;
-  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -48,15 +48,13 @@ a { color: inherit; }
   .pair-row .cell-actions { order: 2; margin-left: auto; }
   .pair-row .cell-price,
   .pair-row .cell-exchange,
-  .pair-row .cell-ratio {
+  .pair-row .cell-ratio,
+  .pair-row .cell-pct {
     order: 3;
     flex: 1 1 45%;
     text-align: left !important;
     font-size: 13px;
   }
-  .pair-row .cell-price::before { content: "Цена 1: "; color: var(--text-dim); }
-  .pair-row .cell-price.second::before { content: "Цена 2: "; }
-  .pair-row .cell-ratio::before { content: "Соотн.: "; color: var(--text-dim); }
   .pair-row .cell-order { order: -1; }
   .pair-row svg { order: 3; }
 }

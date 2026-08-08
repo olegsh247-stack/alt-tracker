@@ -102,9 +102,9 @@ export default function HomePage() {
             <Sparkline points={spark?.closes} />
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>
               {price?.ratio ? price.ratio.toFixed(6) : '—'}
-              <div style={{ fontSize: 11, color: pctColor }}>
-                {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}% (24ч)` : ''}
-              </div>
+            </div>
+            <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 14, color: pctColor }}>
+              {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
             </div>
             <div className="cell-actions">
               <button
