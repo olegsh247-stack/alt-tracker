@@ -67,7 +67,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="page-wrap" style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
+    <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <h1 style={{ fontSize: 20, margin: 0 }}>Мои пары</h1>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -96,12 +96,12 @@ export default function HomePage() {
               <img src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
             <div className="cell-name" style={{ flex: 1, minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
-            <div className="cell-price" style={cell}>{price?.price1 ? price.price1.toFixed(6) : '—'}</div>
-            <div className="cell-price second" style={cell}>{price?.price2 ? price.price2.toFixed(6) : '—'}</div>
+            <div className="cell-price" style={cell}>{price?.price1 ? price.price1.toFixed(8) : '—'}</div>
+            <div className="cell-price second" style={cell}>{price?.price2 ? price.price2.toFixed(8) : '—'}</div>
             <div className="cell-exchange" style={{ ...cell, opacity: 0.6, fontSize: 12 }}>{p.exchange1}/{p.exchange2}</div>
             <Sparkline points={spark?.closes} />
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>
-              {price?.ratio ? price.ratio.toFixed(6) : '—'}
+              {price?.ratio ? price.ratio.toFixed(8) : '—'}
             </div>
             <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 14, color: pctColor }}>
               {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
@@ -124,10 +124,10 @@ export default function HomePage() {
 }
 
 const row = {
-  display: 'flex', alignItems: 'center', gap: 10, padding: '12px 8px',
+  display: 'flex', alignItems: 'center', gap: 14, padding: '12px 6px',
   borderBottom: '1px solid var(--card-border)', textDecoration: 'none', color: 'var(--text)',
 };
-const cell = { minWidth: 80, textAlign: 'right' };
+const cell = { minWidth: 118, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
 const plusBtn = {
   width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
   background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 20,

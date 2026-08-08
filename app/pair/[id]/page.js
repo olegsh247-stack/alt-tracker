@@ -24,7 +24,7 @@ export default function PairChartPage() {
   }, [id, range]);
 
   return (
-    <div className="page-wrap" style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
+    <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <button onClick={() => router.push('/')} style={backBtn}>← Назад</button>
       <div style={{ display: 'flex', gap: 8, margin: '16px 0' }}>
         {RANGES.map(r => (

@@ -26,7 +26,7 @@ html[data-theme='light'] {
 
 body {
   margin: 0;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
