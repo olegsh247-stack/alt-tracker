@@ -20,7 +20,7 @@ export async function POST(req) {
   const userId = getUserId();
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
-  const { asset1, exchange1, asset2, exchange2, alertAbove, alertBelow } = await req.json();
+  const { asset1, exchange1, asset2, exchange2 } = await req.json();
   const validExchanges = ['BINANCE', 'BYBIT', 'OKX'];
 
   if (!asset1 || !asset2 || !validExchanges.includes(exchange1) || !validExchanges.includes(exchange2)) {
@@ -44,8 +44,6 @@ export async function POST(req) {
       asset2: asset2.toUpperCase(),
       exchange2,
       sort_order: nextOrder,
-      alert_above: alertAbove || null,
-      alert_below: alertBelow || null,
     })
     .select()
     .single();

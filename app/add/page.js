@@ -9,8 +9,6 @@ export default function AddPairPage() {
   const [exchange1, setExchange1] = useState('BINANCE');
   const [asset2, setAsset2] = useState('');
   const [exchange2, setExchange2] = useState('BINANCE');
-  const [alertAbove, setAlertAbove] = useState('');
-  const [alertBelow, setAlertBelow] = useState('');
   const [err, setErr] = useState('');
   const router = useRouter();
 
@@ -20,11 +18,7 @@ export default function AddPairPage() {
     const r = await fetch('/api/pairs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        asset1, exchange1, asset2, exchange2,
-        alertAbove: alertAbove ? parseFloat(alertAbove) : null,
-        alertBelow: alertBelow ? parseFloat(alertBelow) : null,
-      }),
+      body: JSON.stringify({ asset1, exchange1, asset2, exchange2 }),
     });
     const d = await r.json();
     if (!r.ok) { setErr(d.error); return; }
@@ -48,17 +42,6 @@ export default function AddPairPage() {
           <select value={exchange2} onChange={e => setExchange2(e.target.value)} style={{ ...input, marginTop: 8 }}>
             {EXCHANGES.map(ex => <option key={ex} value={ex}>{ex}</option>)}
           </select>
-        </div>
-        <div>
-          <div style={label}>Уведомление в Telegram (необязательно)</div>
-          <input
-            placeholder="Сообщить, если соотношение выше..." value={alertAbove}
-            onChange={e => setAlertAbove(e.target.value)} style={input} type="number" step="any"
-          />
-          <input
-            placeholder="Сообщить, если соотношение ниже..." value={alertBelow}
-            onChange={e => setAlertBelow(e.target.value)} style={{ ...input, marginTop: 8 }} type="number" step="any"
-          />
         </div>
         {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8 }}>

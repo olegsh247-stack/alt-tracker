@@ -9,9 +9,6 @@ export async function PATCH(req, { params }) {
   const body = await req.json();
   const update = {};
   if ('sort_order' in body) update.sort_order = body.sort_order;
-  if ('alert_above' in body) update.alert_above = body.alert_above === '' ? null : body.alert_above;
-  if ('alert_below' in body) update.alert_below = body.alert_below === '' ? null : body.alert_below;
-  if ('alert_above' in body || 'alert_below' in body) update.last_alert_direction = null;
 
   const { error } = await supabase
     .from('pairs')

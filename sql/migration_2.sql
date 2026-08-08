@@ -1,11 +1,7 @@
 -- Выполнить в Supabase SQL Editor (после уже применённого schema.sql)
-
-alter table users add column if not exists telegram_chat_id text;
+-- Добавляет только поле сортировки. Telegram-уведомления пока не используются.
 
 alter table pairs add column if not exists sort_order integer default 0;
-alter table pairs add column if not exists alert_above numeric;
-alter table pairs add column if not exists alert_below numeric;
-alter table pairs add column if not exists last_alert_direction text; -- 'above' | 'below' | null
 
 -- проставим порядковые номера уже существующим парам по дате добавления
 update pairs p set sort_order = t.rn
