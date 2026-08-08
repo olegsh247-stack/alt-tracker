@@ -43,18 +43,14 @@ a { color: inherit; }
     row-gap: 6px;
     padding: 12px 6px !important;
   }
-  .pair-row .cell-name { order: 1; flex: 1 1 auto; }
-  .pair-row .cell-icons { order: 0; }
-  .pair-row .cell-actions { order: 2; margin-left: auto; }
-  .pair-row .cell-price,
-  .pair-row .cell-exchange,
-  .pair-row .cell-ratio,
-  .pair-row .cell-pct {
-    order: 3;
-    flex: 1 1 45%;
-    text-align: left !important;
-    font-size: 13px;
-  }
   .pair-row .cell-order { order: -1; }
-  .pair-row svg { order: 3; }
+  .pair-row .cell-icons { order: 0; }
+  .pair-row .cell-name { order: 1; flex: 1 1 auto; }
+
+  .pair-row .cell-price { order: 2; flex: 1 1 45%; text-align: left !important; font-size: 13px; min-width: 0 !important; }
+  .pair-row .cell-exchange { order: 3; flex: 1 1 45%; text-align: right; font-size: 12px; min-width: 0 !important; }
+
+  .pair-row .cell-ratio { order: 4; flex: 1 1 45%; text-align: left !important; font-size: 13px; min-width: 0 !important; }
+  .pair-row .cell-pct { order: 5; flex: 0 0 auto; text-align: left !important; }
+  .pair-row .cell-actions { order: 6; margin-left: auto; }
 }

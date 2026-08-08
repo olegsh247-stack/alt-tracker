@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
-import Sparkline from '../components/Sparkline';
 
 function icon(asset) {
   return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
@@ -95,11 +94,10 @@ export default function HomePage() {
               <img src={icon(p.asset1)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
               <img src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
-            <div className="cell-name" style={{ flex: 1, minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
+            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 12, minWidth: 90 }}>{p.exchange1}/{p.exchange2}</div>
             <div className="cell-price" style={cell}>{price?.price1 ? price.price1.toFixed(8) : '—'}</div>
             <div className="cell-price second" style={cell}>{price?.price2 ? price.price2.toFixed(8) : '—'}</div>
-            <div className="cell-exchange" style={{ ...cell, opacity: 0.6, fontSize: 12 }}>{p.exchange1}/{p.exchange2}</div>
-            <Sparkline points={spark?.closes} />
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>
               {price?.ratio ? price.ratio.toFixed(8) : '—'}
             </div>
@@ -124,7 +122,7 @@ export default function HomePage() {
 }
 
 const row = {
-  display: 'flex', alignItems: 'center', gap: 14, padding: '12px 6px',
+  display: 'flex', alignItems: 'center', gap: 14, padding: '12px 6px', flexWrap: 'wrap',
   borderBottom: '1px solid var(--card-border)', textDecoration: 'none', color: 'var(--text)',
 };
 const cell = { minWidth: 118, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
