@@ -24,7 +24,7 @@ export default function PairChartPage() {
   }, [id, range]);
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
+    <div className="page-wrap" style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
       <button onClick={() => router.push('/')} style={backBtn}>← Назад</button>
       <div style={{ display: 'flex', gap: 8, margin: '16px 0' }}>
         {RANGES.map(r => (
@@ -33,7 +33,7 @@ export default function PairChartPage() {
           </button>
         ))}
       </div>
-      {err && <p style={{ color: '#f66' }}>{err}</p>}
+      {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
       {!err && !candles && <p>Загрузка графика...</p>}
       {!err && candles && candles.length === 0 && <p>Нет данных за этот период.</p>}
       {!err && candles && candles.length > 0 && <Chart candles={candles} />}
@@ -41,6 +41,6 @@ export default function PairChartPage() {
   );
 }
 
-const backBtn = { background: 'none', border: 'none', color: '#8ab4f8', fontSize: 14, cursor: 'pointer', padding: 0 };
-const tab = { padding: '8px 16px', borderRadius: 8, border: '1px solid #333', background: 'none', color: '#aaa' };
-const tabActive = { ...tab, background: '#2b6cf6', color: '#fff', borderColor: '#2b6cf6' };
+const backBtn = { background: 'none', border: 'none', color: 'var(--accent)', fontSize: 14, cursor: 'pointer', padding: 0 };
+const tab = { padding: '8px 16px', borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)' };
+const tabActive = { ...tab, background: 'var(--accent)', color: '#fff', borderColor: 'var(--accent)' };

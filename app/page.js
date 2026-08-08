@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import ThemeToggle from '../components/ThemeToggle';
 
 function icon(asset) {
   return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
@@ -9,6 +10,7 @@ export default function HomePage() {
   const [pairs, setPairs] = useState([]);
   const [prices, setPrices] = useState({});
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
 
   async function load() {
     const [pRes, priceRes] = await Promise.all([
@@ -24,7 +26,7 @@ export default function HomePage() {
 
   useEffect(() => {
     load();
-    const t = setInterval(load, 15000); // обновление цен каждые 15 сек
+    const t = setInterval(load, 15000);
     return () => clearInterval(t);
   }, []);
 
@@ -33,11 +35,22 @@ export default function HomePage() {
     window.location.href = '/login';
   }
 
+  async function removePair(e, id) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm('Удалить эту пару?')) return;
+    setDeletingId(id);
+    const r = await fetch(`/api/pairs/${id}`, { method: 'DELETE' });
+    if (r.ok) setPairs(prev => prev.filter(p => p.id !== id));
+    setDeletingId(null);
+  }
+
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20 }}>Мои пары</h1>
+    <div className="page-wrap" style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+        <h1 style={{ fontSize: 20, margin: 0 }}>Мои пары</h1>
         <div style={{ display: 'flex', gap: 8 }}>
+          <ThemeToggle />
           <a href="/add" style={plusBtn}>+</a>
           <button onClick={logout} style={logoutBtn}>Выйти</button>
         </div>
@@ -49,16 +62,26 @@ export default function HomePage() {
       {pairs.map(p => {
         const price = prices[p.id];
         return (
-          <a key={p.id} href={`/pair/${p.id}`} style={row}>
-            <div style={{ display: 'flex', gap: 4 }}>
+          <a key={p.id} href={`/pair/${p.id}`} className="pair-row" style={row}>
+            <div className="cell-icons" style={{ display: 'flex', gap: 4 }}>
               <img src={icon(p.asset1)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
               <img src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
-            <div style={{ flex: 1, minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
-            <div style={cell}>{price?.price1 ? price.price1.toFixed(6) : '—'}</div>
-            <div style={cell}>{price?.price2 ? price.price2.toFixed(6) : '—'}</div>
-            <div style={{ ...cell, opacity: 0.6, fontSize: 12 }}>{p.exchange1}/{p.exchange2}</div>
-            <div style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(6) : '—'}</div>
+            <div className="cell-name" style={{ flex: 1, minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
+            <div className="cell-price" style={cell}>{price?.price1 ? price.price1.toFixed(6) : '—'}</div>
+            <div className="cell-price second" style={cell}>{price?.price2 ? price.price2.toFixed(6) : '—'}</div>
+            <div className="cell-exchange" style={{ ...cell, opacity: 0.6, fontSize: 12 }}>{p.exchange1}/{p.exchange2}</div>
+            <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(6) : '—'}</div>
+            <div className="cell-actions">
+              <button
+                onClick={(e) => removePair(e, p.id)}
+                disabled={deletingId === p.id}
+                title="Удалить пару"
+                style={minusBtn}
+              >
+                {deletingId === p.id ? '…' : '–'}
+              </button>
+            </div>
           </a>
         );
       })}
@@ -68,11 +91,16 @@ export default function HomePage() {
 
 const row = {
   display: 'flex', alignItems: 'center', gap: 12, padding: '12px 8px',
-  borderBottom: '1px solid #22262b', textDecoration: 'none', color: '#e6e6e6',
+  borderBottom: '1px solid var(--card-border)', textDecoration: 'none', color: 'var(--text)',
 };
 const cell = { minWidth: 80, textAlign: 'right' };
 const plusBtn = {
   width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: '#2b6cf6', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 20,
+  background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 20,
 };
-const logoutBtn = { background: 'none', border: '1px solid #333', color: '#aaa', borderRadius: 8, padding: '0 12px' };
+const logoutBtn = { background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)', borderRadius: 8, padding: '0 12px' };
+const minusBtn = {
+  width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'var(--danger-bg)', color: 'var(--danger)', border: 'none', borderRadius: 8,
+  fontSize: 18, lineHeight: 1, cursor: 'pointer',
+};

@@ -1,0 +1,60 @@
+:root {
+  --bg: #0b0e11;
+  --text: #e6e6e6;
+  --text-dim: #9aa0a6;
+  --card-border: #22262b;
+  --input-bg: #161a1e;
+  --input-border: #333;
+  --accent: #2b6cf6;
+  --danger: #e5484d;
+  --danger-bg: rgba(229, 72, 77, 0.12);
+}
+
+html[data-theme='light'] {
+  --bg: #f5f6f8;
+  --text: #1a1d21;
+  --text-dim: #5f6570;
+  --card-border: #e2e5e9;
+  --input-bg: #ffffff;
+  --input-border: #d0d4da;
+  --accent: #2b6cf6;
+  --danger: #d93036;
+  --danger-bg: rgba(217, 48, 54, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+a { color: inherit; }
+
+/* Планшеты и телефоны */
+@media (max-width: 640px) {
+  .page-wrap { padding: 12px !important; }
+  .pair-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    padding: 12px 6px !important;
+  }
+  .pair-row .cell-name { order: 1; flex: 1 1 auto; }
+  .pair-row .cell-icons { order: 0; }
+  .pair-row .cell-actions { order: 2; margin-left: auto; }
+  .pair-row .cell-price,
+  .pair-row .cell-exchange,
+  .pair-row .cell-ratio {
+    order: 3;
+    flex: 1 1 45%;
+    text-align: left !important;
+    font-size: 13px;
+  }
+  .pair-row .cell-price::before { content: "Цена 1: "; color: var(--text-dim); }
+  .pair-row .cell-price.second::before { content: "Цена 2: "; }
+  .pair-row .cell-ratio::before { content: "Соотн.: "; color: var(--text-dim); }
+}

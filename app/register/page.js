@@ -33,9 +33,9 @@ export default function RegisterPage() {
             type="password" placeholder="Придумайте пароль" value={password}
             onChange={e => setPassword(e.target.value)} style={input}
           />
-          {err && <p style={{ color: '#f66' }}>{err}</p>}
+          {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
           <button style={btn}>Зарегистрироваться</button>
-          <a href="/login" style={{ color: '#8ab4f8', textAlign: 'center' }}>У меня уже есть логин</a>
+          <a href="/login" style={{ color: 'var(--accent)', textAlign: 'center' }}>У меня уже есть логин</a>
         </form>
       )}
     </div>
@@ -43,5 +43,5 @@ export default function RegisterPage() {
 }
 
 const box = { maxWidth: 360, margin: '80px auto', padding: 24 };
-const input = { padding: 12, borderRadius: 8, border: '1px solid #333', background: '#161a1e', color: '#fff' };
-const btn = { padding: 12, borderRadius: 8, border: 'none', background: '#2b6cf6', color: '#fff', fontWeight: 600 };
+const input = { padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)' };
+const btn = { padding: 12, borderRadius: 8, border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600 };

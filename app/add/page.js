@@ -43,7 +43,7 @@ export default function AddPairPage() {
             {EXCHANGES.map(ex => <option key={ex} value={ex}>{ex}</option>)}
           </select>
         </div>
-        {err && <p style={{ color: '#f66' }}>{err}</p>}
+        {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8 }}>
           <button type="button" onClick={() => router.push('/')} style={cancelBtn}>Отмена</button>
           <button style={okBtn}>ОК</button>
@@ -54,6 +54,6 @@ export default function AddPairPage() {
 }
 
 const label = { fontSize: 13, opacity: 0.7, marginBottom: 6 };
-const input = { width: '100%', padding: 12, borderRadius: 8, border: '1px solid #333', background: '#161a1e', color: '#fff', boxSizing: 'border-box' };
-const okBtn = { flex: 1, padding: 12, borderRadius: 8, border: 'none', background: '#2b6cf6', color: '#fff', fontWeight: 600 };
-const cancelBtn = { flex: 1, padding: 12, borderRadius: 8, border: '1px solid #333', background: 'none', color: '#aaa' };
+const input = { width: '100%', padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box' };
+const okBtn = { flex: 1, padding: 12, borderRadius: 8, border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600 };
+const cancelBtn = { flex: 1, padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)' };

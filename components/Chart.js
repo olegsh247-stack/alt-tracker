@@ -9,11 +9,18 @@ export default function Chart({ candles }) {
 
   useEffect(() => {
     if (!ref.current) return;
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     const chart = createChart(ref.current, {
       width: ref.current.clientWidth,
       height: 360,
-      layout: { background: { color: '#0b0e11' }, textColor: '#ccc' },
-      grid: { vertLines: { color: '#1c2127' }, horzLines: { color: '#1c2127' } },
+      layout: {
+        background: { color: isLight ? '#ffffff' : '#0b0e11' },
+        textColor: isLight ? '#333' : '#ccc',
+      },
+      grid: {
+        vertLines: { color: isLight ? '#eee' : '#1c2127' },
+        horzLines: { color: isLight ? '#eee' : '#1c2127' },
+      },
       timeScale: { timeVisible: true },
     });
     const series = chart.addCandlestickSeries({
