@@ -16,6 +16,7 @@ export default function HomePage() {
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState(new Set());
   const [deleting, setDeleting] = useState(false);
+  const [sortMode, setSortMode] = useState(false);
 
   async function load() {
     const [pRes, priceRes, sparkRes] = await Promise.all([
@@ -72,7 +73,13 @@ export default function HomePage() {
 
   function toggleSelectMode() {
     setSelectMode(v => !v);
+    setSortMode(false);
     setSelected(new Set());
+  }
+
+  function toggleSortMode() {
+    setSortMode(v => !v);
+    setSelectMode(false);
   }
 
   function toggleSelected(id) {
@@ -105,20 +112,23 @@ export default function HomePage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <h1 style={{ fontSize: 20, margin: 0 }}>Crypto</h1>
         <div style={{ display: 'flex', gap: 8 }}>
-          {!selectMode ? (
+          {!selectMode && !sortMode ? (
             <>
               <ThemeToggle />
               <a href="/add" style={plusBtn}>+</a>
               {pairs.length > 0 && <button onClick={toggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
+              {pairs.length > 1 && <button onClick={toggleSortMode} style={sortModeBtn} title="Изменить порядок">⇅</button>}
               <button onClick={logout} style={logoutBtn}>Выйти</button>
             </>
-          ) : (
+          ) : selectMode ? (
             <>
               <button onClick={toggleSelectMode} style={logoutBtn}>Отмена</button>
               <button onClick={confirmDeleteSelected} disabled={deleting} style={confirmDeleteBtn}>
                 {deleting ? '...' : `Удалить (${selected.size})`}
               </button>
             </>
+          ) : (
+            <button onClick={toggleSortMode} style={confirmDeleteBtn}>Готово</button>
           )}
         </div>
       </div>
@@ -140,7 +150,7 @@ export default function HomePage() {
             style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
             onClick={(e) => onRowClick(e, p.id)}
           >
-            {!selectMode && (
+            {sortMode && (
               <div className="cell-order" style={{ display: 'flex', flexDirection: 'column' }}>
                 <button onClick={(e) => move(e, i, -1)} style={arrowBtn} disabled={i === 0}>▲</button>
                 <button onClick={(e) => move(e, i, 1)} style={arrowBtn} disabled={i === pairs.length - 1}>▼</button>
@@ -161,7 +171,7 @@ export default function HomePage() {
               <img className="pair-icon" src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
-            {!selectMode && (
+            {!selectMode && !sortMode && (
               <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {swappingId === p.id ? '…' : '⇄'}
               </button>
@@ -197,6 +207,10 @@ const trashBtn = {
   background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 18, cursor: 'pointer',
 };
 const deleteModeBtn = trashBtn;
+const sortModeBtn = {
+  width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'none', border: '1px solid var(--input-border)', color: 'var(--text)', borderRadius: 8, fontSize: 16, cursor: 'pointer',
+};
 const logoutBtn = { background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)', borderRadius: 8, padding: '0 12px' };
 const confirmDeleteBtn = {
   background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, padding: '0 14px', fontWeight: 600, cursor: 'pointer',
