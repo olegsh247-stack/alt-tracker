@@ -43,8 +43,8 @@ a { color: inherit; }
     display: grid !important;
     grid-template-columns: 14px auto auto 1fr auto auto auto;
     grid-template-areas:
-      "order icons icons name  swap exchange pct"
-      ".     price1 price1 price2 price2 ratio ratio";
+      ".     icons icons name  swap exchange pct"
+      "order price1 price1 price2 price2 ratio ratio";
     row-gap: 6px;
     column-gap: 6px;
     align-items: center;
@@ -56,6 +56,8 @@ a { color: inherit; }
     grid-area: order;
     display: flex !important;
     flex-direction: column;
+    justify-content: center;
+    align-self: center;
     gap: 0;
     line-height: 0.8;
   }
