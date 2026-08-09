@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
 import { emojiFor, shortTickerFor } from '../lib/commodities';
@@ -9,9 +10,23 @@ function icon(asset) {
 }
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
   const [login, setLogin] = useState('');
   const [tab, setTab] = useState('crypto');
   const [loading, setLoading] = useState(true);
+
+  // При первой загрузке — вкладка из ссылки (?tab=...), иначе последняя использованная, иначе Crypto
+  useEffect(() => {
+    const fromUrl = searchParams.get('tab');
+    const fromStorage = typeof window !== 'undefined' ? localStorage.getItem('activeTab') : null;
+    const initial = fromUrl || fromStorage || 'crypto';
+    setTab(initial);
+  }, []);
+
+  function changeTab(next) {
+    setTab(next);
+    localStorage.setItem('activeTab', next);
+  }
 
   // --- Crypto ---
   const [pairs, setPairs] = useState([]);
@@ -187,8 +202,8 @@ export default function HomePage() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button onClick={() => setTab('crypto')} style={tab === 'crypto' ? tabActive : tabInactive}>Crypto</button>
-        <button onClick={() => setTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
+        <button onClick={() => changeTab('crypto')} style={tab === 'crypto' ? tabActive : tabInactive}>Crypto</button>
+        <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
       </div>
 
       {loading && <p>Загрузка...</p>}

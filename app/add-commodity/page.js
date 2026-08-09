@@ -19,7 +19,7 @@ export default function AddCommodityPage() {
     });
     const d = await r.json();
     if (!r.ok) { setErr(d.error); return; }
-    router.push('/');
+    router.push('/?tab=commodities');
   }
 
   return (
@@ -40,7 +40,7 @@ export default function AddCommodityPage() {
         </div>
         {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" onClick={() => router.push('/')} style={cancelBtn}>Отмена</button>
+          <button type="button" onClick={() => router.push('/?tab=commodities')} style={cancelBtn}>Отмена</button>
           <button style={okBtn}>ОК</button>
         </div>
       </form>
