@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
 import { emojiFor, shortTickerFor } from '../lib/commodities';
@@ -10,17 +9,16 @@ function icon(asset) {
 }
 
 export default function HomePage() {
-  const searchParams = useSearchParams();
   const [login, setLogin] = useState('');
   const [tab, setTab] = useState('crypto');
   const [loading, setLoading] = useState(true);
 
   // При первой загрузке — вкладка из ссылки (?tab=...), иначе последняя использованная, иначе Crypto
   useEffect(() => {
-    const fromUrl = searchParams.get('tab');
-    const fromStorage = typeof window !== 'undefined' ? localStorage.getItem('activeTab') : null;
-    const initial = fromUrl || fromStorage || 'crypto';
-    setTab(initial);
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get('tab');
+    const fromStorage = localStorage.getItem('activeTab');
+    setTab(fromUrl || fromStorage || 'crypto');
   }, []);
 
   function changeTab(next) {
@@ -277,9 +275,9 @@ export default function HomePage() {
             {cSelectMode && (
               <input type="checkbox" checked={isSelected} onChange={() => cToggleSelected(p.id)} onClick={(e) => e.stopPropagation()} className="cell-order" style={{ width: 18, height: 18 }} />
             )}
-            <div className="cell-icons" style={{ display: 'flex', gap: 4, fontSize: 18 }}>
-              <span>{emojiFor(p.asset1)}</span>
-              <span>{emojiFor(p.asset2)}</span>
+            <div className="cell-icons" style={{ display: 'flex', gap: 4 }}>
+              <span className="commodity-icon">{emojiFor(p.asset1)}</span>
+              <span className="commodity-icon">{emojiFor(p.asset2)}</span>
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{shortTickerFor(p.asset1)}/{shortTickerFor(p.asset2)}</div>
             {!cSelectMode && !cSortMode && (
