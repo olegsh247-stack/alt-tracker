@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
-import { emojiFor, enLabelFor } from '../lib/commodities';
+import { shortTickerFor, enLabelFor } from '../lib/commodities';
 
 function icon(asset) {
   return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
@@ -276,8 +276,8 @@ export default function HomePage() {
               <input type="checkbox" checked={isSelected} onChange={() => cToggleSelected(p.id)} onClick={(e) => e.stopPropagation()} className="cell-order" style={{ width: 18, height: 18 }} />
             )}
             <div className="cell-icons" style={{ display: 'flex', gap: 4 }}>
-              <span className="commodity-icon">{emojiFor(p.asset1)}</span>
-              <span className="commodity-icon">{emojiFor(p.asset2)}</span>
+              <span className="commodity-icon">{shortTickerFor(p.asset1)}</span>
+              <span className="commodity-icon">{shortTickerFor(p.asset2)}</span>
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{enLabelFor(p.asset1)}/{enLabelFor(p.asset2)}</div>
             {!cSelectMode && !cSortMode && (

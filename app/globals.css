@@ -37,7 +37,10 @@ a { color: inherit; }
 
 .commodity-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 24px; height: 24px; font-size: 18px; line-height: 1;
+  min-width: 30px; height: 20px; padding: 0 4px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  border: 1px solid var(--card-border); border-radius: 4px;
+  background: var(--input-bg); color: var(--text-dim);
 }
 
 /* Планшеты и телефоны */
@@ -78,7 +81,7 @@ a { color: inherit; }
 
   .pair-row .cell-icons { grid-area: icons; gap: 3px !important; }
   .pair-row .pair-icon { width: 20px !important; height: 20px !important; }
-  .pair-row .commodity-icon { width: 20px !important; height: 20px !important; font-size: 15px !important; }
+  .pair-row .commodity-icon { min-width: 26px; height: 18px; font-size: 9px; }
 
   .header-login { font-size: 14px; }
   .pair-row .cell-name { grid-area: name; min-width: 0 !important; font-weight: 600; text-align: left !important; font-size: 14px; }
