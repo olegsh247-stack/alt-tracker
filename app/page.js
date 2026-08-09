@@ -111,7 +111,7 @@ export default function HomePage() {
             <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
               {swappingId === p.id ? '…' : '⇄'}
             </button>
-            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 12, minWidth: 90 }}>{p.exchange1}/{p.exchange2}</div>
+            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 12, minWidth: 90, textTransform: 'lowercase' }}>{p.exchange1}/{p.exchange2}</div>
             <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>
