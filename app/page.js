@@ -17,12 +17,15 @@ export default function HomePage() {
   const [selected, setSelected] = useState(new Set());
   const [deleting, setDeleting] = useState(false);
   const [sortMode, setSortMode] = useState(false);
+  const [login, setLogin] = useState('');
+  const [tab, setTab] = useState('crypto');
 
   async function load() {
-    const [pRes, priceRes, sparkRes] = await Promise.all([
+    const [pRes, priceRes, sparkRes, meRes] = await Promise.all([
       fetch('/api/pairs').then(r => r.json()),
       fetch('/api/prices').then(r => r.json()),
       fetch('/api/sparkline').then(r => r.json()),
+      fetch('/api/me').then(r => r.json()),
     ]);
     setPairs(pRes.pairs || []);
     const map = {};
@@ -31,6 +34,7 @@ export default function HomePage() {
     const smap = {};
     (sparkRes.sparklines || []).forEach(s => { smap[s.id] = s; });
     setSparks(smap);
+    if (meRes.login) setLogin(meRes.login);
     setLoading(false);
   }
 
@@ -109,8 +113,8 @@ export default function HomePage() {
 
   return (
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-        <h1 style={{ fontSize: 20, margin: 0 }}>Crypto</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+        <span style={{ fontSize: 14, color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>{login || '\u00A0'}</span>
         <div style={{ display: 'flex', gap: 8 }}>
           {!selectMode && !sortMode ? (
             <>
@@ -132,6 +136,20 @@ export default function HomePage() {
           )}
         </div>
       </div>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <button onClick={() => setTab('crypto')} style={tab === 'crypto' ? tabActive : tabInactive}>Crypto</button>
+        <button onClick={() => setTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
+      </div>
+
+      {tab === 'commodities' && (
+        <p style={{ opacity: 0.7 }}>
+          Раздел Commodities пока пустой — скажите, какие активы (золото, нефть, серебро...) и откуда брать цены, и я его настрою.
+        </p>
+      )}
+
+      {tab === 'crypto' && (
+      <>
 
       {loading && <p>Загрузка...</p>}
       {!loading && pairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
@@ -188,6 +206,8 @@ export default function HomePage() {
           </a>
         );
       })}
+      </>
+      )}
     </div>
   );
 }
@@ -223,4 +243,12 @@ const swapBtn = {
   width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
   background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)',
   borderRadius: 6, cursor: 'pointer', fontSize: 13, padding: 0,
+};
+const tabActive = {
+  padding: '8px 16px', borderRadius: 8, border: '1px solid var(--accent)',
+  background: 'var(--accent)', color: '#fff', fontWeight: 600, cursor: 'pointer',
+};
+const tabInactive = {
+  padding: '8px 16px', borderRadius: 8, border: '1px solid var(--input-border)',
+  background: 'none', color: 'var(--text-dim)', cursor: 'pointer',
 };
