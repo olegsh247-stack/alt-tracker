@@ -267,6 +267,7 @@ export default function HomePage() {
               <span>{emojiFor(p.asset2)}</span>
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{shortTickerFor(p.asset1)}/{shortTickerFor(p.asset2)}</div>
+            {!cSelectMode && !cSortMode && (
               <button onClick={(e) => cSwapPair(e, p.id)} disabled={cSwappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {cSwappingId === p.id ? '…' : '⇄'}
               </button>
