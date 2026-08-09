@@ -41,22 +41,25 @@ a { color: inherit; }
 
   .pair-row {
     display: grid !important;
-    grid-template-columns: auto auto auto 1fr auto auto auto;
+    grid-template-columns: 14px auto auto 1fr auto auto auto;
     grid-template-areas:
-      ".     icons icons name swap exchange pct"
-      "order actions price1 price1 price2 price2 ratio";
+      ".     icons icons name  swap exchange pct"
+      "order price1 price1 price2 price2 ratio ratio";
     row-gap: 6px;
     column-gap: 6px;
     align-items: center;
     padding: 12px 6px !important;
   }
 
-  /* стрелки сортировки — компактно, перед минусом во второй строке */
+  /* стрелки сортировки / чекбокс — максимально компактно */
   .pair-row .cell-order {
-    display: flex !important; grid-area: order; flex-direction: row !important;
-    gap: 4px; margin-right: 2px;
+    grid-area: order;
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+    line-height: 0.8;
   }
-  .pair-row .cell-order button { font-size: 10px; }
+  .pair-row .cell-order button { font-size: 8px; line-height: 0.9; }
 
   .pair-row .cell-icons { grid-area: icons; gap: 3px !important; }
   .pair-row .pair-icon { width: 20px !important; height: 20px !important; }
@@ -68,7 +71,6 @@ a { color: inherit; }
   }
   .pair-row .cell-pct { grid-area: pct; text-align: right !important; min-width: 0 !important; font-size: 15px; }
 
-  .pair-row .cell-actions { grid-area: actions; justify-self: start; }
   .pair-row .cell-price:not(.second) { grid-area: price1; text-align: left !important; min-width: 0 !important; font-size: 13px; }
   .pair-row .cell-price.second { grid-area: price2; text-align: left !important; min-width: 0 !important; font-size: 13px; }
   .pair-row .cell-ratio { grid-area: ratio; text-align: right !important; min-width: 0 !important; font-size: 13px; }

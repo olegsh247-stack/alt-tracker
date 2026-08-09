@@ -12,8 +12,10 @@ export default function HomePage() {
   const [prices, setPrices] = useState({});
   const [sparks, setSparks] = useState({});
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState(null);
   const [swappingId, setSwappingId] = useState(null);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState(new Set());
+  const [deleting, setDeleting] = useState(false);
 
   async function load() {
     const [pRes, priceRes, sparkRes] = await Promise.all([
@@ -42,16 +44,6 @@ export default function HomePage() {
     window.location.href = '/login';
   }
 
-  async function removePair(e, id) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!confirm('Удалить эту пару?')) return;
-    setDeletingId(id);
-    const r = await fetch(`/api/pairs/${id}`, { method: 'DELETE' });
-    if (r.ok) setPairs(prev => prev.filter(p => p.id !== id));
-    setDeletingId(null);
-  }
-
   async function move(e, index, dir) {
     e.preventDefault();
     e.stopPropagation();
@@ -78,14 +70,56 @@ export default function HomePage() {
     setSwappingId(null);
   }
 
+  function toggleSelectMode() {
+    setSelectMode(v => !v);
+    setSelected(new Set());
+  }
+
+  function toggleSelected(id) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function onRowClick(e, id) {
+    if (!selectMode) return;
+    e.preventDefault();
+    toggleSelected(id);
+  }
+
+  async function confirmDeleteSelected() {
+    if (selected.size === 0) { setSelectMode(false); return; }
+    if (!confirm(`Удалить выбранные пары (${selected.size})?`)) return;
+    setDeleting(true);
+    await Promise.all([...selected].map(id => fetch(`/api/pairs/${id}`, { method: 'DELETE' })));
+    setPairs(prev => prev.filter(p => !selected.has(p.id)));
+    setSelected(new Set());
+    setSelectMode(false);
+    setDeleting(false);
+  }
+
   return (
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <h1 style={{ fontSize: 20, margin: 0 }}>Мои пары</h1>
         <div style={{ display: 'flex', gap: 8 }}>
-          <ThemeToggle />
-          <a href="/add" style={plusBtn}>+</a>
-          <button onClick={logout} style={logoutBtn}>Выйти</button>
+          {!selectMode ? (
+            <>
+              <ThemeToggle />
+              <a href="/add" style={plusBtn}>+</a>
+              {pairs.length > 0 && <button onClick={toggleSelectMode} style={trashBtn} title="Удалить пары">🗑</button>}
+              <button onClick={logout} style={logoutBtn}>Выйти</button>
+            </>
+          ) : (
+            <>
+              <button onClick={toggleSelectMode} style={logoutBtn}>Отмена</button>
+              <button onClick={confirmDeleteSelected} disabled={deleting} style={confirmDeleteBtn}>
+                {deleting ? '...' : `Удалить (${selected.size})`}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -97,20 +131,41 @@ export default function HomePage() {
         const spark = sparks[p.id];
         const pct = spark?.changePct;
         const pctColor = pct == null ? 'var(--text-dim)' : pct >= 0 ? '#26a69a' : '#ef5350';
+        const isSelected = selected.has(p.id);
         return (
-          <a key={p.id} href={`/pair/${p.id}`} className="pair-row" style={row}>
-            <div className="cell-order" style={{ display: 'flex', flexDirection: 'column' }}>
-              <button onClick={(e) => move(e, i, -1)} style={arrowBtn} disabled={i === 0}>▲</button>
-              <button onClick={(e) => move(e, i, 1)} style={arrowBtn} disabled={i === pairs.length - 1}>▼</button>
-            </div>
+          <a
+            key={p.id}
+            href={`/pair/${p.id}`}
+            className="pair-row"
+            style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
+            onClick={(e) => onRowClick(e, p.id)}
+          >
+            {!selectMode && (
+              <div className="cell-order" style={{ display: 'flex', flexDirection: 'column' }}>
+                <button onClick={(e) => move(e, i, -1)} style={arrowBtn} disabled={i === 0}>▲</button>
+                <button onClick={(e) => move(e, i, 1)} style={arrowBtn} disabled={i === pairs.length - 1}>▼</button>
+              </div>
+            )}
+            {selectMode && (
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => toggleSelected(p.id)}
+                onClick={(e) => e.stopPropagation()}
+                className="cell-order"
+                style={{ width: 18, height: 18 }}
+              />
+            )}
             <div className="cell-icons" style={{ display: 'flex', gap: 4 }}>
               <img className="pair-icon" src={icon(p.asset1)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
               <img className="pair-icon" src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
-            <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
-              {swappingId === p.id ? '…' : '⇄'}
-            </button>
+            {!selectMode && (
+              <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
+                {swappingId === p.id ? '…' : '⇄'}
+              </button>
+            )}
             <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 12, minWidth: 90, textTransform: 'lowercase' }}>{p.exchange1}/{p.exchange2}</div>
             <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
@@ -119,16 +174,6 @@ export default function HomePage() {
             </div>
             <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 14, color: pctColor }}>
               {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
-            </div>
-            <div className="cell-actions">
-              <button
-                onClick={(e) => removePair(e, p.id)}
-                disabled={deletingId === p.id}
-                title="Удалить пару"
-                style={minusBtn}
-              >
-                {deletingId === p.id ? '…' : '–'}
-              </button>
             </div>
           </a>
         );
@@ -140,21 +185,24 @@ export default function HomePage() {
 const row = {
   display: 'flex', alignItems: 'center', gap: 14, padding: '12px 6px', flexWrap: 'wrap',
   borderBottom: '1px solid var(--card-border)', textDecoration: 'none', color: 'var(--text)',
+  borderRadius: 6,
 };
 const cell = { minWidth: 90, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
 const plusBtn = {
   width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
   background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 20,
 };
+const trashBtn = {
+  width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'none', border: '1px solid var(--input-border)', color: 'var(--text)', borderRadius: 8, fontSize: 16, cursor: 'pointer',
+};
 const logoutBtn = { background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)', borderRadius: 8, padding: '0 12px' };
-const minusBtn = {
-  width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'var(--danger-bg)', color: 'var(--danger)', border: 'none', borderRadius: 8,
-  fontSize: 18, lineHeight: 1, cursor: 'pointer',
+const confirmDeleteBtn = {
+  background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, padding: '0 14px', fontWeight: 600, cursor: 'pointer',
 };
 const arrowBtn = {
   background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer',
-  fontSize: 10, padding: 0, lineHeight: 1.4,
+  fontSize: 9, padding: 0, lineHeight: 1,
 };
 const swapBtn = {
   width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
