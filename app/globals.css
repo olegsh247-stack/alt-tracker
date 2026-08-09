@@ -74,6 +74,7 @@ a { color: inherit; }
   .pair-row .cell-icons { grid-area: icons; gap: 3px !important; }
   .pair-row .pair-icon { width: 20px !important; height: 20px !important; }
 
+  .header-login { font-size: 14px; }
   .pair-row .cell-name { grid-area: name; min-width: 0 !important; font-weight: 600; text-align: left !important; font-size: 14px; }
   .pair-row .cell-swap { grid-area: swap; width: 22px !important; height: 22px !important; font-size: 11px !important; }
   .pair-row .cell-exchange {
