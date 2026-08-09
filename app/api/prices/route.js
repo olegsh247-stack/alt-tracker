@@ -7,7 +7,7 @@ export async function GET() {
   const userId = getUserId();
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
-  const { data: pairs, error } = await supabase.from('pairs').select('*').eq('user_id', userId);
+  const { data: pairs, error } = await supabase.from('pairs').select('*').eq('user_id', userId).eq('category', 'crypto');
   if (error) return NextResponse.json({ error: 'Ошибка базы данных' }, { status: 500 });
 
   const results = await Promise.all(

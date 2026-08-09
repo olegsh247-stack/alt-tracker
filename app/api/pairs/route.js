@@ -10,6 +10,7 @@ export async function GET() {
     .from('pairs')
     .select('*')
     .eq('user_id', userId)
+    .eq('category', 'crypto')
     .order('sort_order', { ascending: true });
 
   if (error) return NextResponse.json({ error: 'Ошибка базы данных' }, { status: 500 });
@@ -31,6 +32,7 @@ export async function POST(req) {
     .from('pairs')
     .select('sort_order')
     .eq('user_id', userId)
+    .eq('category', 'crypto')
     .order('sort_order', { ascending: false })
     .limit(1);
   const nextOrder = existing && existing.length > 0 ? (existing[0].sort_order || 0) + 1 : 0;
@@ -39,6 +41,7 @@ export async function POST(req) {
     .from('pairs')
     .insert({
       user_id: userId,
+      category: 'crypto',
       asset1: asset1.toUpperCase(),
       exchange1,
       asset2: asset2.toUpperCase(),

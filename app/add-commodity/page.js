@@ -29,13 +29,13 @@ export default function AddCommodityPage() {
         <div>
           <div style={label}>Актив 1</div>
           <select value={asset1} onChange={e => setAsset1(e.target.value)} style={input}>
-            {COMMODITIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+            {COMMODITIES.map(c => <option key={c.key} value={c.key}>{c.short}</option>)}
           </select>
         </div>
         <div>
           <div style={label}>Актив 2</div>
           <select value={asset2} onChange={e => setAsset2(e.target.value)} style={input}>
-            {COMMODITIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+            {COMMODITIES.map(c => <option key={c.key} value={c.key}>{c.short}</option>)}
           </select>
         </div>
         {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}

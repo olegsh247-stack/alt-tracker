@@ -16,6 +16,7 @@ export async function GET(req) {
     .select('*')
     .eq('id', pairId)
     .eq('user_id', userId)
+    .eq('category', 'crypto')
     .single();
 
   if (error || !pair) return NextResponse.json({ error: 'Пара не найдена' }, { status: 404 });

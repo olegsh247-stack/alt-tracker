@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
-import { emojiFor } from '../lib/commodities';
+import { emojiFor, shortTickerFor } from '../lib/commodities';
 
 function icon(asset) {
   return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
@@ -266,8 +266,7 @@ export default function HomePage() {
               <span>{emojiFor(p.asset1)}</span>
               <span>{emojiFor(p.asset2)}</span>
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
-            {!cSelectMode && !cSortMode && (
+            <div className="cell-name" style={{ minWidth: 90 }}>{shortTickerFor(p.asset1)}/{shortTickerFor(p.asset2)}</div>
               <button onClick={(e) => cSwapPair(e, p.id)} disabled={cSwappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {cSwappingId === p.id ? '…' : '⇄'}
               </button>

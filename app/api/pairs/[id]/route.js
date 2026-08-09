@@ -14,6 +14,7 @@ export async function PATCH(req, { params }) {
       .select('asset1, exchange1, asset2, exchange2')
       .eq('id', params.id)
       .eq('user_id', userId)
+      .eq('category', 'crypto')
       .single();
 
     if (fetchErr || !pair) return NextResponse.json({ error: 'Пара не найдена' }, { status: 404 });
@@ -38,7 +39,8 @@ export async function PATCH(req, { params }) {
     .from('pairs')
     .update(update)
     .eq('id', params.id)
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .eq('category', 'crypto');
 
   if (error) return NextResponse.json({ error: 'Не удалось обновить пару' }, { status: 500 });
   return NextResponse.json({ ok: true });
@@ -52,7 +54,8 @@ export async function DELETE(req, { params }) {
     .from('pairs')
     .delete()
     .eq('id', params.id)
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .eq('category', 'crypto');
 
   if (error) return NextResponse.json({ error: 'Не удалось удалить пару' }, { status: 500 });
   return NextResponse.json({ ok: true });
