@@ -103,7 +103,7 @@ export default function HomePage() {
   return (
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-        <h1 style={{ fontSize: 20, margin: 0 }}>Мои пары</h1>
+        <h1 style={{ fontSize: 20, margin: 0 }}>Crypto</h1>
         <div style={{ display: 'flex', gap: 8 }}>
           {!selectMode ? (
             <>
