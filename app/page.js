@@ -114,7 +114,7 @@ export default function HomePage() {
   return (
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-        <span style={{ fontSize: 14, color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>{login || '\u00A0'}</span>
+        <span style={{ fontSize: 16, color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>{login || '\u00A0'}</span>
         <div style={{ display: 'flex', gap: 8 }}>
           {!selectMode && !sortMode ? (
             <>
