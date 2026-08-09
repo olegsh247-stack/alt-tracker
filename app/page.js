@@ -109,7 +109,7 @@ export default function HomePage() {
             <>
               <ThemeToggle />
               <a href="/add" style={plusBtn}>+</a>
-              {pairs.length > 0 && <button onClick={toggleSelectMode} style={trashBtn} title="Удалить пары">🗑</button>}
+              {pairs.length > 0 && <button onClick={toggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
               <button onClick={logout} style={logoutBtn}>Выйти</button>
             </>
           ) : (
@@ -189,13 +189,14 @@ const row = {
 };
 const cell = { minWidth: 90, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
 const plusBtn = {
-  width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 20,
+  width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 18,
 };
 const trashBtn = {
-  width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'none', border: '1px solid var(--input-border)', color: 'var(--text)', borderRadius: 8, fontSize: 16, cursor: 'pointer',
+  width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 18, cursor: 'pointer',
 };
+const deleteModeBtn = trashBtn;
 const logoutBtn = { background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)', borderRadius: 8, padding: '0 12px' };
 const confirmDeleteBtn = {
   background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, padding: '0 14px', fontWeight: 600, cursor: 'pointer',
