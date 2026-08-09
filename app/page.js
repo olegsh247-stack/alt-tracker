@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
+import PriceValue from '../components/PriceValue';
 
 function icon(asset) {
   return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
@@ -12,6 +13,7 @@ export default function HomePage() {
   const [sparks, setSparks] = useState({});
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [swappingId, setSwappingId] = useState(null);
 
   async function load() {
     const [pRes, priceRes, sparkRes] = await Promise.all([
@@ -65,6 +67,17 @@ export default function HomePage() {
     ]);
   }
 
+  async function swapPair(e, id) {
+    e.preventDefault();
+    e.stopPropagation();
+    setSwappingId(id);
+    const r = await fetch(`/api/pairs/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ swap: true }),
+    });
+    if (r.ok) await load();
+    setSwappingId(null);
+  }
+
   return (
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
@@ -91,13 +104,16 @@ export default function HomePage() {
               <button onClick={(e) => move(e, i, 1)} style={arrowBtn} disabled={i === pairs.length - 1}>▼</button>
             </div>
             <div className="cell-icons" style={{ display: 'flex', gap: 4 }}>
-              <img src={icon(p.asset1)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
-              <img src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
+              <img className="pair-icon" src={icon(p.asset1)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
+              <img className="pair-icon" src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
+            <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
+              {swappingId === p.id ? '…' : '⇄'}
+            </button>
             <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 12, minWidth: 90 }}>{p.exchange1}/{p.exchange2}</div>
-            <div className="cell-price" style={cell}>{price?.price1 ? price.price1.toFixed(8) : '—'}</div>
-            <div className="cell-price second" style={cell}>{price?.price2 ? price.price2.toFixed(8) : '—'}</div>
+            <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
+            <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>
               {price?.ratio ? price.ratio.toFixed(8) : '—'}
             </div>
@@ -125,7 +141,7 @@ const row = {
   display: 'flex', alignItems: 'center', gap: 14, padding: '12px 6px', flexWrap: 'wrap',
   borderBottom: '1px solid var(--card-border)', textDecoration: 'none', color: 'var(--text)',
 };
-const cell = { minWidth: 118, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
+const cell = { minWidth: 90, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
 const plusBtn = {
   width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
   background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 20,
@@ -139,4 +155,9 @@ const minusBtn = {
 const arrowBtn = {
   background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer',
   fontSize: 10, padding: 0, lineHeight: 1.4,
+};
+const swapBtn = {
+  width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)',
+  borderRadius: 6, cursor: 'pointer', fontSize: 13, padding: 0,
 };

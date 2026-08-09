@@ -41,26 +41,32 @@ a { color: inherit; }
 
   .pair-row {
     display: grid !important;
-    grid-template-columns: auto auto 1fr auto;
+    grid-template-columns: auto auto 1fr auto auto auto;
     grid-template-areas:
-      "order icons name exchange"
-      "price1 price1 price2 price2"
-      "ratio ratio pct actions";
+      "icons icons name swap exchange pct"
+      "actions price1 price1 price2 price2 ratio";
     row-gap: 6px;
-    column-gap: 8px;
+    column-gap: 6px;
     align-items: center;
     padding: 12px 6px !important;
   }
 
-  .pair-row .cell-order { grid-area: order; flex-direction: row !important; gap: 2px; }
-  .pair-row .cell-icons { grid-area: icons; }
-  .pair-row .cell-name { grid-area: name; min-width: 0 !important; font-weight: 600; text-align: left !important; }
-  .pair-row .cell-exchange { grid-area: exchange; text-align: right !important; font-size: 12px; min-width: 0 !important; }
+  /* стрелки сортировки — компактно, в один ряд, над иконками */
+  .pair-row .cell-order { display: none; }
 
+  .pair-row .cell-icons { grid-area: icons; gap: 2px !important; }
+  .pair-row .pair-icon { width: 16px !important; height: 16px !important; }
+
+  .pair-row .cell-name { grid-area: name; min-width: 0 !important; font-weight: 600; text-align: left !important; font-size: 14px; }
+  .pair-row .cell-swap { grid-area: swap; width: 22px !important; height: 22px !important; font-size: 11px !important; }
+  .pair-row .cell-exchange {
+    grid-area: exchange; text-align: right !important; font-size: 11px; min-width: 0 !important;
+    text-transform: lowercase;
+  }
+  .pair-row .cell-pct { grid-area: pct; text-align: right !important; min-width: 0 !important; font-size: 15px; }
+
+  .pair-row .cell-actions { grid-area: actions; justify-self: start; }
   .pair-row .cell-price:not(.second) { grid-area: price1; text-align: left !important; min-width: 0 !important; font-size: 13px; }
-  .pair-row .cell-price.second { grid-area: price2; text-align: right !important; min-width: 0 !important; font-size: 13px; }
-
-  .pair-row .cell-ratio { grid-area: ratio; text-align: left !important; min-width: 0 !important; font-size: 13px; }
-  .pair-row .cell-pct { grid-area: pct; text-align: center !important; min-width: 0 !important; }
-  .pair-row .cell-actions { grid-area: actions; justify-self: end; }
+  .pair-row .cell-price.second { grid-area: price2; text-align: left !important; min-width: 0 !important; font-size: 13px; }
+  .pair-row .cell-ratio { grid-area: ratio; text-align: right !important; min-width: 0 !important; font-size: 13px; }
 }
