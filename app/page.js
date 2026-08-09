@@ -146,7 +146,7 @@ export default function HomePage() {
           <a
             key={p.id}
             href={`/pair/${p.id}`}
-            className="pair-row"
+            className={`pair-row${sortMode || selectMode ? ' sort-active' : ''}`}
             style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
             onClick={(e) => onRowClick(e, p.id)}
           >

@@ -44,14 +44,22 @@ a { color: inherit; }
     grid-template-columns: auto auto 1fr auto auto auto;
     grid-template-areas:
       "icons icons name  swap exchange pct"
-      "order price1 price1 price2 price2 ratio";
+      "price1 price1 price2 price2 ratio ratio";
     row-gap: 6px;
     column-gap: 6px;
     align-items: center;
     padding: 12px 6px !important;
   }
 
-  /* стрелки сортировки / чекбокс — максимально компактно */
+  /* когда включён режим сортировки — добавляется колонка под стрелки слева */
+  .pair-row.sort-active {
+    grid-template-columns: auto auto auto 1fr auto auto auto;
+    grid-template-areas:
+      ".     icons icons name  swap exchange pct"
+      "order price1 price1 price2 price2 ratio ratio";
+  }
+
+  /* стрелки сортировки — максимально компактно, по центру своей ячейки */
   .pair-row .cell-order {
     grid-area: order;
     display: flex !important;
