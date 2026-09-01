@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const EXCHANGES = ['BINANCE', 'BYBIT', 'OKX'];
+const EXCHANGES = ['BINANCE', 'BYBIT', 'OKX', 'MEXC'];
 
 export default function AddPairPage() {
   const [asset1, setAsset1] = useState('');
