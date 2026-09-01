@@ -22,7 +22,7 @@ export async function POST(req) {
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
   const { asset1, exchange1, asset2, exchange2 } = await req.json();
-  const validExchanges = ['BINANCE', 'BYBIT', 'OKX'];
+  const validExchanges = ['BINANCE', 'BYBIT', 'OKX', 'MEXC'];
 
   if (!asset1 || !asset2 || !validExchanges.includes(exchange1) || !validExchanges.includes(exchange2)) {
     return NextResponse.json({ error: 'Заполните оба актива и биржи' }, { status: 400 });
