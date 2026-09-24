@@ -181,7 +181,7 @@ export default function HomePage() {
           {!curSelectMode && !curSortMode ? (
             <>
               <ThemeToggle />
-              <a href={isCrypto ? '/add' : '/add-commodity'} style={plusBtn}>+</a>
+              <a href={isCrypto ? '/assets' : '/add-commodity'} style={plusBtn}>+</a>
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
               {curPairs.length > 1 && <button onClick={curToggleSortMode} style={sortModeBtn} title="Изменить порядок">⇅</button>}
               <button onClick={logout} style={logoutBtn}>Выйти</button>
