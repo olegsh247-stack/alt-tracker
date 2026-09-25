@@ -10,7 +10,7 @@ function icon(asset) {
 
 export default function HomePage() {
   const [login, setLogin] = useState('');
-  const [tab, setTab] = useState('crypto');
+  const [tab, setTab] = useState('assets');
   const [loading, setLoading] = useState(true);
 
   // При первой загрузке — вкладка из ссылки (?tab=...), иначе последняя использованная, иначе Crypto
@@ -18,7 +18,8 @@ export default function HomePage() {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get('tab');
     const fromStorage = localStorage.getItem('activeTab');
-    setTab(fromUrl || fromStorage || 'crypto');
+    const normalized = (fromUrl || fromStorage || 'assets') === 'crypto' ? 'pair' : (fromUrl || fromStorage || 'assets');
+    setTab(normalized);
   }, []);
 
   function changeTab(next) {
