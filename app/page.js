@@ -35,6 +35,11 @@ export default function HomePage() {
   const [selected, setSelected] = useState(new Set());
   const [deleting, setDeleting] = useState(false);
   const [sortMode, setSortMode] = useState(false);
+  const [assets, setAssets] = useState([]);
+  const [assetDetails, setAssetDetails] = useState({});
+  const [assetSelectMode, setAssetSelectMode] = useState(false);
+  const [assetSelected, setAssetSelected] = useState(new Set());
+  const [assetDeleting, setAssetDeleting] = useState(false);
 
   // --- Commodities ---
   const [cPairs, setCPairs] = useState([]);
@@ -45,6 +50,50 @@ export default function HomePage() {
   const [cSelected, setCSelected] = useState(new Set());
   const [cDeleting, setCDeleting] = useState(false);
   const [cSortMode, setCSortMode] = useState(false);
+
+  async function loadAssets() {
+    try {
+      const tracked = JSON.parse(localStorage.getItem('cryptoTrackedAssets') || '[]');
+      const r = await fetch('https://crypto-api.olegsh247.workers.dev/api/assets');
+      const d = await r.json();
+      const all = d.assets || [];
+      const mine = tracked.map(id => all.find(a => a.asset_id === id)).filter(Boolean);
+      setAssets(mine);
+      const rows = await Promise.all(mine.map(async asset => {
+        try {
+          const rr = await fetch(`https://crypto-api.olegsh247.workers.dev/api/assets/${asset.asset_id}`);
+          return [asset.asset_id, rr.ok ? await rr.json() : null];
+        } catch { return [asset.asset_id, null]; }
+      }));
+      setAssetDetails(Object.fromEntries(rows));
+    } catch {
+      setAssets([]);
+    }
+  }
+
+  function toggleAssetSelect(id) {
+    setAssetSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  async function confirmDeleteAssets() {
+    if (assetSelected.size === 0) {
+      setAssetSelectMode(false);
+      return;
+    }
+    if (!confirm(`Удалить выбранные активы (${assetSelected.size})?`)) return;
+    setAssetDeleting(true);
+    const tracked = JSON.parse(localStorage.getItem('cryptoTrackedAssets') || '[]');
+    const next = tracked.filter(id => !assetSelected.has(id));
+    localStorage.setItem('cryptoTrackedAssets', JSON.stringify(next));
+    setAssets(prev => prev.filter(a => !assetSelected.has(a.asset_id)));
+    setAssetSelected(new Set());
+    setAssetSelectMode(false);
+    setAssetDeleting(false);
+  }
 
   async function load() {
     const [pRes, priceRes, sparkRes, meRes, cpRes, cPriceRes, cSparkRes] = await Promise.all([
@@ -73,6 +122,7 @@ export default function HomePage() {
     (cSparkRes.sparklines || []).forEach(s => { csmap[s.id] = s; });
     setCSparks(csmap);
 
+    await loadAssets();
     setLoading(false);
   }
 
@@ -163,15 +213,18 @@ export default function HomePage() {
     setCDeleting(false);
   }
 
-  const isCrypto = tab === 'crypto';
-  const curSelectMode = isCrypto ? selectMode : cSelectMode;
-  const curSortMode = isCrypto ? sortMode : cSortMode;
-  const curSelected = isCrypto ? selected : cSelected;
-  const curDeleting = isCrypto ? deleting : cDeleting;
-  const curPairs = isCrypto ? pairs : cPairs;
-  const curToggleSelectMode = isCrypto ? toggleSelectMode : cToggleSelectMode;
-  const curToggleSortMode = isCrypto ? toggleSortMode : cToggleSortMode;
-  const curConfirmDelete = isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected;
+  const isAssets = tab === 'assets';
+  const isPair = tab === 'pair';
+  const isCommodities = tab === 'commodities';
+  const isCrypto = isPair;
+  const curSelectMode = isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
+  const curSortMode = isAssets ? false : (isCrypto ? sortMode : cSortMode);
+  const curSelected = isAssets ? assetSelected : (isCrypto ? selected : cSelected);
+  const curDeleting = isAssets ? assetDeleting : (isCrypto ? deleting : cDeleting);
+  const curPairs = isAssets ? assets : (isCrypto ? pairs : cPairs);
+  const curToggleSelectMode = isAssets ? (() => { setAssetSelectMode(v => !v); setAssetSelected(new Set()); }) : (isCrypto ? toggleSelectMode : cToggleSelectMode);
+  const curToggleSortMode = isAssets ? (() => {}) : (isCrypto ? toggleSortMode : cToggleSortMode);
+  const curConfirmDelete = isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
@@ -181,9 +234,9 @@ export default function HomePage() {
           {!curSelectMode && !curSortMode ? (
             <>
               <ThemeToggle />
-              <a href={isCrypto ? '/assets' : '/add-commodity'} style={plusBtn}>+</a>
+              <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
-              {curPairs.length > 1 && <button onClick={curToggleSortMode} style={sortModeBtn} title="Изменить порядок">⇅</button>}
+              {isCrypto && curPairs.length > 1 && <button onClick={curToggleSortMode} style={sortModeBtn} title="Изменить порядок">⇅</button>}
               <button onClick={logout} style={logoutBtn}>Выйти</button>
             </>
           ) : curSelectMode ? (
@@ -200,11 +253,29 @@ export default function HomePage() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button onClick={() => changeTab('crypto')} style={tab === 'crypto' ? tabActive : tabInactive}>Crypto</button>
+        <button onClick={() => changeTab('assets')} style={tab === 'assets' ? tabActive : tabInactive}>Assets</button>
+        <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>Pair</button>
         <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
       </div>
 
       {loading && <p>Загрузка...</p>}
+
+      {isAssets && !loading && assets.length === 0 && <p style={{ opacity: 0.7 }}>Активов пока нет — нажмите "+", чтобы добавить первый.</p>}
+      {isAssets && !loading && assets.map((asset) => {
+        const metrics = assetDetails[asset.asset_id]?.metrics || [];
+        const m = metrics.find(x => x.metric_id === 'market.spot_price');
+        const price = m?.value;
+        const isSelected = assetSelected.has(asset.asset_id);
+        return (
+          <div key={asset.asset_id} className="pair-row" style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }} onClick={() => assetSelectMode && toggleAssetSelect(asset.asset_id)}>
+            {assetSelectMode && <input type="checkbox" checked={isSelected} onChange={() => toggleAssetSelect(asset.asset_id)} onClick={e => e.stopPropagation()} style={{ width: 18, height: 18 }} />}
+            <img src={icon(asset.symbol)} width={28} height={28} alt="" onError={e => e.currentTarget.style.visibility='hidden'} />
+            <div style={{ minWidth: 90, fontWeight: 700 }}>{asset.symbol}</div>
+            <div style={{ flex: 1, color: 'var(--text-dim)' }}>{asset.name}</div>
+            <div style={cell}>{price == null ? '—' : Number(price).toLocaleString('en-US', { maximumFractionDigits: price >= 1000 ? 2 : price >= 1 ? 4 : 8 })}</div>
+          </div>
+        );
+      })}
 
       {isCrypto && !loading && pairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
       {isCrypto && pairs.map((p, i) => {
@@ -251,8 +322,8 @@ export default function HomePage() {
         );
       })}
 
-      {!isCrypto && !loading && cPairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
-      {!isCrypto && cPairs.map((p, i) => {
+      {isCommodities && !loading && cPairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
+      {isCommodities && cPairs.map((p, i) => {
         const price = cPrices[p.id];
         const spark = cSparks[p.id];
         const pct = spark?.changePct;
