@@ -94,7 +94,7 @@ export default function AssetsPage() {
   return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: 16 }}>
       <div style={header}>
-        <button onClick={() => router.push('/?tab=crypto')} style={backBtn}>← Crypto</button>
+        <button onClick={() => router.push('/?tab=assets')} style={backBtn}>← Assets</button>
         <h1 style={{ margin: 0, fontSize: 22 }}>Активы</h1>
         <span style={{ color: 'var(--text-dim)', fontSize: 13 }}>{assets.length}/50</span>
       </div>
