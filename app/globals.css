@@ -30,15 +30,18 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  font-size: 17px;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 a { color: inherit; }
 
+input, select, textarea, button { font-family: inherit; font-size: 16px; }
+
 .commodity-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  min-width: 30px; height: 20px; padding: 0 4px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  min-width: 34px; height: 22px; padding: 0 5px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
   border: 1px solid var(--card-border); border-radius: 4px;
   background: var(--input-bg); color: var(--text-dim);
 }
@@ -81,17 +84,17 @@ a { color: inherit; }
 
   .pair-row .cell-icons { grid-area: icons; gap: 3px !important; }
   .pair-row .pair-icon { width: 20px !important; height: 20px !important; }
-  .pair-row .commodity-icon { min-width: 26px; height: 18px; font-size: 9px; }
+  .pair-row .commodity-icon { min-width: 30px; height: 20px; font-size: 11px; }
 
-  .header-login { font-size: 14px; }
-  .pair-row .cell-name { grid-area: name; min-width: 0 !important; font-weight: 600; text-align: left !important; font-size: 14px; }
-  .pair-row .cell-swap { grid-area: swap; width: 22px !important; height: 22px !important; font-size: 11px !important; }
+  .header-login { font-size: 16px; }
+  .pair-row .cell-name { grid-area: name; min-width: 0 !important; font-weight: 600; text-align: left !important; font-size: 16px; }
+  .pair-row .cell-swap { grid-area: swap; width: 24px !important; height: 24px !important; font-size: 13px !important; }
   .pair-row .cell-exchange {
-    grid-area: exchange; text-align: right !important; font-size: 11px; min-width: 0 !important;
+    grid-area: exchange; text-align: right !important; font-size: 13px; min-width: 0 !important;
   }
-  .pair-row .cell-pct { grid-area: pct; text-align: right !important; min-width: 0 !important; font-size: 15px; }
+  .pair-row .cell-pct { grid-area: pct; text-align: right !important; min-width: 0 !important; font-size: 17px; }
 
-  .pair-row .cell-price:not(.second) { grid-area: price1; text-align: left !important; min-width: 0 !important; font-size: 13px; }
-  .pair-row .cell-price.second { grid-area: price2; text-align: left !important; min-width: 0 !important; font-size: 13px; }
-  .pair-row .cell-ratio { grid-area: ratio; text-align: right !important; min-width: 0 !important; font-size: 13px; }
+  .pair-row .cell-price:not(.second) { grid-area: price1; text-align: left !important; min-width: 0 !important; font-size: 15px; }
+  .pair-row .cell-price.second { grid-area: price2; text-align: left !important; min-width: 0 !important; font-size: 15px; }
+  .pair-row .cell-ratio { grid-area: ratio; text-align: right !important; min-width: 0 !important; font-size: 14px; }
 }

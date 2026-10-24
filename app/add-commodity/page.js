@@ -24,7 +24,7 @@ export default function AddCommodityPage() {
 
   return (
     <div style={{ maxWidth: 360, margin: '40px auto', padding: 24 }}>
-      <h1 style={{ fontSize: 20 }}>Добавить пару (Commodities)</h1>
+      <h1 style={{ fontSize: 24 }}>Добавить пару (Commodities)</h1>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
           <div style={label}>Актив 1</div>
@@ -48,7 +48,7 @@ export default function AddCommodityPage() {
   );
 }
 
-const label = { fontSize: 13, opacity: 0.7, marginBottom: 6 };
+const label = { fontSize: 15, opacity: 0.7, marginBottom: 6 };
 const input = { width: '100%', padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box' };
 const okBtn = { flex: 1, padding: 12, borderRadius: 8, border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600 };
 const cancelBtn = { flex: 1, padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)' };

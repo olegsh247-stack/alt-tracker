@@ -72,7 +72,7 @@ export default function TickerPicker({ placeholder, onPick }) {
                 <span style={exchangeBadge}>{r.exchange}</span>
                 <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'baseline', gap: 6 }}>
                   <span>{fmtPrice(r.price)}</span>
-                  <span style={{ color: up ? '#26a69a' : '#ef5350', fontSize: 12 }}>
+                  <span style={{ color: up ? '#26a69a' : '#ef5350', fontSize: 14 }}>
                     ({up ? '+' : ''}{r.changePct.toFixed(1)}%)
                   </span>
                 </span>
@@ -85,7 +85,7 @@ export default function TickerPicker({ placeholder, onPick }) {
   );
 }
 
-const input = { width: '100%', padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box' };
+const input = { width: '100%', padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box', fontSize: 16 };
 const dropdown = {
   position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, maxHeight: 260, overflowY: 'auto',
   background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: 8, zIndex: 20,
@@ -93,10 +93,10 @@ const dropdown = {
 };
 const row = {
   display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', cursor: 'pointer',
-  borderBottom: '1px solid var(--card-border)', fontSize: 14,
+  borderBottom: '1px solid var(--card-border)', fontSize: 16,
 };
-const rowMsg = { padding: '10px 12px', fontSize: 13, opacity: 0.6 };
+const rowMsg = { padding: '10px 12px', fontSize: 15, opacity: 0.6 };
 const exchangeBadge = {
-  fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
+  fontSize: 12, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
   border: '1px solid var(--card-border)', color: 'var(--text-dim)',
 };

@@ -312,11 +312,11 @@ export default function HomePage() {
                 {swappingId === p.id ? '…' : '⇄'}
               </button>
             )}
-            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 12, minWidth: 90, textTransform: 'lowercase' }}>{p.exchange1}/{p.exchange2}</div>
+            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}>{p.exchange1}/{p.exchange2}</div>
             <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>
-            <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 14, color: pctColor }}>
+            <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 16, color: pctColor }}>
               {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
             </div>
           </a>
@@ -357,11 +357,11 @@ export default function HomePage() {
                 {cSwappingId === p.id ? '…' : '⇄'}
               </button>
             )}
-            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 12, minWidth: 90 }}></div>
+            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90 }}></div>
             <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>
-            <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 14, color: pctColor }}>
+            <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 16, color: pctColor }}>
               {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
             </div>
           </a>
@@ -379,16 +379,16 @@ const row = {
 const cell = { minWidth: 90, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
 const plusBtn = {
   width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 18,
+  background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 20,
 };
 const trashBtn = {
   width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 18, cursor: 'pointer',
+  background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 20, cursor: 'pointer',
 };
 const deleteModeBtn = trashBtn;
 const sortModeBtn = {
   width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'none', border: '1px solid var(--input-border)', color: 'var(--text)', borderRadius: 8, fontSize: 16, cursor: 'pointer',
+  background: 'none', border: '1px solid var(--input-border)', color: 'var(--text)', borderRadius: 8, fontSize: 18, cursor: 'pointer',
 };
 const logoutBtn = { background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)', borderRadius: 8, padding: '0 12px' };
 const confirmDeleteBtn = {
@@ -396,12 +396,12 @@ const confirmDeleteBtn = {
 };
 const arrowBtn = {
   background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer',
-  fontSize: 9, padding: 0, lineHeight: 1,
+  fontSize: 10, padding: 0, lineHeight: 1,
 };
 const swapBtn = {
   width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
   background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)',
-  borderRadius: 6, cursor: 'pointer', fontSize: 13, padding: 0,
+  borderRadius: 6, cursor: 'pointer', fontSize: 15, padding: 0,
 };
 const tabActive = {
   padding: '8px 16px', borderRadius: 8, border: '1px solid var(--accent)',

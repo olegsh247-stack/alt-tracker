@@ -24,7 +24,7 @@ export default function RegisterPage() {
 
   return (
     <div style={box}>
-      <h1 style={{ fontSize: 20 }}>Регистрация</h1>
+      <h1 style={{ fontSize: 24 }}>Регистрация</h1>
       {login ? (
         <p>Ваш логин: <b>{login}</b><br />Запомните его — переходим на главную...</p>
       ) : (

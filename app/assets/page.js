@@ -95,8 +95,8 @@ export default function AssetsPage() {
     <div style={{ maxWidth: 760, margin: '0 auto', padding: 16 }}>
       <div style={header}>
         <button onClick={() => router.push('/?tab=assets')} style={backBtn}>← Assets</button>
-        <h1 style={{ margin: 0, fontSize: 22 }}>Активы</h1>
-        <span style={{ color: 'var(--text-dim)', fontSize: 13 }}>{assets.length}/50</span>
+        <h1 style={{ margin: 0, fontSize: 26 }}>Активы</h1>
+        <span style={{ color: 'var(--text-dim)', fontSize: 15 }}>{assets.length}/50</span>
       </div>
 
       <p style={{ color: 'var(--text-dim)', marginTop: 8 }}>
@@ -163,7 +163,7 @@ function AssetRow({ asset, price, added, onToggle }) {
       />
       <div style={{ flex: 1, minWidth: 150 }}>
         <div style={{ fontWeight: 700 }}>{asset.symbol}</div>
-        <div style={{ color: 'var(--text-dim)', fontSize: 13 }}>{asset.name}</div>
+        <div style={{ color: 'var(--text-dim)', fontSize: 15 }}>{asset.name}</div>
       </div>
       <div style={priceStyle}>{formatPrice(price)}{price != null ? ' USD' : ''}</div>
       <button onClick={onToggle} style={added ? addedBtn : addBtn}>
@@ -187,10 +187,10 @@ const header = { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4
 const backBtn = { border: '1px solid var(--input-border)', background: 'none', color: 'var(--text)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' };
 const section = { marginTop: 24 };
 const sectionTitle = { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 };
-const h2 = { margin: 0, fontSize: 16 };
-const count = { color: 'var(--text-dim)', fontSize: 12 };
+const h2 = { margin: 0, fontSize: 18 };
+const count = { color: 'var(--text-dim)', fontSize: 14 };
 const empty = { padding: 18, border: '1px dashed var(--card-border)', borderRadius: 10, color: 'var(--text-dim)' };
 const row = { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 4px', borderBottom: '1px solid var(--card-border)' };
-const priceStyle = { minWidth: 100, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--text-dim)', fontSize: 13 };
+const priceStyle = { minWidth: 100, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--text-dim)', fontSize: 15 };
 const addBtn = { border: '1px solid var(--accent)', background: 'none', color: 'var(--accent)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', fontWeight: 600 };
 const addedBtn = { border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text-dim)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' };

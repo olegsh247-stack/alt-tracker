@@ -41,6 +41,6 @@ export default function PairChartPage() {
   );
 }
 
-const backBtn = { background: 'none', border: 'none', color: 'var(--accent)', fontSize: 14, cursor: 'pointer', padding: 0 };
+const backBtn = { background: 'none', border: 'none', color: 'var(--accent)', fontSize: 16, cursor: 'pointer', padding: 0 };
 const tab = { padding: '8px 16px', borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)' };
 const tabActive = { ...tab, background: 'var(--accent)', color: '#fff', borderColor: 'var(--accent)' };

@@ -23,7 +23,7 @@ export default function LoginPage() {
 
   return (
     <div style={box}>
-      <h1 style={{ fontSize: 20 }}>Вход</h1>
+      <h1 style={{ fontSize: 24 }}>Вход</h1>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <input placeholder="Логин (00000001)" value={login} onChange={e => setLogin(e.target.value)} style={input} />
         <input type="password" placeholder="Пароль" value={password} onChange={e => setPassword(e.target.value)} style={input} />

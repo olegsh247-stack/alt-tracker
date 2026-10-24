@@ -27,5 +27,5 @@ export default function ThemeToggle() {
 const btn = {
   width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
   background: 'none', border: '1px solid var(--input-border)', color: 'var(--text)',
-  borderRadius: 8, cursor: 'pointer', fontSize: 16,
+  borderRadius: 8, cursor: 'pointer', fontSize: 18,
 };
