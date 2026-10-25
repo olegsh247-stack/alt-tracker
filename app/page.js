@@ -324,7 +324,7 @@ export default function HomePage() {
           <a
             key={p.id}
             href={`/pair/${p.id}`}
-            className={`pair-row${selectMode ? ' sort-active' : ''}`}
+            className={`pair-row pair-grid${selectMode ? ' sort-active' : ''}`}
             style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
             onClick={(e) => onRowClick(e, p.id)}
           >
@@ -335,13 +335,13 @@ export default function HomePage() {
               <img className="pair-icon" src={icon(p.asset1)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
               <img className="pair-icon" src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/<wbr />{p.asset2}</div>
             {!selectMode && (
               <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {swappingId === p.id ? '…' : '⇄'}
               </button>
             )}
-            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}>{p.exchange1}/{p.exchange2}</div>
+            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}>{p.exchange1}/<wbr />{p.exchange2}</div>
             <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>
@@ -363,7 +363,7 @@ export default function HomePage() {
           <a
             key={p.id}
             href={`/commodity-pair/${p.id}`}
-            className={`pair-row${cSelectMode ? ' sort-active' : ''}`}
+            className={`pair-row pair-grid${cSelectMode ? ' sort-active' : ''}`}
             style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
             onClick={(e) => cOnRowClick(e, p.id)}
           >
@@ -374,7 +374,7 @@ export default function HomePage() {
               <span className="commodity-icon">{shortTickerFor(p.asset1)}</span>
               <span className="commodity-icon">{shortTickerFor(p.asset2)}</span>
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{enLabelFor(p.asset1)}/{enLabelFor(p.asset2)}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{enLabelFor(p.asset1)}/<wbr />{enLabelFor(p.asset2)}</div>
             {!cSelectMode && (
               <button onClick={(e) => cSwapPair(e, p.id)} disabled={cSwappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {cSwappingId === p.id ? '…' : '⇄'}

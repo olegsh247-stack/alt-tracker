@@ -46,6 +46,35 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   background: var(--input-bg); color: var(--text-dim);
 }
 
+/* Строки пар (Pair / Commodities): общие фиксированные колонки, чтобы всё выравнивалось между строками */
+.pair-row.pair-grid {
+  display: grid !important;
+  grid-template-columns: 80px minmax(0, 1.3fr) 28px 108px minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.5fr) 62px;
+  grid-template-areas: "icons name swap exchange price1 price2 ratio pct";
+  column-gap: 10px !important;
+  row-gap: 0;
+  align-items: center;
+}
+.pair-row.pair-grid.sort-active {
+  grid-template-columns: 24px 80px minmax(0, 1.3fr) 28px 108px minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.5fr) 62px;
+  grid-template-areas: "order icons name swap exchange price1 price2 ratio pct";
+}
+.pair-grid .cell-order { grid-area: order; align-self: center; justify-self: center; }
+.pair-grid .cell-icons { grid-area: icons; min-width: 0; }
+.pair-grid .cell-name {
+  grid-area: name; min-width: 0 !important; text-align: left !important; font-weight: 600;
+  white-space: normal; overflow-wrap: anywhere; line-height: 1.15;
+}
+.pair-grid .cell-swap { grid-area: swap; justify-self: center; }
+.pair-grid .cell-exchange {
+  grid-area: exchange; min-width: 0 !important; text-align: left !important; font-size: 13px !important;
+  white-space: normal; overflow-wrap: anywhere; line-height: 1.15;
+}
+.pair-grid .cell-price:not(.second) { grid-area: price1; min-width: 0 !important; text-align: right !important; }
+.pair-grid .cell-price.second { grid-area: price2; min-width: 0 !important; text-align: right !important; }
+.pair-grid .cell-ratio { grid-area: ratio; min-width: 0 !important; text-align: right !important; }
+.pair-grid .cell-pct { grid-area: pct; min-width: 0 !important; text-align: right !important; }
+
 /* Планшеты и телефоны */
 @media (max-width: 640px) {
   .page-wrap { padding: 12px !important; }
@@ -97,4 +126,26 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .pair-row .cell-price:not(.second) { grid-area: price1; text-align: left !important; min-width: 0 !important; font-size: 15px; }
   .pair-row .cell-price.second { grid-area: price2; text-align: left !important; min-width: 0 !important; font-size: 15px; }
   .pair-row .cell-ratio { grid-area: ratio; text-align: right !important; min-width: 0 !important; font-size: 14px; }
+
+  /* Телефон: те же колонки у всех строк (fr-колонки одинаковы, т.к. ширина строки одна) */
+  .pair-row.pair-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) 26px minmax(0, 0.9fr) minmax(0, 0.85fr);
+    grid-template-areas:
+      "icons  name   swap  exchange pct"
+      "price1 price2 ratio ratio    ratio";
+    row-gap: 6px;
+    column-gap: 6px !important;
+  }
+  .pair-row.pair-grid.sort-active {
+    grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1.3fr) 26px minmax(0, 0.9fr) minmax(0, 0.85fr);
+    grid-template-areas:
+      "order icons  name   swap  exchange pct"
+      "order price1 price2 ratio ratio    ratio";
+  }
+  .pair-grid .cell-order { display: flex !important; flex-direction: row; }
+  .pair-grid .cell-exchange { text-align: right !important; }
+  .pair-grid .cell-price:not(.second),
+  .pair-grid .cell-price.second { text-align: left !important; }
 }
+
+.pair-grid .cell-price, .pair-grid .cell-ratio, .pair-grid .cell-pct { white-space: nowrap; }
