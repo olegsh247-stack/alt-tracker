@@ -36,7 +36,7 @@ export default function HomePage() {
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState(new Set());
   const [deleting, setDeleting] = useState(false);
-  const [sortDir, setSortDir] = useState(null); // null | 'asc' | 'desc'
+  const [sortDir, setSortDir] = useState(null); // null | 'alpha_asc' | 'alpha_desc' | 'pct_asc' | 'pct_desc'
   const [assets, setAssets] = useState([]);
   const [assetDetails, setAssetDetails] = useState({});
   const [assetSelectMode, setAssetSelectMode] = useState(false);
@@ -58,8 +58,9 @@ export default function HomePage() {
   const sortMenuRef = useRef(null);
   useEffect(() => {
     try {
-      setSortDir(localStorage.getItem('pairSortDir') || null);
-      setCSortDir(localStorage.getItem('commoditySortDir') || null);
+      const fix = (v) => (v === 'asc' || v === 'desc' ? `pct_${v}` : v || null);
+      setSortDir(fix(localStorage.getItem('pairSortDir')));
+      setCSortDir(fix(localStorage.getItem('commoditySortDir')));
     } catch {}
   }, []);
   useEffect(() => {
@@ -219,19 +220,24 @@ export default function HomePage() {
     try { next ? localStorage.setItem(key, next) : localStorage.removeItem(key); } catch {}
     setSortMenuOpen(false);
   }
-  function sortByPct(list, sparksMap, dir) {
-    if (!dir) return list;
+  function sortList(list, sparksMap, mode, nameOf) {
+    if (!mode) return list;
+    const [kind, dir] = mode.split('_');
+    const sign = dir === 'asc' ? 1 : -1;
+    if (kind === 'alpha') {
+      return [...list].sort((a, b) => sign * nameOf(a).localeCompare(nameOf(b), 'en', { sensitivity: 'base' }));
+    }
     const val = (p) => sparksMap[p.id]?.changePct;
     return [...list].sort((a, b) => {
       const va = val(a), vb = val(b);
       if (va == null && vb == null) return 0;
       if (va == null) return 1;   // без данных — всегда внизу
       if (vb == null) return -1;
-      return dir === 'asc' ? va - vb : vb - va;
+      return sign * (va - vb);
     });
   }
-  const displayPairs = sortByPct(pairs, sparks, sortDir);
-  const displayCPairs = sortByPct(cPairs, cSparks, cSortDir);
+  const displayPairs = sortList(pairs, sparks, sortDir, p => `${p.asset1}/${p.asset2}`);
+  const displayCPairs = sortList(cPairs, cSparks, cSortDir, p => `${enLabelFor(p.asset1)}/${enLabelFor(p.asset2)}`);
   const curConfirmDelete = isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
@@ -253,12 +259,18 @@ export default function HomePage() {
                   >⇅</button>
                   {sortMenuOpen && (
                     <div style={sortMenu}>
-                      <button onClick={() => chooseSort('asc')} style={sortItem}>
-                        <span>По возрастанию</span>{curSortDir === 'asc' && <span style={{ color: 'var(--accent)' }}>✓</span>}
-                      </button>
-                      <button onClick={() => chooseSort('desc')} style={{ ...sortItem, borderBottom: 'none' }}>
-                        <span>По убыванию</span>{curSortDir === 'desc' && <span style={{ color: 'var(--accent)' }}>✓</span>}
-                      </button>
+                      <div style={sortHead}>По алфавиту</div>
+                      {[['alpha_asc', 'A → Z'], ['alpha_desc', 'Z → A']].map(([k, t]) => (
+                        <button key={k} onClick={() => chooseSort(k)} style={sortItem}>
+                          <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent)' }}>✓</span>}
+                        </button>
+                      ))}
+                      <div style={sortHead}>По изменению за 24ч</div>
+                      {[['pct_asc', 'По возрастанию'], ['pct_desc', 'По убыванию']].map(([k, t], idx) => (
+                        <button key={k} onClick={() => chooseSort(k)} style={{ ...sortItem, ...(idx === 1 ? { borderBottom: 'none' } : {}) }}>
+                          <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent)' }}>✓</span>}
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -402,9 +414,13 @@ const sortModeBtn = {
   background: 'none', border: '1px solid var(--input-border)', color: 'var(--text)', borderRadius: 8, fontSize: 18, cursor: 'pointer',
 };
 const sortMenu = {
-  position: 'absolute', top: '100%', right: 0, marginTop: 6, minWidth: 190, zIndex: 30,
+  position: 'absolute', top: '100%', right: 0, marginTop: 6, minWidth: 220, zIndex: 30,
   background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: 10,
   boxShadow: '0 8px 20px rgba(0,0,0,0.25)', overflow: 'hidden',
+};
+const sortHead = {
+  padding: '8px 14px 4px', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5,
+  color: 'var(--text-dim)', background: 'var(--bg)', borderBottom: '1px solid var(--card-border)',
 };
 const sortItem = {
   display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%',
