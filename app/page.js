@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
 import { shortTickerFor, enLabelFor } from '../lib/commodities';
@@ -24,6 +24,7 @@ export default function HomePage() {
 
   function changeTab(next) {
     setTab(next);
+    setSortMenuOpen(false);
     localStorage.setItem('activeTab', next);
   }
 
@@ -35,7 +36,7 @@ export default function HomePage() {
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState(new Set());
   const [deleting, setDeleting] = useState(false);
-  const [sortMode, setSortMode] = useState(false);
+  const [sortDir, setSortDir] = useState(null); // null | 'asc' | 'desc'
   const [assets, setAssets] = useState([]);
   const [assetDetails, setAssetDetails] = useState({});
   const [assetSelectMode, setAssetSelectMode] = useState(false);
@@ -50,7 +51,23 @@ export default function HomePage() {
   const [cSelectMode, setCSelectMode] = useState(false);
   const [cSelected, setCSelected] = useState(new Set());
   const [cDeleting, setCDeleting] = useState(false);
-  const [cSortMode, setCSortMode] = useState(false);
+  const [cSortDir, setCSortDir] = useState(null);
+
+  // --- Меню сортировки ---
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const sortMenuRef = useRef(null);
+  useEffect(() => {
+    try {
+      setSortDir(localStorage.getItem('pairSortDir') || null);
+      setCSortDir(localStorage.getItem('commoditySortDir') || null);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    function onDown(e) { if (sortMenuRef.current && !sortMenuRef.current.contains(e.target)) setSortMenuOpen(false); }
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('touchstart', onDown);
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('touchstart', onDown); };
+  }, []);
 
   async function loadAssets() {
     try {
@@ -139,20 +156,6 @@ export default function HomePage() {
   }
 
   // --- Crypto handlers ---
-  async function move(e, index, dir) {
-    e.preventDefault();
-    e.stopPropagation();
-    const j = index + dir;
-    if (j < 0 || j >= pairs.length) return;
-    const a = pairs[index], b = pairs[j];
-    const newPairs = [...pairs];
-    [newPairs[index], newPairs[j]] = [newPairs[j], newPairs[index]];
-    setPairs(newPairs);
-    await Promise.all([
-      fetch(`/api/pairs/${a.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sort_order: b.sort_order }) }),
-      fetch(`/api/pairs/${b.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sort_order: a.sort_order }) }),
-    ]);
-  }
   async function swapPair(e, id) {
     e.preventDefault();
     e.stopPropagation();
@@ -161,8 +164,7 @@ export default function HomePage() {
     if (r.ok) await load();
     setSwappingId(null);
   }
-  function toggleSelectMode() { setSelectMode(v => !v); setSortMode(false); setSelected(new Set()); }
-  function toggleSortMode() { setSortMode(v => !v); setSelectMode(false); }
+  function toggleSelectMode() { setSelectMode(v => !v); setSelected(new Set()); }
   function toggleSelected(id) { setSelected(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; }); }
   function onRowClick(e, id) { if (!selectMode) return; e.preventDefault(); toggleSelected(id); }
   async function confirmDeleteSelected() {
@@ -177,20 +179,6 @@ export default function HomePage() {
   }
 
   // --- Commodity handlers (то же самое, но на /api/commodities) ---
-  async function cMove(e, index, dir) {
-    e.preventDefault();
-    e.stopPropagation();
-    const j = index + dir;
-    if (j < 0 || j >= cPairs.length) return;
-    const a = cPairs[index], b = cPairs[j];
-    const newPairs = [...cPairs];
-    [newPairs[index], newPairs[j]] = [newPairs[j], newPairs[index]];
-    setCPairs(newPairs);
-    await Promise.all([
-      fetch(`/api/commodities/${a.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sort_order: b.sort_order }) }),
-      fetch(`/api/commodities/${b.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sort_order: a.sort_order }) }),
-    ]);
-  }
   async function cSwapPair(e, id) {
     e.preventDefault();
     e.stopPropagation();
@@ -199,8 +187,7 @@ export default function HomePage() {
     if (r.ok) await load();
     setCSwappingId(null);
   }
-  function cToggleSelectMode() { setCSelectMode(v => !v); setCSortMode(false); setCSelected(new Set()); }
-  function cToggleSortMode() { setCSortMode(v => !v); setCSelectMode(false); }
+  function cToggleSelectMode() { setCSelectMode(v => !v); setCSelected(new Set()); }
   function cToggleSelected(id) { setCSelected(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; }); }
   function cOnRowClick(e, id) { if (!cSelectMode) return; e.preventDefault(); cToggleSelected(id); }
   async function cConfirmDeleteSelected() {
@@ -219,12 +206,32 @@ export default function HomePage() {
   const isCommodities = tab === 'commodities';
   const isCrypto = isPair;
   const curSelectMode = isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
-  const curSortMode = isAssets ? false : (isCrypto ? sortMode : cSortMode);
   const curSelected = isAssets ? assetSelected : (isCrypto ? selected : cSelected);
   const curDeleting = isAssets ? assetDeleting : (isCrypto ? deleting : cDeleting);
   const curPairs = isAssets ? assets : (isCrypto ? pairs : cPairs);
   const curToggleSelectMode = isAssets ? (() => { setAssetSelectMode(v => !v); setAssetSelected(new Set()); }) : (isCrypto ? toggleSelectMode : cToggleSelectMode);
-  const curToggleSortMode = isAssets ? (() => {}) : (isCrypto ? toggleSortMode : cToggleSortMode);
+  const curSortDir = isCrypto ? sortDir : cSortDir;
+  function chooseSort(dir) {
+    // повторный выбор того же пункта возвращает исходный порядок
+    const next = curSortDir === dir ? null : dir;
+    const key = isCrypto ? 'pairSortDir' : 'commoditySortDir';
+    (isCrypto ? setSortDir : setCSortDir)(next);
+    try { next ? localStorage.setItem(key, next) : localStorage.removeItem(key); } catch {}
+    setSortMenuOpen(false);
+  }
+  function sortByPct(list, sparksMap, dir) {
+    if (!dir) return list;
+    const val = (p) => sparksMap[p.id]?.changePct;
+    return [...list].sort((a, b) => {
+      const va = val(a), vb = val(b);
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;   // без данных — всегда внизу
+      if (vb == null) return -1;
+      return dir === 'asc' ? va - vb : vb - va;
+    });
+  }
+  const displayPairs = sortByPct(pairs, sparks, sortDir);
+  const displayCPairs = sortByPct(cPairs, cSparks, cSortDir);
   const curConfirmDelete = isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
@@ -232,23 +239,39 @@ export default function HomePage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
         <span className="header-login" style={{ color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>{login || '\u00A0'}</span>
         <div style={{ display: 'flex', gap: 8 }}>
-          {!curSelectMode && !curSortMode ? (
+          {!curSelectMode ? (
             <>
               <ThemeToggle />
               <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
-              {isCrypto && curPairs.length > 1 && <button onClick={curToggleSortMode} style={sortModeBtn} title="Изменить порядок">⇅</button>}
+              {!isAssets && curPairs.length > 1 && (
+                <div ref={sortMenuRef} style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setSortMenuOpen(v => !v)}
+                    style={{ ...sortModeBtn, ...(curSortDir ? { borderColor: 'var(--accent)', color: 'var(--accent)' } : {}) }}
+                    title="Сортировка"
+                  >⇅</button>
+                  {sortMenuOpen && (
+                    <div style={sortMenu}>
+                      <button onClick={() => chooseSort('asc')} style={sortItem}>
+                        <span>По возрастанию</span>{curSortDir === 'asc' && <span style={{ color: 'var(--accent)' }}>✓</span>}
+                      </button>
+                      <button onClick={() => chooseSort('desc')} style={{ ...sortItem, borderBottom: 'none' }}>
+                        <span>По убыванию</span>{curSortDir === 'desc' && <span style={{ color: 'var(--accent)' }}>✓</span>}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               <button onClick={logout} style={logoutBtn}>Выйти</button>
             </>
-          ) : curSelectMode ? (
+          ) : (
             <>
               <button onClick={curToggleSelectMode} style={logoutBtn}>Отмена</button>
               <button onClick={curConfirmDelete} disabled={curDeleting} style={confirmDeleteBtn}>
                 {curDeleting ? '...' : `Удалить (${curSelected.size})`}
               </button>
             </>
-          ) : (
-            <button onClick={curToggleSortMode} style={confirmDeleteBtn}>Готово</button>
           )}
         </div>
       </div>
@@ -279,7 +302,7 @@ export default function HomePage() {
       })}
 
       {isCrypto && !loading && pairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
-      {isCrypto && pairs.map((p, i) => {
+      {isCrypto && displayPairs.map((p) => {
         const price = prices[p.id];
         const spark = sparks[p.id];
         const pct = spark?.changePct;
@@ -289,16 +312,10 @@ export default function HomePage() {
           <a
             key={p.id}
             href={`/pair/${p.id}`}
-            className={`pair-row${sortMode || selectMode ? ' sort-active' : ''}`}
+            className={`pair-row${selectMode ? ' sort-active' : ''}`}
             style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
             onClick={(e) => onRowClick(e, p.id)}
           >
-            {sortMode && (
-              <div className="cell-order" style={{ display: 'flex', flexDirection: 'column' }}>
-                <button onClick={(e) => move(e, i, -1)} style={arrowBtn} disabled={i === 0}>▲</button>
-                <button onClick={(e) => move(e, i, 1)} style={arrowBtn} disabled={i === pairs.length - 1}>▼</button>
-              </div>
-            )}
             {selectMode && (
               <input type="checkbox" checked={isSelected} onChange={() => toggleSelected(p.id)} onClick={(e) => e.stopPropagation()} className="cell-order" style={{ width: 18, height: 18 }} />
             )}
@@ -307,7 +324,7 @@ export default function HomePage() {
               <img className="pair-icon" src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
-            {!selectMode && !sortMode && (
+            {!selectMode && (
               <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {swappingId === p.id ? '…' : '⇄'}
               </button>
@@ -324,7 +341,7 @@ export default function HomePage() {
       })}
 
       {isCommodities && !loading && cPairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
-      {isCommodities && cPairs.map((p, i) => {
+      {isCommodities && displayCPairs.map((p) => {
         const price = cPrices[p.id];
         const spark = cSparks[p.id];
         const pct = spark?.changePct;
@@ -334,16 +351,10 @@ export default function HomePage() {
           <a
             key={p.id}
             href={`/commodity-pair/${p.id}`}
-            className={`pair-row${cSortMode || cSelectMode ? ' sort-active' : ''}`}
+            className={`pair-row${cSelectMode ? ' sort-active' : ''}`}
             style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
             onClick={(e) => cOnRowClick(e, p.id)}
           >
-            {cSortMode && (
-              <div className="cell-order" style={{ display: 'flex', flexDirection: 'column' }}>
-                <button onClick={(e) => cMove(e, i, -1)} style={arrowBtn} disabled={i === 0}>▲</button>
-                <button onClick={(e) => cMove(e, i, 1)} style={arrowBtn} disabled={i === cPairs.length - 1}>▼</button>
-              </div>
-            )}
             {cSelectMode && (
               <input type="checkbox" checked={isSelected} onChange={() => cToggleSelected(p.id)} onClick={(e) => e.stopPropagation()} className="cell-order" style={{ width: 18, height: 18 }} />
             )}
@@ -352,7 +363,7 @@ export default function HomePage() {
               <span className="commodity-icon">{shortTickerFor(p.asset2)}</span>
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{enLabelFor(p.asset1)}/{enLabelFor(p.asset2)}</div>
-            {!cSelectMode && !cSortMode && (
+            {!cSelectMode && (
               <button onClick={(e) => cSwapPair(e, p.id)} disabled={cSwappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {cSwappingId === p.id ? '…' : '⇄'}
               </button>
@@ -390,13 +401,19 @@ const sortModeBtn = {
   width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
   background: 'none', border: '1px solid var(--input-border)', color: 'var(--text)', borderRadius: 8, fontSize: 18, cursor: 'pointer',
 };
+const sortMenu = {
+  position: 'absolute', top: '100%', right: 0, marginTop: 6, minWidth: 190, zIndex: 30,
+  background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: 10,
+  boxShadow: '0 8px 20px rgba(0,0,0,0.25)', overflow: 'hidden',
+};
+const sortItem = {
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, width: '100%',
+  padding: '12px 14px', background: 'none', border: 'none', borderBottom: '1px solid var(--card-border)',
+  color: 'var(--text)', fontSize: 16, textAlign: 'left', cursor: 'pointer',
+};
 const logoutBtn = { background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)', borderRadius: 8, padding: '0 12px' };
 const confirmDeleteBtn = {
   background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, padding: '0 14px', fontWeight: 600, cursor: 'pointer',
-};
-const arrowBtn = {
-  background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer',
-  fontSize: 10, padding: 0, lineHeight: 1,
 };
 const swapBtn = {
   width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
