@@ -18,7 +18,8 @@ export default function HomePage() {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get('tab');
     const fromStorage = localStorage.getItem('activeTab');
-    const normalized = (fromUrl || fromStorage || 'assets') === 'crypto' ? 'pair' : (fromUrl || fromStorage || 'assets');
+    const raw = fromUrl || fromStorage || 'assets';
+    const normalized = raw === 'crypto' ? 'pair' : raw === 'dex' ? 'pool' : raw;
     setTab(normalized);
   }, []);
 
@@ -205,7 +206,7 @@ export default function HomePage() {
   const isAssets = tab === 'assets';
   const isPair = tab === 'pair';
   const isCommodities = tab === 'commodities';
-  const isDex = tab === 'dex';
+  const isPool = tab === 'pool';
   const isCrypto = isPair;
   const curSelectMode = isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
   const curSelected = isAssets ? assetSelected : (isCrypto ? selected : cSelected);
@@ -249,9 +250,9 @@ export default function HomePage() {
           {!curSelectMode ? (
             <>
               <ThemeToggle />
-              {!isDex && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>}
-              {!isDex && curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
-              {!isAssets && !isDex && curPairs.length > 1 && (
+              {!isPool && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>}
+              {!isPool && curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
+              {!isAssets && !isPool && curPairs.length > 1 && (
                 <div ref={sortMenuRef} style={{ position: 'relative' }}>
                   <button
                     onClick={() => setSortMenuOpen(v => !v)}
@@ -291,14 +292,14 @@ export default function HomePage() {
 
       <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
         <button onClick={() => changeTab('assets')} style={tab === 'assets' ? tabActive : tabInactive}>Assets</button>
-        <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>CEX</button>
-        <button onClick={() => changeTab('dex')} style={tab === 'dex' ? tabActive : tabInactive}>DEX</button>
+        <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>Spot</button>
+        <button onClick={() => changeTab('pool')} style={tab === 'pool' ? tabActive : tabInactive}>Pool</button>
         <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
       </div>
 
       {loading && <p>Загрузка...</p>}
 
-      {isDex && <p style={{ opacity: 0.7 }}>DEX — раздел в разработке.</p>}
+      {isPool && <p style={{ opacity: 0.7 }}>Pool — раздел в разработке.</p>}
 
       {isAssets && !loading && assets.length === 0 && <p style={{ opacity: 0.7 }}>Активов пока нет — нажмите "+", чтобы добавить первый.</p>}
       {isAssets && !loading && assets.map((asset) => {
