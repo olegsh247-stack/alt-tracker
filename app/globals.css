@@ -154,14 +154,14 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 /* --- Pool: избранные пулы --- */
 .pool-row {
   display: grid !important;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 70px;
-  grid-template-areas: "name tvl vol fees pct";
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 64px;
+  grid-template-areas: "name apr tvl vol fees pct";
   column-gap: 12px !important;
   align-items: center;
 }
 .pool-row.sort-active {
-  grid-template-columns: 24px minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 70px;
-  grid-template-areas: "order name tvl vol fees pct";
+  grid-template-columns: 24px minmax(0, 1.8fr) minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 64px;
+  grid-template-areas: "order name apr tvl vol fees pct";
 }
 .pool-order { grid-area: order; align-self: center; justify-self: center; }
 .pool-name { grid-area: name; min-width: 0; }
@@ -170,6 +170,7 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .pool-fee { font-size: 12px; font-weight: 700; padding: 1px 5px; border: 1px solid var(--card-border); border-radius: 4px; }
 .pool-stat { display: flex; flex-direction: column; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 0; font-size: 16px; }
 .pool-stat .cap { font-size: 11px; color: var(--text-dim); margin-bottom: 2px; }
+.pool-apr { grid-area: apr; font-weight: 700; }
 .pool-tvl { grid-area: tvl; }
 .pool-vol { grid-area: vol; }
 .pool-fees { grid-area: fees; }
@@ -177,21 +178,20 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 
 @media (max-width: 640px) {
   .pool-row {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-areas:
       "name name name pct"
-      "tvl  vol  fees fees";
+      "apr  tvl  vol  fees";
     row-gap: 8px;
     column-gap: 6px !important;
     padding: 12px 6px !important;
   }
   .pool-row.sort-active {
-    grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr);
+    grid-template-columns: 24px repeat(4, minmax(0, 1fr));
     grid-template-areas:
       "order name name name pct"
-      "order tvl  vol  fees fees";
+      "order apr  tvl  vol  fees";
   }
-  .pool-stat { text-align: left; font-size: 15px; }
-  .pool-stat.pool-fees { text-align: right; }
+  .pool-stat { text-align: left; font-size: 14px; }
   .pool-pct { font-size: 17px; }
 }

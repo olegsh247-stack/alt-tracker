@@ -36,6 +36,7 @@ export async function GET() {
       quote: s?.quote || qs || '?',
       dex: s?.dex || f.dex || null,
       feePct: s?.feePct ?? null,
+      apr: s?.apr ?? null,
       tvl: s?.tvl ?? null,
       vol24: s?.vol24 ?? null,
       change24: s?.change24 ?? null,

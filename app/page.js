@@ -4,6 +4,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
 import { shortTickerFor, enLabelFor } from '../lib/commodities';
 import NetworkBadge from '../components/NetworkBadge';
+import PoolSearch from '../components/PoolSearch';
 import { fmtUsd, fmtPct, fmtFee } from '../lib/format';
 
 function icon(asset) {
@@ -63,6 +64,7 @@ export default function HomePage() {
   const [poolSelectMode, setPoolSelectMode] = useState(false);
   const [poolSelected, setPoolSelected] = useState(new Set());
   const [poolDeleting, setPoolDeleting] = useState(false);
+  const [poolSearching, setPoolSearching] = useState(false);
 
   async function loadPools() {
     try {
@@ -288,7 +290,7 @@ export default function HomePage() {
           {!curSelectMode ? (
             <>
               <ThemeToggle />
-              <a href={isPool ? '/add-pool' : isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isPool ? 'Добавить пул' : isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>
+              {!isPool && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>}
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить">–</button>}
               {!isAssets && !isPool && curPairs.length > 1 && (
                 <div ref={sortMenuRef} style={{ position: 'relative' }}>
@@ -337,9 +339,17 @@ export default function HomePage() {
 
       {loading && <p>Загрузка...</p>}
 
-      {isPool && poolLoaded && poolFavs.length === 0 && <p style={{ opacity: 0.7 }}>Пулов пока нет — нажмите "+", чтобы найти и добавить первый.</p>}
-      {isPool && poolStatsError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>Часть данных не загрузилась — источник временно недоступен, обновится автоматически.</p>}
-      {isPool && poolFavs.map((f) => {
+      {isPool && (
+        <PoolSearch
+          favSet={new Set(poolFavs.map(f => `${f.network}:${f.address}`))}
+          onAdded={loadPools}
+          onActiveChange={setPoolSearching}
+        />
+      )}
+      {isPool && !poolSearching && poolFavs.length > 0 && <div style={{ fontSize: 14, color: 'var(--text-dim)', margin: '4px 0 2px' }}>Избранное</div>}
+      {isPool && !poolSearching && poolLoaded && poolFavs.length === 0 && <p style={{ opacity: 0.7 }}>Избранных пулов пока нет — найдите пул по монете выше и добавьте его.</p>}
+      {isPool && !poolSearching && poolStatsError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>Часть данных не загрузилась — источник временно недоступен, обновится автоматически.</p>}
+      {isPool && !poolSearching && poolFavs.map((f) => {
         const isSelected = poolSelected.has(f.id);
         const fees24 = f.vol24 != null && f.feePct != null ? f.vol24 * f.feePct / 100 : null;
         const pctColor = f.change24 == null ? 'var(--text-dim)' : f.change24 >= 0 ? '#26a69a' : '#ef5350';
@@ -360,6 +370,7 @@ export default function HomePage() {
               <div className="pool-pair">{f.base}/{f.quote}</div>
               <div className="pool-sub"><NetworkBadge network={f.network} /><span>{f.dex || '—'}</span><span className="pool-fee">{fmtFee(f.feePct)}</span></div>
             </div>
+            <div className="pool-stat pool-apr"><span className="cap">APR 24ч</span><span>{f.apr == null ? '—' : `${f.apr >= 1000 ? Math.round(f.apr) : f.apr.toFixed(1).replace('.', ',')}%`}</span></div>
             <div className="pool-stat pool-tvl"><span className="cap">TVL</span><span>{fmtUsd(f.tvl)}</span></div>
             <div className="pool-stat pool-vol"><span className="cap">Объём 24ч</span><span>{fmtUsd(f.vol24)}</span></div>
             <div className="pool-stat pool-fees"><span className="cap">Комиссии 24ч</span><span>{fmtUsd(fees24)}</span></div>
