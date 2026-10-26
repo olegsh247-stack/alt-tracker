@@ -205,6 +205,7 @@ export default function HomePage() {
   const isAssets = tab === 'assets';
   const isPair = tab === 'pair';
   const isCommodities = tab === 'commodities';
+  const isDex = tab === 'dex';
   const isCrypto = isPair;
   const curSelectMode = isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
   const curSelected = isAssets ? assetSelected : (isCrypto ? selected : cSelected);
@@ -248,9 +249,9 @@ export default function HomePage() {
           {!curSelectMode ? (
             <>
               <ThemeToggle />
-              <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>
-              {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
-              {!isAssets && curPairs.length > 1 && (
+              {!isDex && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>}
+              {!isDex && curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
+              {!isAssets && !isDex && curPairs.length > 1 && (
                 <div ref={sortMenuRef} style={{ position: 'relative' }}>
                   <button
                     onClick={() => setSortMenuOpen(v => !v)}
@@ -288,13 +289,16 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
         <button onClick={() => changeTab('assets')} style={tab === 'assets' ? tabActive : tabInactive}>Assets</button>
-        <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>Pair</button>
+        <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>CEX</button>
+        <button onClick={() => changeTab('dex')} style={tab === 'dex' ? tabActive : tabInactive}>DEX</button>
         <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
       </div>
 
       {loading && <p>Загрузка...</p>}
+
+      {isDex && <p style={{ opacity: 0.7 }}>DEX — раздел в разработке.</p>}
 
       {isAssets && !loading && assets.length === 0 && <p style={{ opacity: 0.7 }}>Активов пока нет — нажмите "+", чтобы добавить первый.</p>}
       {isAssets && !loading && assets.map((asset) => {
@@ -437,10 +441,10 @@ const swapBtn = {
   borderRadius: 6, cursor: 'pointer', fontSize: 15, padding: 0,
 };
 const tabActive = {
-  padding: '8px 16px', borderRadius: 8, border: '1px solid var(--accent)',
+  padding: '8px 10px', borderRadius: 8, border: '1px solid var(--accent)',
   background: 'var(--accent)', color: '#fff', fontWeight: 600, cursor: 'pointer',
 };
 const tabInactive = {
-  padding: '8px 16px', borderRadius: 8, border: '1px solid var(--input-border)',
+  padding: '8px 10px', borderRadius: 8, border: '1px solid var(--input-border)',
   background: 'none', color: 'var(--text-dim)', cursor: 'pointer',
 };
