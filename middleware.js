@@ -11,5 +11,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/', '/add', '/pair/:path*'],
+  matcher: ['/', '/add', '/add-pool', '/pair/:path*'],
 };

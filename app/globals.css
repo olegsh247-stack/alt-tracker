@@ -149,3 +149,49 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 }
 
 .pair-grid .cell-price, .pair-grid .cell-ratio, .pair-grid .cell-pct { white-space: nowrap; }
+
+
+/* --- Pool: избранные пулы --- */
+.pool-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 70px;
+  grid-template-areas: "name tvl vol fees pct";
+  column-gap: 12px !important;
+  align-items: center;
+}
+.pool-row.sort-active {
+  grid-template-columns: 24px minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 70px;
+  grid-template-areas: "order name tvl vol fees pct";
+}
+.pool-order { grid-area: order; align-self: center; justify-self: center; }
+.pool-name { grid-area: name; min-width: 0; }
+.pool-pair { font-weight: 700; font-size: 17px; overflow-wrap: anywhere; line-height: 1.15; }
+.pool-sub { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; font-size: 13px; color: var(--text-dim); }
+.pool-fee { font-size: 12px; font-weight: 700; padding: 1px 5px; border: 1px solid var(--card-border); border-radius: 4px; }
+.pool-stat { display: flex; flex-direction: column; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 0; font-size: 16px; }
+.pool-stat .cap { font-size: 11px; color: var(--text-dim); margin-bottom: 2px; }
+.pool-tvl { grid-area: tvl; }
+.pool-vol { grid-area: vol; }
+.pool-fees { grid-area: fees; }
+.pool-pct { grid-area: pct; text-align: right; font-weight: 600; font-size: 16px; white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .pool-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr);
+    grid-template-areas:
+      "name name name pct"
+      "tvl  vol  fees fees";
+    row-gap: 8px;
+    column-gap: 6px !important;
+    padding: 12px 6px !important;
+  }
+  .pool-row.sort-active {
+    grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr);
+    grid-template-areas:
+      "order name name name pct"
+      "order tvl  vol  fees fees";
+  }
+  .pool-stat { text-align: left; font-size: 15px; }
+  .pool-stat.pool-fees { text-align: right; }
+  .pool-pct { font-size: 17px; }
+}

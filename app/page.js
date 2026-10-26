@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
 import { shortTickerFor, enLabelFor } from '../lib/commodities';
+import NetworkBadge from '../components/NetworkBadge';
+import { fmtUsd, fmtPct, fmtFee } from '../lib/format';
 
 function icon(asset) {
   return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
@@ -53,6 +55,42 @@ export default function HomePage() {
   const [cSelected, setCSelected] = useState(new Set());
   const [cDeleting, setCDeleting] = useState(false);
   const [cSortDir, setCSortDir] = useState(null);
+
+  // --- Pool (избранные пулы ликвидности) ---
+  const [poolFavs, setPoolFavs] = useState([]);
+  const [poolLoaded, setPoolLoaded] = useState(false);
+  const [poolStatsError, setPoolStatsError] = useState(false);
+  const [poolSelectMode, setPoolSelectMode] = useState(false);
+  const [poolSelected, setPoolSelected] = useState(new Set());
+  const [poolDeleting, setPoolDeleting] = useState(false);
+
+  async function loadPools() {
+    try {
+      const r = await fetch('/api/pool-favorites');
+      const d = await r.json();
+      if (r.ok) { setPoolFavs(d.pools || []); setPoolStatsError(!!d.statsError); }
+    } catch {}
+    setPoolLoaded(true);
+  }
+  useEffect(() => {
+    if (tab !== 'pool') return;
+    loadPools();
+    const t = setInterval(loadPools, 30000);
+    return () => clearInterval(t);
+  }, [tab]);
+
+  function togglePoolSelectMode() { setPoolSelectMode(v => !v); setPoolSelected(new Set()); }
+  function togglePoolSelected(id) { setPoolSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; }); }
+  async function confirmDeletePools() {
+    if (poolSelected.size === 0) { setPoolSelectMode(false); return; }
+    if (!confirm(`Удалить выбранные пулы (${poolSelected.size})?`)) return;
+    setPoolDeleting(true);
+    await Promise.all([...poolSelected].map(id => fetch(`/api/pool-favorites/${id}`, { method: 'DELETE' })));
+    setPoolFavs(prev => prev.filter(f => !poolSelected.has(f.id)));
+    setPoolSelected(new Set());
+    setPoolSelectMode(false);
+    setPoolDeleting(false);
+  }
 
   // --- Меню сортировки ---
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
@@ -208,11 +246,11 @@ export default function HomePage() {
   const isCommodities = tab === 'commodities';
   const isPool = tab === 'pool';
   const isCrypto = isPair;
-  const curSelectMode = isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
-  const curSelected = isAssets ? assetSelected : (isCrypto ? selected : cSelected);
-  const curDeleting = isAssets ? assetDeleting : (isCrypto ? deleting : cDeleting);
-  const curPairs = isAssets ? assets : (isCrypto ? pairs : cPairs);
-  const curToggleSelectMode = isAssets ? (() => { setAssetSelectMode(v => !v); setAssetSelected(new Set()); }) : (isCrypto ? toggleSelectMode : cToggleSelectMode);
+  const curSelectMode = isPool ? poolSelectMode : isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
+  const curSelected = isPool ? poolSelected : isAssets ? assetSelected : (isCrypto ? selected : cSelected);
+  const curDeleting = isPool ? poolDeleting : isAssets ? assetDeleting : (isCrypto ? deleting : cDeleting);
+  const curPairs = isPool ? poolFavs : isAssets ? assets : (isCrypto ? pairs : cPairs);
+  const curToggleSelectMode = isPool ? togglePoolSelectMode : isAssets ? (() => { setAssetSelectMode(v => !v); setAssetSelected(new Set()); }) : (isCrypto ? toggleSelectMode : cToggleSelectMode);
   const curSortDir = isCrypto ? sortDir : cSortDir;
   function chooseSort(dir) {
     // повторный выбор того же пункта возвращает исходный порядок
@@ -240,7 +278,7 @@ export default function HomePage() {
   }
   const displayPairs = sortList(pairs, sparks, sortDir, p => `${p.asset1}/${p.asset2}`);
   const displayCPairs = sortList(cPairs, cSparks, cSortDir, p => `${enLabelFor(p.asset1)}/${enLabelFor(p.asset2)}`);
-  const curConfirmDelete = isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
+  const curConfirmDelete = isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
@@ -250,8 +288,8 @@ export default function HomePage() {
           {!curSelectMode ? (
             <>
               <ThemeToggle />
-              {!isPool && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>}
-              {!isPool && curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить пары">–</button>}
+              <a href={isPool ? '/add-pool' : isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isPool ? 'Добавить пул' : isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>
+              {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить">–</button>}
               {!isAssets && !isPool && curPairs.length > 1 && (
                 <div ref={sortMenuRef} style={{ position: 'relative' }}>
                   <button
@@ -299,7 +337,36 @@ export default function HomePage() {
 
       {loading && <p>Загрузка...</p>}
 
-      {isPool && <p style={{ opacity: 0.7 }}>Pool — раздел в разработке.</p>}
+      {isPool && poolLoaded && poolFavs.length === 0 && <p style={{ opacity: 0.7 }}>Пулов пока нет — нажмите "+", чтобы найти и добавить первый.</p>}
+      {isPool && poolStatsError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>Часть данных не загрузилась — источник временно недоступен, обновится автоматически.</p>}
+      {isPool && poolFavs.map((f) => {
+        const isSelected = poolSelected.has(f.id);
+        const fees24 = f.vol24 != null && f.feePct != null ? f.vol24 * f.feePct / 100 : null;
+        const pctColor = f.change24 == null ? 'var(--text-dim)' : f.change24 >= 0 ? '#26a69a' : '#ef5350';
+        return (
+          <a
+            key={f.id}
+            href={`https://www.geckoterminal.com/${f.network}/pools/${f.address}`}
+            target="_blank"
+            rel="noreferrer"
+            className={`pool-row${poolSelectMode ? ' sort-active' : ''}`}
+            style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
+            onClick={(e) => { if (poolSelectMode) { e.preventDefault(); togglePoolSelected(f.id); } }}
+          >
+            {poolSelectMode && (
+              <input type="checkbox" checked={isSelected} onChange={() => togglePoolSelected(f.id)} onClick={(e) => e.stopPropagation()} className="pool-order" style={{ width: 18, height: 18 }} />
+            )}
+            <div className="pool-name">
+              <div className="pool-pair">{f.base}/{f.quote}</div>
+              <div className="pool-sub"><NetworkBadge network={f.network} /><span>{f.dex || '—'}</span><span className="pool-fee">{fmtFee(f.feePct)}</span></div>
+            </div>
+            <div className="pool-stat pool-tvl"><span className="cap">TVL</span><span>{fmtUsd(f.tvl)}</span></div>
+            <div className="pool-stat pool-vol"><span className="cap">Объём 24ч</span><span>{fmtUsd(f.vol24)}</span></div>
+            <div className="pool-stat pool-fees"><span className="cap">Комиссии 24ч</span><span>{fmtUsd(fees24)}</span></div>
+            <div className="pool-pct" style={{ color: pctColor }}>{fmtPct(f.change24)}</div>
+          </a>
+        );
+      })}
 
       {isAssets && !loading && assets.length === 0 && <p style={{ opacity: 0.7 }}>Активов пока нет — нажмите "+", чтобы добавить первый.</p>}
       {isAssets && !loading && assets.map((asset) => {

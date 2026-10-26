@@ -1,0 +1,14 @@
+import { NextResponse } from 'next/server';
+import { supabase } from '../../../../lib/supabaseClient';
+import { getUserId } from '../../../../lib/getUser';
+
+export async function DELETE(req, { params }) {
+  const userId = getUserId();
+  if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
+
+  const { error } = await supabase
+    .from('pool_favorites').delete()
+    .eq('id', params.id).eq('user_id', userId);
+  if (error) return NextResponse.json({ error: 'Не удалось удалить пул' }, { status: 500 });
+  return NextResponse.json({ ok: true });
+}
