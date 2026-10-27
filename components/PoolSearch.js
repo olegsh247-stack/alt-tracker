@@ -18,8 +18,6 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   const [sort, setSort] = useState('tvl');
   const [hideSmall, setHideSmall] = useState(true);
   const [stableOnly, setStableOnly] = useState(false);
-  const [offFamilies, setOffFamilies] = useState(new Set()); // снятые галочки площадок
-  const [offVersions, setOffVersions] = useState(new Set()); // снятые галочки версий
   const [recent, setRecent] = useState([]);
   const [addingKey, setAddingKey] = useState(null);
   const reqId = useRef(0);
@@ -43,8 +41,6 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   // поиск с задержкой, чтобы не дёргать источник на каждую букву
   useEffect(() => {
     setErr('');
-    setOffFamilies(new Set());
-    setOffVersions(new Set());
     if (q.length < 2) { setResults([]); setLoading(false); return; }
     setLoading(true);
     const id = ++reqId.current;
@@ -95,18 +91,9 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     onAdded && onAdded();
   }
 
-  const NO_VER = 'Без версии';
-  const verOf = (p) => p.version || NO_VER;
-  const base = results.filter(p => (!hideSmall || (p.tvl || 0) >= MIN_TVL) && (!stableOnly || p.hasStable));
-  // кнопки площадок и версий строятся из того, что реально есть в выдаче; счётчик учитывает соседний фильтр
-  const famCounts = countBy(base.filter(p => !offVersions.has(verOf(p))), p => p.family || 'Другие');
-  const verCounts = countBy(base.filter(p => !offFamilies.has(p.family || 'Другие')), verOf);
-  const families = Object.keys(countBy(base, p => p.family || 'Другие')).sort((a, b) => (famCounts[b] || 0) - (famCounts[a] || 0) || a.localeCompare(b));
-  const versions = Object.keys(countBy(base, verOf)).sort((a, b) => (a === NO_VER) - (b === NO_VER) || a.localeCompare(b));
-  let shown = base.filter(p => !offFamilies.has(p.family || 'Другие') && !offVersions.has(verOf(p)));
+  let shown = results.filter(p => (!hideSmall || (p.tvl || 0) >= MIN_TVL) && (!stableOnly || p.hasStable));
   shown = [...shown].sort((a, b) => (b[sort] ?? -1) - (a[sort] ?? -1));
   const hiddenCount = results.length - shown.length;
-  const toggle = (setter) => (k) => setter(prev => { const n = new Set(prev); n.has(k) ? n.delete(k) : n.add(k); return n; });
 
   const quick = [...new Set([...recent, ...(networkFor(network).quick || [])])].slice(0, 8);
 
@@ -150,13 +137,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
               <button key={k} type="button" onClick={() => pickSort(k)} style={sort === k ? sortChipActive : sortChip}>{t}</button>
             ))}
           </div>
-          {families.length > 1 && (
-            <ChipRow label="Площадка" items={families} counts={famCounts} off={offFamilies} onToggle={toggle(setOffFamilies)} />
-          )}
-          {versions.length > 1 && (
-            <ChipRow label="Версия" items={versions} counts={verCounts} off={offVersions} onToggle={toggle(setOffVersions)} />
-          )}
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', margin: '4px 0 8px', fontSize: 15, color: 'var(--text-dim)' }}>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 8, fontSize: 15, color: 'var(--text-dim)' }}>
             <label style={checkLabel}>
               <input type="checkbox" checked={hideSmall} onChange={e => setHideSmall(e.target.checked)} style={checkBox} />
               Скрыть мелкие (TVL &lt; {fmtUsd(MIN_TVL)})
@@ -204,32 +185,6 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   );
 }
 
-function countBy(list, keyFn) {
-  const out = {};
-  list.forEach(x => { const k = keyFn(x); out[k] = (out[k] || 0) + 1; });
-  return out;
-}
-
-// Одна строка кнопок-галочек: подпись слева, кнопки в одну линию с прокруткой вбок
-function ChipRow({ label, items, counts, off, onToggle }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '6px 0' }}>
-      <span style={{ flex: 'none', width: 74, fontSize: 14, color: 'var(--text-dim)' }}>{label}:</span>
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, scrollbarWidth: 'none' }}>
-        {items.map(k => {
-          const on = !off.has(k);
-          return (
-            <button key={k} type="button" onClick={() => onToggle(k)} style={on ? filterOn : filterOff}>
-              <span style={{ marginRight: 5 }}>{on ? '☑' : '☐'}</span>{k}
-              <span style={{ marginLeft: 6, opacity: 0.6, fontSize: 12 }}>{counts[k] || 0}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 function Stat({ cap, value, strong }) {
   return (
     <div style={{ minWidth: 0 }}>
@@ -246,9 +201,6 @@ const chipActive = { ...chip, borderColor: 'var(--accent)', background: 'var(--i
 const coinChip = { padding: '8px 14px', borderRadius: 999, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', cursor: 'pointer', fontSize: 16, fontWeight: 600 };
 const sortChip = { padding: '5px 12px', borderRadius: 999, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 14 };
 const sortChipActive = { ...sortChip, borderColor: 'var(--accent)', color: 'var(--accent)', fontWeight: 600 };
-const filterBase = { flex: 'none', whiteSpace: 'nowrap', padding: '5px 10px', borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', cursor: 'pointer', fontSize: 14 };
-const filterOn = { ...filterBase, borderColor: 'var(--accent)', color: 'var(--text)', background: 'var(--input-bg)' };
-const filterOff = { ...filterBase, color: 'var(--text-dim)', opacity: 0.7 };
 const checkLabel = { display: 'flex', alignItems: 'center', gap: 8 };
 const checkBox = { width: 18, height: 18 };
 const card = { display: 'block', width: '100%', textAlign: 'left', padding: '14px 4px', background: 'none', border: 'none', borderBottom: '1px solid var(--card-border)', color: 'var(--text)', cursor: 'pointer' };
