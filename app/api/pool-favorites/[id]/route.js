@@ -7,8 +7,8 @@ export async function DELETE(req, { params }) {
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
   const { error } = await supabase
-    .from('pool_favorites').delete()
-    .eq('id', params.id).eq('user_id', userId);
+    .from('pairs').delete()
+    .eq('id', params.id).eq('user_id', userId).eq('category', 'pool');
   if (error) return NextResponse.json({ error: 'Не удалось удалить пул' }, { status: 500 });
   return NextResponse.json({ ok: true });
 }

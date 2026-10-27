@@ -8,13 +8,15 @@ export async function GET() {
   const userId = getUserId();
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
-  const { data: favs, error } = await supabase
-    .from('pool_favorites')
+  const { data: rows, error } = await supabase
+    .from('pairs')
     .select('*')
     .eq('user_id', userId)
+    .eq('category', 'pool')
     .order('sort_order', { ascending: true })
     .order('id', { ascending: true });
-  if (error) return NextResponse.json({ error: 'Ошибка базы данных (выполнен ли migration_4.sql?)' }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Ошибка базы данных' }, { status: 500 });
+  const favs = (rows || []).map(r => ({ id: r.id, network: r.exchange1, address: r.asset1, pool_name: r.asset2, dex: r.exchange2 }));
 
   // статистика по сетям параллельно; сбой одной сети не ломает остальные
   const byNet = {};
@@ -56,8 +58,8 @@ export async function POST(req) {
   }
 
   const { data: dup } = await supabase
-    .from('pool_favorites').select('id')
-    .eq('user_id', userId).eq('network', network).eq('address', address).limit(1);
+    .from('pairs').select('id')
+    .eq('user_id', userId).eq('category', 'pool').eq('exchange1', network).eq('asset1', address).limit(1);
   if (dup && dup.length > 0) return NextResponse.json({ error: 'Этот пул уже в избранном' }, { status: 409 });
 
   // название и площадку берём с сервера, а не от клиента
@@ -68,13 +70,16 @@ export async function POST(req) {
   } catch {}
 
   const { data: existing } = await supabase
-    .from('pool_favorites').select('sort_order').eq('user_id', userId)
+    .from('pairs').select('sort_order').eq('user_id', userId).eq('category', 'pool')
     .order('sort_order', { ascending: false }).limit(1);
   const nextOrder = existing && existing.length > 0 ? (existing[0].sort_order || 0) + 1 : 0;
 
-  const { error } = await supabase.from('pool_favorites').insert({
-    user_id: userId, network, address, pool_name: poolName, dex, sort_order: nextOrder,
+  const { error } = await supabase.from('pairs').insert({
+    user_id: userId, category: 'pool',
+    asset1: address, exchange1: network,
+    asset2: poolName || '', exchange2: dex || '',
+    sort_order: nextOrder,
   });
-  if (error) return NextResponse.json({ error: 'Не удалось сохранить пул (выполнен ли migration_4.sql?)' }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Не удалось сохранить пул' }, { status: 500 });
   return NextResponse.json({ ok: true });
 }
