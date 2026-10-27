@@ -351,7 +351,7 @@ export default function HomePage() {
       {isPool && !poolSearching && poolStatsError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>Часть данных не загрузилась — источник временно недоступен, обновится автоматически.</p>}
       {isPool && !poolSearching && poolFavs.map((f) => {
         const isSelected = poolSelected.has(f.id);
-        const fees24 = f.vol24 != null && f.feePct != null ? f.vol24 * f.feePct / 100 : null;
+        const fees24 = f.fees24 ?? (f.vol24 != null && f.feePct != null ? f.vol24 * f.feePct / 100 : null);
         const pctColor = f.change24 == null ? 'var(--text-dim)' : f.change24 >= 0 ? '#26a69a' : '#ef5350';
         return (
           <a

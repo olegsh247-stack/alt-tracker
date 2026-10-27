@@ -173,7 +173,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
               <Stat cap="APR 24ч" value={p.apr == null ? '—' : `${p.apr >= 1000 ? Math.round(p.apr) : p.apr.toFixed(1).replace('.', ',')}%`} strong />
               <Stat cap="TVL" value={fmtUsd(p.tvl)} />
               <Stat cap="Объём 24ч" value={fmtUsd(p.vol24)} />
-              <Stat cap="Комиссии 24ч" value={fmtUsd(p.vol24 != null && p.feePct != null ? p.vol24 * p.feePct / 100 : null)} />
+              <Stat cap="Комиссии 24ч" value={fmtUsd(p.fees24 ?? (p.vol24 != null && p.feePct != null ? p.vol24 * p.feePct / 100 : null))} />
             </div>
             <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 6 }}>
               Цена 24ч <span style={{ color: (p.change24 ?? 0) >= 0 ? '#26a69a' : '#ef5350' }}>{fmtPct(p.change24)}</span> · Возраст {fmtAge(p.createdAt)}
