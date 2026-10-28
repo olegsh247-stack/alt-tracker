@@ -5,6 +5,7 @@ import PoolTable from './PoolTable';
 import { NETWORKS, networkFor } from '../lib/networks';
 import { fmtUsd } from '../lib/format';
 
+const MIN_VOL = 1000;  // «мёртвые» пулы: объём за 24ч меньше этого (или его нет) скрываем
 const MIN_TVL = 10000; // «совсем мусор»: пулы с ликвидностью меньше этого скрываем
 const SORTS = [['tvl', 'TVL'], ['apr', 'APR'], ['vol24', 'Объём']];
 
@@ -21,6 +22,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   const [sort, setSort] = useState('tvl');
   const [hideSmall, setHideSmall] = useState(true);
   const [stableOnly, setStableOnly] = useState(false);
+  const [hideDead, setHideDead] = useState(true);
   const [recent, setRecent] = useState([]);
   const [addingKey, setAddingKey] = useState(null);
   const reqId = useRef(0);
@@ -120,7 +122,13 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     onAdded && onAdded();
   }
 
-  let shown = results.filter(p => (!hideSmall || (p.tvl || 0) >= MIN_TVL) && (!stableOnly || p.hasStable));
+  const base = results.filter(p => (!hideSmall || (p.tvl || 0) >= MIN_TVL) && (!stableOnly || p.hasStable));
+  const isDead = (p) => !(p.vol24 >= MIN_VOL);
+  let shown = hideDead ? base.filter(p => !isDead(p)) : base;
+  // сколько мёртвых пулов скрыто по каждой площадке — чтобы видеть, где объёма нет
+  const deadByDex = {};
+  if (hideDead) base.filter(isDead).forEach(p => { const k = `${networkFor(p.network).short} ${p.dex || '—'}`; deadByDex[k] = (deadByDex[k] || 0) + 1; });
+  const deadList = Object.entries(deadByDex).sort((a, b) => b[1] - a[1]);
   shown = [...shown].sort((a, b) => (b[sort] ?? -1) - (a[sort] ?? -1));
   const hiddenCount = results.length - shown.length;
 
@@ -191,9 +199,18 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
             <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={checkBox} />
             Только со стейблом
           </label>
+          <label style={checkLabel}>
+            <input type="checkbox" checked={hideDead} onChange={e => setHideDead(e.target.checked)} style={checkBox} />
+            Скрыть без объёма (&lt; {fmtUsd(MIN_VOL)} за 24ч)
+          </label>
         </div>
       )}
 
+      {q && hideDead && deadList.length > 0 && (
+        <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: '0 0 8px' }}>
+          Скрыто без объёма ({deadList.reduce((n, x) => n + x[1], 0)}): {deadList.slice(0, 8).map(([k, n]) => `${k} — ${n}`).join(' · ')}
+        </p>
+      )}
       {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
       {loading && <p style={{ opacity: 0.7 }}>Ищу…</p>}
       {!loading && failed.length > 0 && <p style={{ opacity: 0.7, fontSize: 14 }}>Не ответили: {failed.map(k => networkFor(k).label).join(', ')}.</p>}
