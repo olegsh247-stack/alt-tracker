@@ -178,3 +178,29 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .pool-table .pt-row.pt-disabled .pt-action { color: var(--accent); }
 
 .pool-table .pt-mark { color: var(--accent); font-weight: 700; }
+
+/* --- Pool: мобильная раскладка без горизонтальной прокрутки ---
+   строка = 2 линии: сверху пара и вид пула, ниже 5 значений; шапка одна — над значениями */
+@media (max-width: 720px) {
+  .pool-table-wrap { overflow-x: visible; margin: 4px 0 8px; padding: 0; }
+  .pool-table, .pool-table thead, .pool-table tbody { display: block; min-width: 0; width: 100%; }
+  .pool-table tr { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: 6px; row-gap: 4px; align-items: center; }
+  .pool-table.pt-has-check tr { grid-template-columns: 28px repeat(5, minmax(0, 1fr)); }
+  .pool-table thead th.pt-pair, .pool-table thead th.pt-kind, .pool-table thead th.pt-action { display: none; }
+  .pool-table th { position: static; padding: 6px 0; font-size: 11px; white-space: normal; line-height: 1.2; }
+  .pool-table tbody tr { padding: 8px 0; border-bottom: 1px solid var(--card-border); }
+  .pool-table td { padding: 0; border-bottom: none; white-space: normal; min-width: 0; background: transparent; font-size: 14px; }
+  .pool-table .pt-row:hover td, .pool-table .pt-row.pt-selected td { background: transparent; }
+  .pool-table .pt-row.pt-selected { background: var(--danger-bg); }
+  .pool-table thead tr { border-bottom: 1px solid var(--card-border); }
+  .pool-table thead th { border-bottom: none; }
+  .pool-table .pt-pair { position: static; min-width: 0; background: transparent; grid-column: 1 / span 2; }
+  .pool-table .pt-kind { grid-column: 3 / span 3; justify-self: end; text-align: right; }
+  .pool-table .pt-kind-inner { flex-wrap: wrap; justify-content: flex-end; }
+  .pool-table .pt-action { display: none; }
+  .pool-table.pt-has-check td.pt-check, .pool-table.pt-has-check th.pt-check { grid-column: 1; width: auto; padding: 0; }
+  .pool-table.pt-has-check td.pt-check { grid-row: 1 / span 2; }
+  .pool-table.pt-has-check .pt-pair { grid-column: 2 / span 2; grid-row: 1; }
+  .pool-table.pt-has-check .pt-kind { grid-column: 4 / span 3; grid-row: 1; }
+  .pool-table .pt-pair-name { font-size: 16px; overflow-wrap: anywhere; }
+}

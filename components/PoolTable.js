@@ -16,17 +16,17 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
   const selectMode = !!select?.mode;
   return (
     <div className="pool-table-wrap">
-      <table className="pool-table">
+      <table className={`pool-table${selectMode ? ' pt-has-check' : ''}`}>
         <thead>
           <tr>
             {selectMode && <th className="pt-check" />}
             <th className="pt-pair">Пара</th>
             <th className="pt-kind">Вид пула</th>
-            <th className="pt-num">APR 24ч</th>
-            <th className="pt-num">TVL</th>
-            <th className="pt-num">Объём 24ч</th>
-            <th className="pt-num">Комиссии 24ч</th>
-            <th className="pt-num">Цена 24ч</th>
+            <th className="pt-num pt-apr">APR 24ч</th>
+            <th className="pt-num pt-tvl">TVL</th>
+            <th className="pt-num pt-vol">Объём 24ч</th>
+            <th className="pt-num pt-fees">Комиссии 24ч</th>
+            <th className="pt-num pt-chg">Цена 24ч</th>
             {action && <th className="pt-action">{actionTitle}</th>}
           </tr>
         </thead>
@@ -59,11 +59,11 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
                     <span className="pt-dex">{p.dex || '—'}</span>
                   </span>
                 </td>
-                <td className="pt-num pt-strong">{fmtApr(p.apr)}</td>
-                <td className="pt-num">{fmtUsd(p.tvl)}</td>
-                <td className="pt-num">{fmtUsd(p.vol24)}</td>
-                <td className="pt-num">{fmtUsd(fees24)}</td>
-                <td className="pt-num" style={{ color: pctColor }}>{fmtPct(p.change24)}</td>
+                <td className="pt-num pt-apr pt-strong">{fmtApr(p.apr)}</td>
+                <td className="pt-num pt-tvl">{fmtUsd(p.tvl)}</td>
+                <td className="pt-num pt-vol">{fmtUsd(p.vol24)}</td>
+                <td className="pt-num pt-fees">{fmtUsd(fees24)}</td>
+                <td className="pt-num pt-chg" style={{ color: pctColor }}>{fmtPct(p.change24)}</td>
                 {action && <td className="pt-action">{action(p)}</td>}
               </tr>
             );
