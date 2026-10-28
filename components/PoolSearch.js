@@ -125,10 +125,6 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   const base = results.filter(p => (!hideSmall || (p.tvl || 0) >= MIN_TVL) && (!stableOnly || p.hasStable));
   const isDead = (p) => !(p.vol24 >= MIN_VOL);
   let shown = hideDead ? base.filter(p => !isDead(p)) : base;
-  // сколько мёртвых пулов скрыто по каждой площадке — чтобы видеть, где объёма нет
-  const deadByDex = {};
-  if (hideDead) base.filter(isDead).forEach(p => { const k = `${networkFor(p.network).short} ${p.dex || '—'}`; deadByDex[k] = (deadByDex[k] || 0) + 1; });
-  const deadList = Object.entries(deadByDex).sort((a, b) => b[1] - a[1]);
   shown = [...shown].sort((a, b) => (b[sort] ?? -1) - (a[sort] ?? -1));
   const hiddenCount = results.length - shown.length;
 
@@ -206,11 +202,6 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
         </div>
       )}
 
-      {q && hideDead && deadList.length > 0 && (
-        <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: '0 0 8px' }}>
-          Скрыто без объёма ({deadList.reduce((n, x) => n + x[1], 0)}): {deadList.slice(0, 8).map(([k, n]) => `${k} — ${n}`).join(' · ')}
-        </p>
-      )}
       {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
       {loading && <p style={{ opacity: 0.7 }}>Ищу…</p>}
       {!loading && failed.length > 0 && <p style={{ opacity: 0.7, fontSize: 14 }}>Не ответили: {failed.map(k => networkFor(k).label).join(', ')}.</p>}
