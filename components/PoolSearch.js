@@ -13,7 +13,8 @@ const SORTS = [['tvl', 'TVL'], ['apr', 'APR'], ['vol24', 'Объём']];
 export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   const [nets, setNets] = useState(['solana']); // выбранные сети (можно несколько)
   const [failed, setFailed] = useState([]);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState('');   // Актив 1
+  const [query2, setQuery2] = useState(''); // Актив 2 (необязательно)
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
@@ -24,6 +25,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   const [addingKey, setAddingKey] = useState(null);
   const reqId = useRef(0);
   const inputRef = useRef(null);
+  const input2Ref = useRef(null);
 
   useEffect(() => {
     try {
@@ -40,7 +42,9 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     try { setRecent(JSON.parse(localStorage.getItem('poolRecentAll') || '[]')); } catch { setRecent([]); }
   }, []);
 
-  const q = query.trim();
+  const t1 = query.trim(), t2 = query2.trim();
+  const q = t1 || t2;           // основной актив поиска
+  const qb = t1 && t2.length >= 2 ? t2 : ''; // второй актив (если задан первый; от 2 символов)
   useEffect(() => { onActiveChange && onActiveChange(q.length > 0); }, [q.length > 0]);
 
   // поиск с задержкой; по каждой выбранной сети запрос идёт отдельно, результаты склеиваются
@@ -53,7 +57,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     const id = ++reqId.current;
     const t = setTimeout(async () => {
       const settled = await Promise.allSettled(nets.map(async (net) => {
-        const r = await fetch(`/api/pool-search?network=${net}&q=${encodeURIComponent(q)}`);
+        const r = await fetch(`/api/pool-search?network=${net}&q=${encodeURIComponent(q)}${qb ? `&q2=${encodeURIComponent(qb)}` : ''}`);
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Ошибка поиска');
         return d.results || [];
@@ -72,7 +76,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
       setLoading(false);
     }, 400);
     return () => clearTimeout(t);
-  }, [q, netsKey]);
+  }, [q, qb, netsKey]);
 
   // клик по сети включает/выключает её; хотя бы одна всегда остаётся выбранной
   function toggleNetwork(k) {
@@ -87,9 +91,15 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     try { localStorage.setItem('poolSort', k); } catch {}
   }
   function rememberCoin(coin) {
-    const list = [coin, ...recent.filter(x => x.toUpperCase() !== coin.toUpperCase())].slice(0, 4);
-    setRecent(list);
-    try { localStorage.setItem('poolRecentAll', JSON.stringify(list)); } catch {}
+    setRecent(prev => {
+      const list = [coin, ...prev.filter(x => x.toUpperCase() !== coin.toUpperCase())].slice(0, 4);
+      try { localStorage.setItem('poolRecentAll', JSON.stringify(list)); } catch {}
+      return list;
+    });
+  }
+  function swapAssets() { setQuery(query2); setQuery2(query); }
+  function pickQuick(c) {
+    if (!query.trim()) setQuery(c); else if (!query2.trim()) setQuery2(c); else setQuery(c);
   }
 
   async function add(p) {
@@ -104,8 +114,9 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     const d = await r.json();
     setAddingKey(null);
     if (!r.ok && r.status !== 409) { setErr(d.error || 'Не удалось добавить'); return; }
-    if (q.length < 30) rememberCoin(q);
+    [t1, t2].filter(x => x && x.length < 30).reverse().forEach(rememberCoin);
     setQuery('');
+    setQuery2('');
     onAdded && onAdded();
   }
 
@@ -133,24 +144,39 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
             <button key={k} type="button" onClick={() => pickSort(k)} style={sort === k ? sortChipActive : sortChip}>{t}</button>
           ))}
         </div>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 180 }}>
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder={nets.length === 1 ? `Монета в сети ${networkFor(nets[0]).label}: ETH, SOL…` : `Монета в выбранных сетях (${nets.length}): ETH, SOL…`}
-            autoComplete="off"
-            autoCapitalize="characters"
-            style={input}
-          />
-          {query && <button type="button" onClick={() => setQuery('')} style={clearBtn} aria-label="Очистить">×</button>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: '1 1 340px', minWidth: 0, flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: '1 1 130px', minWidth: 120 }}>
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Актив 1: ETH, SOL…"
+              autoComplete="off"
+              autoCapitalize="characters"
+              style={input}
+            />
+            {query && <button type="button" onClick={() => setQuery('')} style={clearBtn} aria-label="Очистить актив 1">×</button>}
+          </div>
+          <button type="button" onClick={swapAssets} style={swapBtn} aria-label="Поменять активы местами" title="Поменять местами">⇄</button>
+          <div style={{ position: 'relative', flex: '1 1 130px', minWidth: 120 }}>
+            <input
+              ref={input2Ref}
+              value={query2}
+              onChange={e => setQuery2(e.target.value)}
+              placeholder="Актив 2 (необяз.)"
+              autoComplete="off"
+              autoCapitalize="characters"
+              style={input}
+            />
+            {query2 && <button type="button" onClick={() => setQuery2('')} style={clearBtn} aria-label="Очистить актив 2">×</button>}
+          </div>
         </div>
       </div>
 
       {!q && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
           {quick.map(c => (
-            <button key={c} type="button" onClick={() => { setQuery(c); inputRef.current?.focus(); }} style={coinChip}>{c}</button>
+            <button key={c} type="button" onClick={() => pickQuick(c)} style={coinChip}>{c}</button>
           ))}
         </div>
       )}
@@ -191,6 +217,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
 }
 
 const input = { width: '100%', padding: '10px 36px 10px 12px', borderRadius: 10, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box', fontSize: 16 };
+const swapBtn = { width: 34, height: 38, border: '1px solid var(--input-border)', borderRadius: 8, background: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 16, flex: 'none' };
 const clearBtn = { position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: 'none', background: 'none', color: 'var(--text-dim)', fontSize: 22, cursor: 'pointer' };
 const chip = { display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, border: '1px solid #000', background: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: 15 };
 const chipActive = { ...chip, background: 'var(--input-bg)', fontWeight: 600 };
