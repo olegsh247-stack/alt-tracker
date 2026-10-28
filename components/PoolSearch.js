@@ -126,17 +126,25 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
         ))}
       </div>
 
-      <div style={{ position: 'relative' }}>
-        <input
-          ref={inputRef}
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder={nets.length === 1 ? `Монета в сети ${networkFor(nets[0]).label}: ETH, SOL…` : `Монета в выбранных сетях (${nets.length}): ETH, SOL…`}
-          autoComplete="off"
-          autoCapitalize="characters"
-          style={input}
-        />
-        {query && <button type="button" onClick={() => setQuery('')} style={clearBtn} aria-label="Очистить">×</button>}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{ color: 'var(--text-dim)', fontSize: 14 }}>Сортировка:</span>
+          {SORTS.map(([k, t]) => (
+            <button key={k} type="button" onClick={() => pickSort(k)} style={sort === k ? sortChipActive : sortChip}>{t}</button>
+          ))}
+        </div>
+        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 180 }}>
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder={nets.length === 1 ? `Монета в сети ${networkFor(nets[0]).label}: ETH, SOL…` : `Монета в выбранных сетях (${nets.length}): ETH, SOL…`}
+            autoComplete="off"
+            autoCapitalize="characters"
+            style={input}
+          />
+          {query && <button type="button" onClick={() => setQuery('')} style={clearBtn} aria-label="Очистить">×</button>}
+        </div>
       </div>
 
       {!q && (
@@ -148,24 +156,16 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
       )}
 
       {q && (
-        <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', margin: '12px 0 6px' }}>
-            <span style={{ color: 'var(--text-dim)', fontSize: 14 }}>Сортировка:</span>
-            {SORTS.map(([k, t]) => (
-              <button key={k} type="button" onClick={() => pickSort(k)} style={sort === k ? sortChipActive : sortChip}>{t}</button>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 8, fontSize: 15, color: 'var(--text-dim)' }}>
-            <label style={checkLabel}>
-              <input type="checkbox" checked={hideSmall} onChange={e => setHideSmall(e.target.checked)} style={checkBox} />
-              Скрыть мелкие (TVL &lt; {fmtUsd(MIN_TVL)})
-            </label>
-            <label style={checkLabel}>
-              <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={checkBox} />
-              Только со стейблом
-            </label>
-          </div>
-        </>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', margin: '10px 0 8px', fontSize: 15, color: 'var(--text-dim)' }}>
+          <label style={checkLabel}>
+            <input type="checkbox" checked={hideSmall} onChange={e => setHideSmall(e.target.checked)} style={checkBox} />
+            Скрыть мелкие (TVL &lt; {fmtUsd(MIN_TVL)})
+          </label>
+          <label style={checkLabel}>
+            <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={checkBox} />
+            Только со стейблом
+          </label>
+        </div>
       )}
 
       {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
@@ -190,7 +190,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   );
 }
 
-const input = { width: '100%', padding: '14px 40px 14px 14px', borderRadius: 10, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box', fontSize: 17 };
+const input = { width: '100%', padding: '10px 36px 10px 12px', borderRadius: 10, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box', fontSize: 16 };
 const clearBtn = { position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: 'none', background: 'none', color: 'var(--text-dim)', fontSize: 22, cursor: 'pointer' };
 const chip = { display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, border: '1px solid #000', background: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: 15 };
 const chipActive = { ...chip, background: 'var(--input-bg)', fontWeight: 600 };
