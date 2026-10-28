@@ -11,8 +11,8 @@ import { fmtUsd, fmtPct, fmtFee, fmtApr, fmtAge } from '../lib/format';
 //   action(p)   — содержимое последней колонки (например «☆ добавить»), необязательно
 //   actionTitle — заголовок этой колонки
 //   showAge     — показывать возраст пула под парой
-//   isDisabled  — строка неактивна (например, уже в избранном)
-export default function PoolTable({ rows, getKey, onRowClick, select, action, actionTitle = '', showAge = false, isDisabled }) {
+//   isDisabled  — строка неактивна (например, уже в избранном); markDisabled — рисовать у такой пары галочку
+export default function PoolTable({ rows, getKey, onRowClick, select, action, actionTitle = '', showAge = false, isDisabled, markDisabled = false }) {
   const selectMode = !!select?.mode;
   return (
     <div className="pool-table-wrap">
@@ -49,7 +49,7 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
                   </td>
                 )}
                 <td className="pt-pair">
-                  <div className="pt-pair-name">{p.base}/{p.quote}</div>
+                  <div className="pt-pair-name">{p.base}/{p.quote}{markDisabled && disabled && <span className="pt-mark" title="В избранном"> ✓</span>}</div>
                   {showAge && <div className="pt-sub">{fmtAge(p.createdAt)}</div>}
                 </td>
                 <td className="pt-kind">

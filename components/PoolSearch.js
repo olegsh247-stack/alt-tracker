@@ -183,8 +183,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
           showAge
           onRowClick={add}
           isDisabled={p => favSet.has(`${p.network}:${p.address}`) || addingKey === p.address}
-          actionTitle=""
-          action={p => (favSet.has(`${p.network}:${p.address}`) ? '✓ в избранном' : addingKey === p.address ? '…' : '☆ добавить')}
+          markDisabled
         />
       )}
     </div>
