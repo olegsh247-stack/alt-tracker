@@ -38,6 +38,7 @@ export async function GET() {
       quote: s?.quote || qs || '?',
       dex: s?.dex || f.dex || null,
       feePct: s?.feePct ?? null,
+      feeApprox: !!s?.feeApprox,
       apr: s?.apr ?? null,
       fees24: s?.fees24 ?? null,
       tvl: s?.tvl ?? null,

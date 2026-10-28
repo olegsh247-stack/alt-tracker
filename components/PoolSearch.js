@@ -1,8 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import NetworkBadge from './NetworkBadge';
+import PoolTable from './PoolTable';
 import { NETWORKS, networkFor } from '../lib/networks';
-import { fmtUsd, fmtPct, fmtFee, fmtAge } from '../lib/format';
+import { fmtUsd } from '../lib/format';
 
 const MIN_TVL = 10000; // «совсем мусор»: пулы с ликвидностью меньше этого скрываем
 const SORTS = [['tvl', 'TVL'], ['apr', 'APR'], ['vol24', 'Объём']];
@@ -157,39 +158,17 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
         <p style={{ opacity: 0.7 }}>Пулов не найдено{hiddenCount > 0 ? ` (скрыто фильтрами: ${hiddenCount})` : ''}.</p>
       )}
 
-      {q.length >= 2 && shown.map(p => {
-        const inFav = favSet.has(`${p.network}:${p.address}`);
-        return (
-          <button key={p.address} type="button" onClick={() => add(p)} disabled={addingKey === p.address || inFav} style={card}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontWeight: 700, fontSize: 18 }}>{p.base}/{p.quote}</span>
-              <span style={feeBadge}>{fmtFee(p.feePct)}</span>
-              <span style={{ color: 'var(--text-dim)', fontSize: 14 }}>{p.dex || '—'}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 14, color: inFav ? 'var(--accent)' : 'var(--text-dim)' }}>
-                {inFav ? '✓ в избранном' : addingKey === p.address ? '…' : '☆ добавить'}
-              </span>
-            </div>
-            <div style={statGrid}>
-              <Stat cap="APR 24ч" value={p.apr == null ? '—' : `${p.apr >= 1000 ? Math.round(p.apr) : p.apr.toFixed(1).replace('.', ',')}%`} strong />
-              <Stat cap="TVL" value={fmtUsd(p.tvl)} />
-              <Stat cap="Объём 24ч" value={fmtUsd(p.vol24)} />
-              <Stat cap="Комиссии 24ч" value={fmtUsd(p.fees24 ?? (p.vol24 != null && p.feePct != null ? p.vol24 * p.feePct / 100 : null))} />
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--text-dim)', marginTop: 6 }}>
-              Цена 24ч <span style={{ color: (p.change24 ?? 0) >= 0 ? '#26a69a' : '#ef5350' }}>{fmtPct(p.change24)}</span> · Возраст {fmtAge(p.createdAt)}
-            </div>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function Stat({ cap, value, strong }) {
-  return (
-    <div style={{ minWidth: 0 }}>
-      <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 2, whiteSpace: 'nowrap' }}>{cap}</div>
-      <div style={{ fontSize: 16, fontWeight: strong ? 700 : 500, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{value}</div>
+      {q.length >= 2 && shown.length > 0 && (
+        <PoolTable
+          rows={shown}
+          getKey={p => p.address}
+          showAge
+          onRowClick={add}
+          isDisabled={p => favSet.has(`${p.network}:${p.address}`) || addingKey === p.address}
+          actionTitle=""
+          action={p => (favSet.has(`${p.network}:${p.address}`) ? '✓ в избранном' : addingKey === p.address ? '…' : '☆ добавить')}
+        />
+      )}
     </div>
   );
 }
@@ -203,6 +182,3 @@ const sortChip = { padding: '5px 12px', borderRadius: 999, border: '1px solid va
 const sortChipActive = { ...sortChip, borderColor: 'var(--accent)', color: 'var(--accent)', fontWeight: 600 };
 const checkLabel = { display: 'flex', alignItems: 'center', gap: 8 };
 const checkBox = { width: 18, height: 18 };
-const card = { display: 'block', width: '100%', textAlign: 'left', padding: '14px 4px', background: 'none', border: 'none', borderBottom: '1px solid var(--card-border)', color: 'var(--text)', cursor: 'pointer' };
-const statGrid = { display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8, marginTop: 10 };
-const feeBadge = { fontSize: 12, fontWeight: 700, padding: '2px 6px', borderRadius: 4, border: '1px solid var(--card-border)', color: 'var(--text-dim)' };

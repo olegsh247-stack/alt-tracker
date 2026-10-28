@@ -151,47 +151,28 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .pair-grid .cell-price, .pair-grid .cell-ratio, .pair-grid .cell-pct { white-space: nowrap; }
 
 
-/* --- Pool: избранные пулы --- */
-.pool-row {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1.8fr) minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 64px;
-  grid-template-areas: "name apr tvl vol fees pct";
-  column-gap: 12px !important;
-  align-items: center;
+/* --- Pool: таблица пулов (одна шапка на все строки) --- */
+.pool-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 4px -4px 8px; padding: 0 4px; }
+.pool-table { width: 100%; min-width: 720px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.pool-table th {
+  position: sticky; top: 0; font-size: 12px; font-weight: 600; color: var(--text-dim);
+  text-align: left; padding: 8px 10px; white-space: nowrap; border-bottom: 1px solid var(--card-border); background: var(--bg);
 }
-.pool-row.sort-active {
-  grid-template-columns: 24px minmax(0, 1.8fr) minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) 64px;
-  grid-template-areas: "order name apr tvl vol fees pct";
-}
-.pool-order { grid-area: order; align-self: center; justify-self: center; }
-.pool-name { grid-area: name; min-width: 0; }
-.pool-pair { font-weight: 700; font-size: 17px; overflow-wrap: anywhere; line-height: 1.15; }
-.pool-sub { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px; font-size: 13px; color: var(--text-dim); }
-.pool-fee { font-size: 12px; font-weight: 700; padding: 1px 5px; border: 1px solid var(--card-border); border-radius: 4px; }
-.pool-stat { display: flex; flex-direction: column; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 0; font-size: 16px; }
-.pool-stat .cap { font-size: 11px; color: var(--text-dim); margin-bottom: 2px; }
-.pool-apr { grid-area: apr; font-weight: 700; }
-.pool-tvl { grid-area: tvl; }
-.pool-vol { grid-area: vol; }
-.pool-fees { grid-area: fees; }
-.pool-pct { grid-area: pct; text-align: right; font-weight: 600; font-size: 16px; white-space: nowrap; }
-
-@media (max-width: 640px) {
-  .pool-row {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-areas:
-      "name name name pct"
-      "apr  tvl  vol  fees";
-    row-gap: 8px;
-    column-gap: 6px !important;
-    padding: 12px 6px !important;
-  }
-  .pool-row.sort-active {
-    grid-template-columns: 24px repeat(4, minmax(0, 1fr));
-    grid-template-areas:
-      "order name name name pct"
-      "order apr  tvl  vol  fees";
-  }
-  .pool-stat { text-align: left; font-size: 14px; }
-  .pool-pct { font-size: 17px; }
-}
+.pool-table td { padding: 12px 10px; border-bottom: 1px solid var(--card-border); font-size: 15px; white-space: nowrap; vertical-align: middle; }
+.pool-table .pt-num { text-align: right; }
+.pool-table .pt-strong { font-weight: 700; }
+.pool-table .pt-check { width: 34px; padding-left: 4px; padding-right: 0; }
+.pool-table .pt-pair { position: sticky; left: 0; z-index: 1; background: var(--bg); min-width: 110px; }
+.pool-table .pt-check + .pt-pair { left: 34px; }
+.pool-table th.pt-pair { z-index: 2; }
+.pool-table .pt-pair-name { font-weight: 700; font-size: 16px; }
+.pool-table .pt-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.pool-table .pt-kind-inner { display: inline-flex; align-items: center; gap: 6px; }
+.pool-table .pt-fee { font-size: 13px; font-weight: 700; }
+.pool-table .pt-dex { color: var(--text-dim); font-size: 14px; }
+.pool-table .pt-action { text-align: right; font-size: 14px; color: var(--text-dim); }
+.pool-table .pt-row { cursor: pointer; }
+.pool-table .pt-row:hover td { background: var(--input-bg); }
+.pool-table .pt-row.pt-selected td { background: var(--danger-bg); }
+.pool-table .pt-row.pt-disabled { cursor: default; }
+.pool-table .pt-row.pt-disabled .pt-action { color: var(--accent); }
