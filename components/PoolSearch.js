@@ -5,6 +5,19 @@ import PoolTable from './PoolTable';
 import { NETWORKS, networkFor } from '../lib/networks';
 import { fmtUsd } from '../lib/format';
 
+// запрос с одним автоматическим повтором, если источник данных перегружен или недоступен
+async function fetchJsonRetry(url) {
+  let out;
+  for (let i = 0; i < 2; i++) {
+    const r = await fetch(url);
+    const d = await r.json().catch(() => ({}));
+    out = { r, d };
+    if (r.ok || (r.status !== 502 && r.status !== 429)) return out;
+    if (i === 0) await new Promise(res => setTimeout(res, r.status === 429 ? 3000 : 1500));
+  }
+  return out;
+}
+
 const MIN_VOL = 1000;  // «мёртвые» пулы: объём за 24ч меньше этого (или его нет) скрываем
 const MIN_TVL = 10000; // «совсем мусор»: пулы с ликвидностью меньше этого скрываем
 const SORTS = [['tvl', 'TVL'], ['apr', 'APR'], ['vol24', 'Объём']];
@@ -25,6 +38,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   const [hideDead, setHideDead] = useState(false);
   const [defaults, setDefaults] = useState({}); // пары по умолчанию: { сеть: [пулы] }
   const [defLoading, setDefLoading] = useState(false);
+  const [retryTick, setRetryTick] = useState(0); // «Повторить» запускает поиск и основные пары заново
   const [defFailed, setDefFailed] = useState([]);
   const [recent, setRecent] = useState([]);
   const [addingKey, setAddingKey] = useState(null);
@@ -50,9 +64,8 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     if (need.length === 0) { setDefFailed([]); return; }
     let alive = true;
     setDefLoading(true);
-    fetch(`/api/pool-defaults?networks=${need.join(',')}`)
-      .then(r => r.json())
-      .then(d => {
+    fetchJsonRetry(`/api/pool-defaults?networks=${need.join(',')}`)
+      .then(({ d }) => {
         if (!alive) return;
         setDefaults(prev => ({ ...prev, ...(d.results || {}) }));
         setDefFailed(d.failed || (d.results ? [] : need));
@@ -60,7 +73,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
       .catch(() => { if (alive) setDefFailed(need); })
       .finally(() => { if (alive) setDefLoading(false); });
     return () => { alive = false; };
-  }, [q, netsKey]);
+  }, [q, netsKey, retryTick]);
   useEffect(() => {
     setErr('');
     setFailed([]);
@@ -69,8 +82,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     const id = ++reqId.current;
     const t = setTimeout(async () => {
       const settled = await Promise.allSettled(nets.map(async (net) => {
-        const r = await fetch(`/api/pool-search?network=${net}&q=${encodeURIComponent(q)}${qb ? `&q2=${encodeURIComponent(qb)}` : ''}`);
-        const d = await r.json();
+        const { r, d } = await fetchJsonRetry(`/api/pool-search?network=${net}&q=${encodeURIComponent(q)}${qb ? `&q2=${encodeURIComponent(qb)}` : ''}`);
         if (!r.ok) throw new Error(d.error || 'Ошибка поиска');
         return d.results || [];
       }));
@@ -88,7 +100,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
       setLoading(false);
     }, 400);
     return () => clearTimeout(t);
-  }, [q, qb, netsKey]);
+  }, [q, qb, netsKey, retryTick]);
 
   // клик по сети включает/выключает её; хотя бы одна всегда остаётся выбранной
   function toggleNetwork(k) {
@@ -231,10 +243,14 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
         </>
       )}
       {!q && defLoading && defRows.length === 0 && <p style={{ opacity: 0.7 }}>Загружаю основные пары…</p>}
-      {!q && !defLoading && defFailed.length > 0 && <p style={{ opacity: 0.7, fontSize: 14 }}>Не загрузились: {defFailed.map(k => networkFor(k).label).join(', ')}.</p>}
-      {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
+      {!q && !defLoading && defFailed.length > 0 && (
+        <p style={{ opacity: 0.8, fontSize: 14 }}>Не загрузились: {defFailed.map(k => networkFor(k).label).join(', ')}. <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>Повторить</button></p>
+      )}
+      {err && (
+        <p style={{ color: 'var(--danger)' }}>{err} <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>Повторить</button></p>
+      )}
       {loading && <p style={{ opacity: 0.7 }}>Ищу…</p>}
-      {!loading && failed.length > 0 && <p style={{ opacity: 0.7, fontSize: 14 }}>Не ответили: {failed.map(k => networkFor(k).label).join(', ')}.</p>}
+      {!loading && failed.length > 0 && <p style={{ opacity: 0.8, fontSize: 14 }}>Не ответили: {failed.map(k => networkFor(k).label).join(', ')}. <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>Повторить</button></p>}
       {q && q.length < 2 && <p style={{ opacity: 0.7 }}>Введите минимум 2 символа.</p>}
       {!loading && q.length >= 2 && !err && shown.length === 0 && (
         <p style={{ opacity: 0.7 }}>Пулов не найдено{hiddenCount > 0 ? ` (скрыто фильтрами: ${hiddenCount})` : ''}.</p>

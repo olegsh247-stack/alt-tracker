@@ -24,7 +24,7 @@ export async function GET() {
   const stats = {};
   let statsError = false;
   await Promise.all(Object.entries(byNet).map(async ([net, addrs]) => {
-    try { stats[net] = await getPoolsStats(net, addrs); } catch { statsError = true; stats[net] = new Map(); }
+    try { stats[net] = await getPoolsStats(net, addrs); if (stats[net].failed) statsError = true; } catch { statsError = true; stats[net] = new Map(); }
   }));
 
   const pools = (favs || []).map(f => {

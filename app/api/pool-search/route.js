@@ -17,7 +17,8 @@ export async function GET(req) {
   try {
     const results = await searchPair(network, q, q2);
     return NextResponse.json({ results });
-  } catch {
-    return NextResponse.json({ error: 'Источник данных временно недоступен' }, { status: 502 });
+  } catch (e) {
+    const busy = /429|лимит/i.test(String(e?.message));
+    return NextResponse.json({ error: busy ? 'Источник данных перегружен — повторите через несколько секунд' : 'Источник данных временно недоступен' }, { status: busy ? 429 : 502 });
   }
 }
