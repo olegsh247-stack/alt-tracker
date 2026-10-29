@@ -25,7 +25,7 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
             <th className="pt-num pt-apr">APR 24ч</th>
             <th className="pt-num pt-tvl">TVL</th>
             <th className="pt-num pt-vol">Объём 24ч</th>
-            <th className="pt-num pt-fees">Комиссии 24ч</th>
+            <th className="pt-num pt-fees"><span className="pt-long">Комиссии 24ч</span><span className="pt-short">Комисс.</span></th>
             <th className="pt-num pt-chg">Цена 24ч</th>
             {action && <th className="pt-action">{actionTitle}</th>}
           </tr>
@@ -36,12 +36,20 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
             const isSel = selectMode && select.selected.has(p.id);
             const disabled = isDisabled ? isDisabled(p) : false;
             const fees24 = p.fees24 ?? (p.vol24 != null && p.feePct != null ? p.vol24 * p.feePct / 100 : null);
-            const pctColor = p.change24 == null ? 'var(--text-dim)' : p.change24 >= 0 ? '#26a69a' : '#ef5350';
+            const pctColor = p.change24 == null ? 'var(--text-dim)' : p.change24 >= 0 ? 'var(--up)' : 'var(--down)';
             return (
               <tr
                 key={key}
                 className={`pt-row${isSel ? ' pt-selected' : ''}${disabled ? ' pt-disabled' : ''}`}
-                onClick={() => (selectMode ? select.onToggle(p) : onRowClick && onRowClick(p))}
+                tabIndex={disabled && !selectMode ? -1 : 0}
+                aria-disabled={disabled || undefined}
+                aria-label={`${p.base}/${p.quote}, ${p.dex || ''}`}
+                onClick={() => (selectMode ? select.onToggle(p) : !disabled && onRowClick && onRowClick(p))}
+                onKeyDown={(e) => {
+                  if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
+                  e.preventDefault();
+                  if (selectMode) select.onToggle(p); else if (!disabled && onRowClick) onRowClick(p);
+                }}
               >
                 {selectMode && (
                   <td className="pt-check">
@@ -56,7 +64,7 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
                   <span className="pt-kind-inner">
                     <NetworkBadge network={p.network} />
                     <span className="pt-fee">{fmtFee(p.feePct, p.feeApprox)}</span>
-                    <span className="pt-dex">{p.dex || '—'}</span>
+                    <span className="pt-dex" title={p.dex || ''}>{p.dex || '—'}</span>
                   </span>
                 </td>
                 <td className="pt-num pt-apr pt-strong">{fmtApr(p.apr)}</td>

@@ -8,6 +8,9 @@
   --accent: #2b6cf6;
   --danger: #e5484d;
   --danger-bg: rgba(229, 72, 77, 0.12);
+  --up: #26a69a;
+  --down: #ef5350;
+  --accent-text: #6b9dff;
 }
 
 html[data-theme='light'] {
@@ -20,6 +23,9 @@ html[data-theme='light'] {
   --accent: #2b6cf6;
   --danger: #d93036;
   --danger-bg: rgba(217, 48, 54, 0.08);
+  --up: #0b7a70;
+  --down: #c0272d;
+  --accent-text: #1d4fc9;
 }
 
 * { box-sizing: border-box; }
@@ -153,7 +159,17 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 
 /* --- Pool: таблица пулов (одна шапка на все строки) --- */
 .pool-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 4px -4px 8px; padding: 0 4px; }
-.pool-table { width: 100%; min-width: 720px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.pool-table { width: 100%; min-width: 720px; border-collapse: collapse; font-variant-numeric: tabular-nums; table-layout: fixed; }
+.pool-table th.pt-pair { width: 17%; }
+.pool-table th.pt-kind { width: 27%; }
+.pool-table th.pt-num { width: 11.2%; }
+.pool-table th.pt-check { width: 34px; }
+.pool-table th.pt-action { width: 9%; }
+.pool-table .pt-long { display: inline; }
+.pool-table .pt-short { display: none; }
+.pool-table .pt-dex { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pool-table .pt-kind-inner { max-width: 100%; }
+.pool-table .pt-row:focus-visible { outline: 2px solid var(--accent-text); outline-offset: -2px; }
 .pool-table th {
   position: sticky; top: 0; font-size: 12px; font-weight: 600; color: var(--text-dim);
   text-align: left; padding: 8px 10px; white-space: nowrap; border-bottom: 1px solid var(--card-border); background: var(--bg);
@@ -196,11 +212,59 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .pool-table thead th { border-bottom: none; }
   .pool-table .pt-pair { position: static; min-width: 0; background: transparent; grid-column: 1 / span 2; }
   .pool-table .pt-kind { grid-column: 3 / span 3; justify-self: end; text-align: right; }
-  .pool-table .pt-kind-inner { flex-wrap: wrap; justify-content: flex-end; }
+  .pool-table .pt-kind-inner { justify-content: flex-end; }
   .pool-table .pt-action { display: none; }
   .pool-table.pt-has-check td.pt-check, .pool-table.pt-has-check th.pt-check { grid-column: 1; width: auto; padding: 0; }
   .pool-table.pt-has-check td.pt-check { grid-row: 1 / span 2; }
   .pool-table.pt-has-check .pt-pair { grid-column: 2 / span 2; grid-row: 1; }
   .pool-table.pt-has-check .pt-kind { grid-column: 4 / span 3; grid-row: 1; }
   .pool-table .pt-pair-name { font-size: 16px; overflow-wrap: anywhere; }
+  .pool-table { table-layout: auto; }
+  .pool-table th.pt-pair, .pool-table th.pt-kind, .pool-table th.pt-num, .pool-table th.pt-check, .pool-table th.pt-action { width: auto; }
+  .pool-table .pt-long { display: none; }
+  .pool-table .pt-short { display: inline; }
+  .pool-table .pt-kind-inner { flex-wrap: nowrap; max-width: 100%; }
+  .pool-table .pt-dex { white-space: nowrap; }
+}
+
+/* --- Pool: выбор сети, сортировка, поиск, фильтры --- */
+.net-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.net-chip {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 12px;
+  border: none; border-radius: 10px; background: transparent; color: var(--text-dim);
+  cursor: pointer; font-size: 15px;
+}
+.net-chip img, .net-chip .net-fallback { filter: grayscale(1); opacity: 0.45; transition: opacity .15s, filter .15s; }
+.net-chip:hover img { opacity: 0.8; }
+.net-chip[aria-pressed='true'] { background: var(--input-bg); color: var(--text); font-weight: 600; box-shadow: inset 0 0 0 2px var(--accent); }
+.net-chip[aria-pressed='true'] img, .net-chip[aria-pressed='true'] .net-fallback { filter: none; opacity: 1; }
+.net-chip:focus-visible, .pool-ctl:focus-visible, .filter-chip:focus-within { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+
+.pool-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pool-sort { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pool-sort-chip {
+  min-height: 36px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--input-border);
+  background: none; color: var(--text-dim); cursor: pointer; font-size: 14px;
+}
+.pool-sort-chip[aria-pressed='true'] { border-color: var(--accent-text); color: var(--accent-text); font-weight: 600; }
+.pool-fields { display: flex; align-items: center; gap: 6px; flex: 1 1 340px; min-width: 0; }
+.pool-field { position: relative; flex: 1 1 0; min-width: 0; }
+.pool-swap { width: 40px; height: 42px; border: 1px solid var(--input-border); border-radius: 8px; background: none; color: var(--text-dim); cursor: pointer; font-size: 16px; flex: none; }
+.pool-clear { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: none; background: none; color: var(--text-dim); font-size: 22px; cursor: pointer; }
+
+.pool-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 8px; }
+.filter-chip {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 12px;
+  border: 1px solid var(--input-border); border-radius: 999px; color: var(--text-dim); font-size: 14px; cursor: pointer; user-select: none;
+}
+.filter-chip input { width: 18px; height: 18px; margin: 0; }
+.filter-chip:has(input:checked) { border-color: var(--accent-text); color: var(--text); }
+
+@media (max-width: 720px) {
+  /* сети — одним рядом, только значки */
+  .net-row { flex-wrap: nowrap; gap: 6px; }
+  .net-chip { flex: 1 1 0; justify-content: center; min-height: 44px; padding: 6px 0; }
+  .net-chip .net-label { display: none; }
+  /* поиск выше сортировки */
+  .pool-fields { order: -1; flex-basis: 100%; }
 }

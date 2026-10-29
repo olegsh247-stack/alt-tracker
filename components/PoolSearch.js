@@ -124,6 +124,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
 
   const base = results.filter(p => (!hideSmall || (p.tvl || 0) >= MIN_TVL) && (!stableOnly || p.hasStable));
   const isDead = (p) => !(p.vol24 >= MIN_VOL);
+  const deadCount = base.filter(isDead).length;
   let shown = hideDead ? base.filter(p => !isDead(p)) : base;
   shown = [...shown].sort((a, b) => (b[sort] ?? -1) - (a[sort] ?? -1));
   const hiddenCount = results.length - shown.length;
@@ -132,47 +133,49 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
 
   return (
     <div style={{ marginBottom: 16 }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+      <div className="net-row" role="group" aria-label="Сети">
         {NETWORKS.map(n => (
-          <button key={n.key} type="button" onClick={() => toggleNetwork(n.key)} aria-pressed={nets.includes(n.key)} style={nets.includes(n.key) ? chipActive : chip}>
+          <button key={n.key} type="button" className="net-chip" onClick={() => toggleNetwork(n.key)} aria-pressed={nets.includes(n.key)} aria-label={n.label} title={n.label}>
             <NetworkBadge network={n.key} size="md" />
-            <span>{n.label}</span>
+            <span className="net-label">{n.label}</span>
           </button>
         ))}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+      <div className="pool-top">
+        <div className="pool-sort" role="group" aria-label="Сортировка">
           <span style={{ color: 'var(--text-dim)', fontSize: 14 }}>Сортировка:</span>
           {SORTS.map(([k, t]) => (
-            <button key={k} type="button" onClick={() => pickSort(k)} style={sort === k ? sortChipActive : sortChip}>{t}</button>
+            <button key={k} type="button" className="pool-sort-chip" aria-pressed={sort === k} onClick={() => pickSort(k)}>{t}</button>
           ))}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: '1 1 340px', minWidth: 0, flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', flex: '1 1 130px', minWidth: 120 }}>
+        <div className="pool-fields">
+          <div className="pool-field">
             <input
               ref={inputRef}
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Актив 1: ETH, SOL…"
+              placeholder="Актив 1"
+              aria-label="Актив 1: тикер или адрес токена"
               autoComplete="off"
               autoCapitalize="characters"
               style={input}
             />
-            {query && <button type="button" onClick={() => setQuery('')} style={clearBtn} aria-label="Очистить актив 1">×</button>}
+            {query && <button type="button" className="pool-clear" onClick={() => setQuery('')} aria-label="Очистить актив 1">×</button>}
           </div>
-          <button type="button" onClick={swapAssets} style={swapBtn} aria-label="Поменять активы местами" title="Поменять местами">⇄</button>
-          <div style={{ position: 'relative', flex: '1 1 130px', minWidth: 120 }}>
+          <button type="button" className="pool-swap" onClick={swapAssets} aria-label="Поменять активы местами" title="Поменять местами">⇄</button>
+          <div className="pool-field">
             <input
               ref={input2Ref}
               value={query2}
               onChange={e => setQuery2(e.target.value)}
-              placeholder="Актив 2 (необяз.)"
+              placeholder="Актив 2"
+              aria-label="Актив 2 (необязательно): тикер или адрес токена"
               autoComplete="off"
               autoCapitalize="characters"
               style={input}
             />
-            {query2 && <button type="button" onClick={() => setQuery2('')} style={clearBtn} aria-label="Очистить актив 2">×</button>}
+            {query2 && <button type="button" className="pool-clear" onClick={() => setQuery2('')} aria-label="Очистить актив 2">×</button>}
           </div>
         </div>
       </div>
@@ -186,18 +189,18 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
       )}
 
       {q && (
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', margin: '10px 0 8px', fontSize: 15, color: 'var(--text-dim)' }}>
-          <label style={checkLabel}>
-            <input type="checkbox" checked={hideSmall} onChange={e => setHideSmall(e.target.checked)} style={checkBox} />
-            Скрыть мелкие (TVL &lt; {fmtUsd(MIN_TVL)})
+        <div className="pool-filters">
+          <label className="filter-chip" title={`Скрыть пулы с TVL меньше ${fmtUsd(MIN_TVL)}`}>
+            <input type="checkbox" checked={hideSmall} onChange={e => setHideSmall(e.target.checked)} />
+            Скрыть мелкие
           </label>
-          <label style={checkLabel}>
-            <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} style={checkBox} />
+          <label className="filter-chip">
+            <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} />
             Только со стейблом
           </label>
-          <label style={checkLabel}>
-            <input type="checkbox" checked={hideDead} onChange={e => setHideDead(e.target.checked)} style={checkBox} />
-            Скрыть без объёма (&lt; {fmtUsd(MIN_VOL)} за 24ч)
+          <label className="filter-chip" title={`Скрыть пулы с объёмом за 24ч меньше ${fmtUsd(MIN_VOL)}`}>
+            <input type="checkbox" checked={hideDead} onChange={e => setHideDead(e.target.checked)} />
+            Без объёма{hideDead && deadCount > 0 ? ` (${deadCount})` : ''}
           </label>
         </div>
       )}
@@ -225,12 +228,4 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
 }
 
 const input = { width: '100%', padding: '10px 36px 10px 12px', borderRadius: 10, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box', fontSize: 16 };
-const swapBtn = { width: 34, height: 38, border: '1px solid var(--input-border)', borderRadius: 8, background: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 16, flex: 'none' };
-const clearBtn = { position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: 'none', background: 'none', color: 'var(--text-dim)', fontSize: 22, cursor: 'pointer' };
-const chip = { display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 10, border: '1px solid #000', background: 'none', color: 'var(--text)', cursor: 'pointer', fontSize: 15 };
-const chipActive = { ...chip, background: 'var(--input-bg)', fontWeight: 600 };
 const coinChip = { padding: '8px 14px', borderRadius: 999, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', cursor: 'pointer', fontSize: 16, fontWeight: 600 };
-const sortChip = { padding: '5px 12px', borderRadius: 999, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 14 };
-const sortChipActive = { ...sortChip, borderColor: 'var(--accent)', color: 'var(--accent)', fontWeight: 600 };
-const checkLabel = { display: 'flex', alignItems: 'center', gap: 8 };
-const checkBox = { width: 18, height: 18 };

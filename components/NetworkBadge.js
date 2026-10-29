@@ -23,6 +23,7 @@ export default function NetworkBadge({ network, size = 'sm' }) {
   }
   return (
     <span
+      className="net-fallback"
       title={n.label}
       style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none',

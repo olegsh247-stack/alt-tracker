@@ -351,6 +351,7 @@ export default function HomePage() {
       {isPool && !poolSearching && poolFavs.length > 0 && (
         <PoolTable
           rows={poolFavs}
+          showAge
           getKey={f => f.id}
           onRowClick={f => window.open(`https://www.geckoterminal.com/${f.network}/pools/${f.address}`, '_blank', 'noopener,noreferrer')}
           select={{ mode: poolSelectMode, selected: poolSelected, onToggle: f => togglePoolSelected(f.id) }}
@@ -379,7 +380,7 @@ export default function HomePage() {
         const price = prices[p.id];
         const spark = sparks[p.id];
         const pct = spark?.changePct;
-        const pctColor = pct == null ? 'var(--text-dim)' : pct >= 0 ? '#26a69a' : '#ef5350';
+        const pctColor = pct == null ? 'var(--text-dim)' : pct >= 0 ? 'var(--up)' : 'var(--down)';
         const isSelected = selected.has(p.id);
         return (
           <a
@@ -418,7 +419,7 @@ export default function HomePage() {
         const price = cPrices[p.id];
         const spark = cSparks[p.id];
         const pct = spark?.changePct;
-        const pctColor = pct == null ? 'var(--text-dim)' : pct >= 0 ? '#26a69a' : '#ef5350';
+        const pctColor = pct == null ? 'var(--text-dim)' : pct >= 0 ? 'var(--up)' : 'var(--down)';
         const isSelected = cSelected.has(p.id);
         return (
           <a
