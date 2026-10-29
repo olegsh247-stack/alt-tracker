@@ -12,34 +12,23 @@ const SORTS = [['tvl', 'TVL'], ['apr', 'APR'], ['vol24', 'Объём']];
 // favSet — множество "сеть:адрес" уже добавленных пулов; onAdded() — после успешного добавления;
 // onActiveChange(bool) — сообщает странице, что идёт поиск (чтобы спрятать избранное)
 export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
-  const [nets, setNets] = useState(['solana']); // выбранные сети (можно несколько)
+  const [nets, setNets] = useState(['bsc']); // выбранные сети (можно несколько); при открытии — BNB Chain
   const [failed, setFailed] = useState([]);
   const [query, setQuery] = useState('');   // Актив 1
   const [query2, setQuery2] = useState(''); // Актив 2 (необязательно)
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
-  const [sort, setSort] = useState('tvl');
+  const [sort, setSort] = useState('vol24'); // при открытии — по объёму
   const [hideSmall, setHideSmall] = useState(true);
   const [stableOnly, setStableOnly] = useState(false);
-  const [hideDead, setHideDead] = useState(true);
+  const [hideDead, setHideDead] = useState(false);
   const [recent, setRecent] = useState([]);
   const [addingKey, setAddingKey] = useState(null);
   const reqId = useRef(0);
   const inputRef = useRef(null);
   const input2Ref = useRef(null);
 
-  useEffect(() => {
-    try {
-      let saved = null;
-      try { saved = JSON.parse(localStorage.getItem('poolNetworks') || 'null'); } catch {}
-      if (!Array.isArray(saved)) { const n = localStorage.getItem('poolNetwork'); saved = n ? [n] : null; }
-      const ok = (saved || []).filter(k => NETWORKS.some(x => x.key === k));
-      if (ok.length > 0) setNets(ok);
-      const sv = localStorage.getItem('poolSort');
-      if (sv && SORTS.some(x => x[0] === sv)) setSort(sv);
-    } catch {}
-  }, []);
   useEffect(() => {
     try { setRecent(JSON.parse(localStorage.getItem('poolRecentAll') || '[]')); } catch { setRecent([]); }
   }, []);
@@ -86,11 +75,9 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     if (next.length === 0) return;
     const ordered = NETWORKS.map(n => n.key).filter(x => next.includes(x));
     setNets(ordered);
-    try { localStorage.setItem('poolNetworks', JSON.stringify(ordered)); } catch {}
   }
   function pickSort(k) {
     setSort(k);
-    try { localStorage.setItem('poolSort', k); } catch {}
   }
   function rememberCoin(coin) {
     setRecent(prev => {
@@ -190,18 +177,20 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
 
       {q && (
         <div className="pool-filters">
-          <label className="filter-chip" title={`Скрыть пулы с TVL меньше ${fmtUsd(MIN_TVL)}`}>
-            <input type="checkbox" checked={hideSmall} onChange={e => setHideSmall(e.target.checked)} />
-            Скрыть мелкие
-          </label>
           <label className="filter-chip">
             <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} />
             Только со стейблом
           </label>
-          <label className="filter-chip" title={`Скрыть пулы с объёмом за 24ч меньше ${fmtUsd(MIN_VOL)}`}>
-            <input type="checkbox" checked={hideDead} onChange={e => setHideDead(e.target.checked)} />
-            Без объёма{hideDead && deadCount > 0 ? ` (${deadCount})` : ''}
-          </label>
+          <div className="pool-filters-right">
+            <label className="filter-chip" title={`Скрыть пулы с TVL меньше ${fmtUsd(MIN_TVL)}`}>
+              <input type="checkbox" checked={hideSmall} onChange={e => setHideSmall(e.target.checked)} />
+              Скрыть мелкие
+            </label>
+            <label className="filter-chip" title={`Скрыть пулы с объёмом за 24ч меньше ${fmtUsd(MIN_VOL)}`}>
+              <input type="checkbox" checked={hideDead} onChange={e => setHideDead(e.target.checked)} />
+              Без объёма{hideDead && deadCount > 0 ? ` (${deadCount})` : ''}
+            </label>
+          </div>
         </div>
       )}
 
