@@ -283,3 +283,24 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .filter-chip, .filter-chip:has(input:checked) { border: none; border-radius: 0; padding: 0; min-height: 32px; color: var(--text); }
   .pool-filters-right { gap: 24px; }
 }
+
+/* --- Pool: мобильная раскладка v2 ---
+   верхняя линия: [галочка] пара | вид пула (гибкая ширина, площадка обрезается многоточием);
+   нижняя линия: 5 равных колонок на всю ширину, шапка совпадает с ними */
+@media (max-width: 720px) {
+  .pool-table tr, .pool-table.pt-has-check tr { display: flex; flex-wrap: wrap; align-items: center; gap: 0; }
+  .pool-table tr::after { content: ''; flex: 0 0 100%; height: 0; order: 1; }
+  .pool-table thead th.pt-check, .pool-table thead th.pt-pair, .pool-table thead th.pt-kind, .pool-table thead th.pt-action { display: none; }
+  .pool-table td.pt-check { order: 0; flex: 0 0 30px; padding: 0; align-self: center; }
+  .pool-table td.pt-pair { order: 0; flex: 0 1 auto; max-width: 62%; min-width: 0; padding: 0; grid-column: auto; }
+  .pool-table td.pt-kind { order: 0; flex: 1 1 0; min-width: 0; overflow: hidden; padding: 0 0 0 8px; text-align: right; grid-column: auto; justify-self: auto; }
+  .pool-table .pt-kind-inner { display: inline-flex; flex-wrap: nowrap; justify-content: flex-end; max-width: 100%; }
+  .pool-table .pt-dex { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pool-table .pt-fee, .pool-table .pt-kind-inner > img, .pool-table .pt-kind-inner > .net-fallback { flex: none; }
+  .pool-table .pt-num { order: 2; flex: 0 0 20%; max-width: 20%; min-width: 0; box-sizing: border-box; padding: 6px 0 0; text-align: right; }
+  .pool-table thead .pt-num { padding: 6px 0; align-self: flex-end; white-space: normal; }
+  .pool-table tbody tr { padding: 8px 0 10px; }
+}
+@media (max-width: 380px) {
+  .pool-table td.pt-num { font-size: 13px; }
+}

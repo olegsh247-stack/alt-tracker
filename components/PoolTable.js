@@ -24,7 +24,7 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
             <th className="pt-kind">Вид пула</th>
             <th className="pt-num pt-apr">APR 24ч</th>
             <th className="pt-num pt-tvl">TVL</th>
-            <th className="pt-num pt-vol">Объём 24ч</th>
+            <th className="pt-num pt-vol"><span className="pt-long">Объём 24ч</span><span className="pt-short">Объём</span></th>
             <th className="pt-num pt-fees"><span className="pt-long">Комиссии 24ч</span><span className="pt-short">Комисс.</span></th>
             <th className="pt-num pt-chg">Цена 24ч</th>
             {action && <th className="pt-action">{actionTitle}</th>}
