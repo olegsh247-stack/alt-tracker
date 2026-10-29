@@ -159,10 +159,15 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 
 /* --- Pool: таблица пулов (одна шапка на все строки) --- */
 .pool-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 4px -4px 8px; padding: 0 4px; }
-.pool-table { width: 100%; min-width: 720px; border-collapse: collapse; font-variant-numeric: tabular-nums; table-layout: fixed; }
-.pool-table th.pt-pair { width: 17%; }
-.pool-table th.pt-kind { width: 27%; }
-.pool-table th.pt-num { width: 11.2%; }
+.pool-table { width: 100%; min-width: 780px; border-collapse: collapse; font-variant-numeric: tabular-nums; table-layout: fixed; }
+.pool-table th.pt-pair { width: 22%; }
+.pool-table th.pt-kind { width: 24%; }
+.pool-table th.pt-num { width: 10.8%; }
+.pool-table th.pt-apr { width: 10%; }
+.pool-table th.pt-tvl { width: 9.5%; }
+.pool-table th.pt-vol { width: 10.5%; }
+.pool-table th.pt-fees { width: 12.5%; }
+.pool-table th.pt-chg { width: 11.5%; }
 .pool-table th.pt-check { width: 34px; }
 .pool-table th.pt-action { width: 9%; }
 .pool-table .pt-long { display: inline; }
@@ -181,7 +186,7 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .pool-table .pt-pair { position: sticky; left: 0; z-index: 1; background: var(--bg); min-width: 110px; }
 .pool-table .pt-check + .pt-pair { left: 34px; }
 .pool-table th.pt-pair { z-index: 2; }
-.pool-table .pt-pair-name { font-weight: 700; font-size: 16px; display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 8px; }
+.pool-table .pt-pair-name { font-weight: 700; font-size: 16px; display: flex; align-items: baseline; flex-wrap: nowrap; column-gap: 8px; white-space: nowrap; }
 .pool-table .pt-age { font-size: 12px; font-weight: 400; color: var(--text-dim); white-space: nowrap; }
 .pool-table .pt-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
 .pool-table .pt-kind-inner { display: inline-flex; align-items: center; gap: 6px; }
@@ -219,9 +224,9 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .pool-table.pt-has-check td.pt-check { grid-row: 1 / span 2; }
   .pool-table.pt-has-check .pt-pair { grid-column: 2 / span 2; grid-row: 1; }
   .pool-table.pt-has-check .pt-kind { grid-column: 4 / span 3; grid-row: 1; }
-  .pool-table .pt-pair-name { font-size: 16px; overflow-wrap: anywhere; }
+  .pool-table .pt-pair-name { font-size: 16px; overflow-wrap: anywhere; flex-wrap: wrap; white-space: normal; }
   .pool-table { table-layout: auto; }
-  .pool-table th.pt-pair, .pool-table th.pt-kind, .pool-table th.pt-num, .pool-table th.pt-check, .pool-table th.pt-action { width: auto; }
+  .pool-table th.pt-pair, .pool-table th.pt-kind, .pool-table th.pt-num, .pool-table th.pt-apr, .pool-table th.pt-tvl, .pool-table th.pt-vol, .pool-table th.pt-fees, .pool-table th.pt-chg, .pool-table th.pt-check, .pool-table th.pt-action { width: auto; }
   .pool-table .pt-long { display: none; }
   .pool-table .pt-short { display: inline; }
   .pool-table .pt-kind-inner { flex-wrap: nowrap; max-width: 100%; }
