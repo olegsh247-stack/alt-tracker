@@ -57,8 +57,10 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
                   </td>
                 )}
                 <td className="pt-pair">
-                  <div className="pt-pair-name">{p.base}/{p.quote}{markDisabled && disabled && <span className="pt-mark" title="В избранном"> ✓</span>}</div>
-                  {showAge && <div className="pt-sub">{fmtAge(p.createdAt)}</div>}
+                  <div className="pt-pair-name">
+                    <span>{p.base}/{p.quote}{markDisabled && disabled && <span className="pt-mark" title="В избранном"> ✓</span>}</span>
+                    {showAge && <span className="pt-age" title="Возраст пула">{fmtAge(p.createdAt)}</span>}
+                  </div>
                 </td>
                 <td className="pt-kind">
                   <span className="pt-kind-inner">

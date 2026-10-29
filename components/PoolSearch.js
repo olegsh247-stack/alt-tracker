@@ -23,6 +23,9 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   const [hideSmall, setHideSmall] = useState(true);
   const [stableOnly, setStableOnly] = useState(false);
   const [hideDead, setHideDead] = useState(false);
+  const [defaults, setDefaults] = useState({}); // пары по умолчанию: { сеть: [пулы] }
+  const [defLoading, setDefLoading] = useState(false);
+  const [defFailed, setDefFailed] = useState([]);
   const [recent, setRecent] = useState([]);
   const [addingKey, setAddingKey] = useState(null);
   const reqId = useRef(0);
@@ -40,6 +43,24 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
 
   // поиск с задержкой; по каждой выбранной сети запрос идёт отдельно, результаты склеиваются
   const netsKey = nets.join(',');
+  // пары по умолчанию: пока поиск пуст, для каждой выбранной сети подгружаем 2 пула
+  useEffect(() => {
+    if (q) return;
+    const need = nets.filter(n => !defaults[n]);
+    if (need.length === 0) { setDefFailed([]); return; }
+    let alive = true;
+    setDefLoading(true);
+    fetch(`/api/pool-defaults?networks=${need.join(',')}`)
+      .then(r => r.json())
+      .then(d => {
+        if (!alive) return;
+        setDefaults(prev => ({ ...prev, ...(d.results || {}) }));
+        setDefFailed(d.failed || (d.results ? [] : need));
+      })
+      .catch(() => { if (alive) setDefFailed(need); })
+      .finally(() => { if (alive) setDefLoading(false); });
+    return () => { alive = false; };
+  }, [q, netsKey]);
   useEffect(() => {
     setErr('');
     setFailed([]);
@@ -115,6 +136,8 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
   let shown = hideDead ? base.filter(p => !isDead(p)) : base;
   shown = [...shown].sort((a, b) => (b[sort] ?? -1) - (a[sort] ?? -1));
   const hiddenCount = results.length - shown.length;
+
+  const defRows = nets.flatMap(n => defaults[n] || []);
 
   const quick = [...new Set([...recent, ...nets.flatMap(k => networkFor(k).quick || [])])].slice(0, 8);
 
@@ -194,6 +217,21 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
         </div>
       )}
 
+      {!q && defRows.length > 0 && (
+        <>
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', margin: '14px 0 2px' }}>Основные пары</div>
+          <PoolTable
+            rows={defRows}
+            getKey={p => `${p.network}:${p.address}`}
+            showAge
+            onRowClick={add}
+            isDisabled={p => favSet.has(`${p.network}:${p.address}`) || addingKey === p.address}
+            markDisabled
+          />
+        </>
+      )}
+      {!q && defLoading && defRows.length === 0 && <p style={{ opacity: 0.7 }}>Загружаю основные пары…</p>}
+      {!q && !defLoading && defFailed.length > 0 && <p style={{ opacity: 0.7, fontSize: 14 }}>Не загрузились: {defFailed.map(k => networkFor(k).label).join(', ')}.</p>}
       {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
       {loading && <p style={{ opacity: 0.7 }}>Ищу…</p>}
       {!loading && failed.length > 0 && <p style={{ opacity: 0.7, fontSize: 14 }}>Не ответили: {failed.map(k => networkFor(k).label).join(', ')}.</p>}
