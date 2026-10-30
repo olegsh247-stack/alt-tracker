@@ -501,11 +501,11 @@ const row = {
 const cell = { minWidth: 90, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
 const plusBtn = {
   width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'var(--accent)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontSize: 20,
+  background: 'var(--accent)', color: 'var(--on-accent)', borderRadius: 8, textDecoration: 'none', fontSize: 20,
 };
 const trashBtn = {
   width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 20, cursor: 'pointer',
+  background: 'var(--danger)', color: 'var(--on-danger)', border: 'none', borderRadius: 8, fontSize: 20, cursor: 'pointer',
 };
 const deleteModeBtn = trashBtn;
 const sortModeBtn = {
@@ -528,7 +528,7 @@ const sortItem = {
 };
 const logoutBtn = { background: 'none', border: '1px solid var(--input-border)', color: 'var(--text-dim)', borderRadius: 8, padding: '0 12px' };
 const confirmDeleteBtn = {
-  background: 'var(--danger)', color: '#fff', border: 'none', borderRadius: 8, padding: '0 14px', fontWeight: 600, cursor: 'pointer',
+  background: 'var(--danger)', color: 'var(--on-danger)', border: 'none', borderRadius: 8, padding: '0 14px', fontWeight: 600, cursor: 'pointer',
 };
 const swapBtn = {
   width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -537,7 +537,7 @@ const swapBtn = {
 };
 const tabActive = {
   padding: '8px 10px', borderRadius: 8, border: '1px solid var(--accent)',
-  background: 'var(--accent)', color: '#fff', fontWeight: 600, cursor: 'pointer',
+  background: 'var(--accent)', color: 'var(--on-accent)', fontWeight: 600, cursor: 'pointer',
 };
 const tabInactive = {
   padding: '8px 10px', borderRadius: 8, border: '1px solid var(--input-border)',

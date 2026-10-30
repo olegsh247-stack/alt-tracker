@@ -14,18 +14,18 @@ export default function Chart({ candles }) {
       width: ref.current.clientWidth,
       height: 360,
       layout: {
-        background: { color: isLight ? '#ffffff' : '#0b0e11' },
+        background: { color: isLight ? '#ffffff' : '#07090d' },
         textColor: isLight ? '#333' : '#ccc',
       },
       grid: {
-        vertLines: { color: isLight ? '#eee' : '#1c2127' },
-        horzLines: { color: isLight ? '#eee' : '#1c2127' },
+        vertLines: { color: isLight ? '#eee' : '#161b22' },
+        horzLines: { color: isLight ? '#eee' : '#161b22' },
       },
       timeScale: { timeVisible: true },
     });
     const series = chart.addCandlestickSeries({
-      upColor: '#26a69a', downColor: '#ef5350', borderVisible: false,
-      wickUpColor: '#26a69a', wickDownColor: '#ef5350',
+      upColor: isLight ? '#1a7f37' : '#00e676', downColor: isLight ? '#cf222e' : '#ff5252', borderVisible: false,
+      wickUpColor: isLight ? '#1a7f37' : '#00e676', wickDownColor: isLight ? '#cf222e' : '#ff5252',
     });
     chartRef.current = chart;
     seriesRef.current = series;

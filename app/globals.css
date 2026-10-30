@@ -1,31 +1,44 @@
 :root {
-  --bg: #0b0e11;
-  --text: #e6e6e6;
-  --text-dim: #9aa0a6;
-  --card-border: #22262b;
-  --input-bg: #161a1e;
-  --input-border: #333;
-  --accent: #2b6cf6;
-  --danger: #e5484d;
-  --danger-bg: rgba(229, 72, 77, 0.12);
-  --up: #26a69a;
-  --down: #ef5350;
-  --accent-text: #6b9dff;
+  /* === ТЁМНАЯ ТЕМА (Neon Terminal) === */
+  --bg: #07090d;
+  --bg-elevated: #0d1117;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --card-border: #21262d;
+  --input-bg: #0d1117;
+  --input-border: #30363d;
+  --accent: #00d4ff;
+  --accent-hover: #00b8e0;
+  --accent-text: #7ee8ff;
+  --accent-soft: rgba(0, 212, 255, 0.12);
+  --danger: #ff4d6a;
+  --danger-bg: rgba(255, 77, 106, 0.12);
+  --up: #00e676;
+  --down: #ff5252;
+  /* цвет текста на кнопках с фоном accent / danger (белый на неоновом голубом нечитаем) */
+  --on-accent: #04141a;
+  --on-danger: #1a0006;
 }
 
 html[data-theme='light'] {
-  --bg: #f5f6f8;
-  --text: #1a1d21;
-  --text-dim: #5f6570;
-  --card-border: #e2e5e9;
+  /* === СВЕТЛАЯ ТЕМА (Clean Paper) === */
+  --bg: #f6f8fa;
+  --bg-elevated: #ffffff;
+  --text: #1f2328;
+  --text-dim: #656d76;
+  --card-border: #d0d7de;
   --input-bg: #ffffff;
-  --input-border: #d0d4da;
-  --accent: #2b6cf6;
-  --danger: #d93036;
-  --danger-bg: rgba(217, 48, 54, 0.08);
-  --up: #0b7a70;
-  --down: #c0272d;
-  --accent-text: #1d4fc9;
+  --input-border: #d0d7de;
+  --accent: #0969da;
+  --accent-hover: #0550ae;
+  --accent-text: #0550ae;
+  --accent-soft: rgba(9, 105, 218, 0.08);
+  --danger: #cf222e;
+  --danger-bg: rgba(207, 34, 46, 0.08);
+  --up: #1a7f37;
+  --down: #cf222e;
+  --on-accent: #ffffff;
+  --on-danger: #ffffff;
 }
 
 * { box-sizing: border-box; }
@@ -314,8 +327,8 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .tv-box { display: flex; flex-direction: column; }
 .tv-head { min-height: 120px; }
 .tv-chart { height: 400px; }
-.tv-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); width: 100%; }
-.tv-pair .tv-box + .tv-box { border-top: 1px solid var(--card-border); }
+.tv-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; width: 100%; }
+.tv-pair .tv-box { border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; }
 .open-pair { margin-left: 6px; padding: 0 6px; border-radius: 6px; color: var(--text-dim); text-decoration: none; font-size: 15px; }
 .open-pair:hover { color: var(--text); background: var(--input-bg); }
 .side-title { padding: 10px 14px 0; font-size: 15px; font-weight: 600; color: var(--text-dim); }
@@ -339,7 +352,6 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .side-panel { position: sticky; top: 0; height: 100vh; padding: 16px 16px 16px 0; gap: 12px; }
   .side-chart { flex: 0 0 62%; display: flex; }
   .tv-pair { flex: 1; min-height: 0; grid-auto-rows: minmax(0, 1fr); }
-  .tv-pair .tv-box + .tv-box { border-top: none; border-left: 1px solid var(--card-border); }
   .tv-box { flex: 1; min-height: 0; width: 100%; }
   .tv-chart { flex: 1; height: auto; min-height: 0; }
   .side-news { flex: 1; min-height: 0; display: flex; flex-direction: column; }

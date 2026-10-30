@@ -92,5 +92,5 @@ const box = { maxWidth: 440, margin: '40px auto', padding: 20 };
 const card = { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6, padding: 16, marginBottom: 14, border: '1px solid var(--card-border)', borderRadius: 10 };
 const label = { fontSize: 14, color: 'var(--text-dim)' };
 const input = { width: '100%', padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)' };
-const btn = { padding: '10px 16px', borderRadius: 8, border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600, textDecoration: 'none', cursor: 'pointer' };
+const btn = { padding: '10px 16px', borderRadius: 8, border: 'none', background: 'var(--accent)', color: 'var(--on-accent)', fontWeight: 600, textDecoration: 'none', cursor: 'pointer' };
 const btnGhost = { padding: '10px 16px', borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text)', cursor: 'pointer' };

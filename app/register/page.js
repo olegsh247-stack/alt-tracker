@@ -44,4 +44,4 @@ export default function RegisterPage() {
 
 const box = { maxWidth: 360, margin: '80px auto', padding: 24 };
 const input = { padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)' };
-const btn = { padding: 12, borderRadius: 8, border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600 };
+const btn = { padding: 12, borderRadius: 8, border: 'none', background: 'var(--accent)', color: 'var(--on-accent)', fontWeight: 600 };

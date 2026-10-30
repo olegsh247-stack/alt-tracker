@@ -72,7 +72,7 @@ export default function TickerPicker({ placeholder, onPick }) {
                 <span style={exchangeBadge}>{r.exchange}</span>
                 <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'baseline', gap: 6 }}>
                   <span>{fmtPrice(r.price)}</span>
-                  <span style={{ color: up ? '#26a69a' : '#ef5350', fontSize: 14 }}>
+                  <span style={{ color: up ? 'var(--up)' : 'var(--down)', fontSize: 14 }}>
                     ({up ? '+' : ''}{r.changePct.toFixed(1)}%)
                   </span>
                 </span>

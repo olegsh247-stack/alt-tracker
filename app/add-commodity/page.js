@@ -50,5 +50,5 @@ export default function AddCommodityPage() {
 
 const label = { fontSize: 15, opacity: 0.7, marginBottom: 6 };
 const input = { width: '100%', padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)', boxSizing: 'border-box' };
-const okBtn = { flex: 1, padding: 12, borderRadius: 8, border: 'none', background: 'var(--accent)', color: '#fff', fontWeight: 600 };
+const okBtn = { flex: 1, padding: 12, borderRadius: 8, border: 'none', background: 'var(--accent)', color: 'var(--on-accent)', fontWeight: 600 };
 const cancelBtn = { flex: 1, padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)' };
