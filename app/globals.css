@@ -1,22 +1,22 @@
 :root {
-  /* === ТЁМНАЯ ТЕМА (Neon Terminal) === */
-  --bg: #07090d;
-  --bg-elevated: #0d1117;
+  /* === ТЁМНАЯ ТЕМА (Neon Deep Sea) === */
+  --bg: #060f11;
+  --bg-elevated: #0b1a1d;
   --text: #e6edf3;
   --text-dim: #8b949e;
-  --card-border: #21262d;
-  --input-bg: #0d1117;
-  --input-border: #30363d;
-  --accent: #00d4ff;
-  --accent-hover: #00b8e0;
-  --accent-text: #7ee8ff;
-  --accent-soft: rgba(0, 212, 255, 0.12);
+  --card-border: #17302f;
+  --input-bg: #0b1a1d;
+  --input-border: #24413f;
+  --accent: #14b8a6;
+  --accent-hover: #0d9488;
+  --accent-text: #5eead4;
+  --accent-soft: rgba(20, 184, 166, 0.14);
   --danger: #ff4d6a;
   --danger-bg: rgba(255, 77, 106, 0.12);
   --up: #00e676;
   --down: #ff5252;
   /* цвет текста на кнопках с фоном accent / danger (белый на неоновом голубом нечитаем) */
-  --on-accent: #04141a;
+  --on-accent: #02130f;
   --on-danger: #1a0006;
 }
 
@@ -29,10 +29,10 @@ html[data-theme='light'] {
   --card-border: #d0d7de;
   --input-bg: #ffffff;
   --input-border: #d0d7de;
-  --accent: #0969da;
-  --accent-hover: #0550ae;
-  --accent-text: #0550ae;
-  --accent-soft: rgba(9, 105, 218, 0.08);
+  --accent: #0f766e;
+  --accent-hover: #115e59;
+  --accent-text: #0f766e;
+  --accent-soft: rgba(15, 118, 110, 0.10);
   --danger: #cf222e;
   --danger-bg: rgba(207, 34, 46, 0.08);
   --up: #1a7f37;

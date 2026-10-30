@@ -40,7 +40,7 @@ function Widget({ src, config, className, style }) {
 
 export default function TvChart({ symbols = ['BINANCE:BTCUSDT', 'BINANCE:ETHUSDT'] }) {
   const theme = useTheme();
-  const bg = theme === 'light' ? '#ffffff' : '#07090d';
+  const bg = theme === 'light' ? '#ffffff' : '#060f11';
   return (
     <div className="tv-pair">
       {symbols.map(symbol => (

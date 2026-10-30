@@ -14,12 +14,12 @@ export default function Chart({ candles }) {
       width: ref.current.clientWidth,
       height: 360,
       layout: {
-        background: { color: isLight ? '#ffffff' : '#07090d' },
+        background: { color: isLight ? '#ffffff' : '#060f11' },
         textColor: isLight ? '#333' : '#ccc',
       },
       grid: {
-        vertLines: { color: isLight ? '#eee' : '#161b22' },
-        horzLines: { color: isLight ? '#eee' : '#161b22' },
+        vertLines: { color: isLight ? '#eee' : '#102224' },
+        horzLines: { color: isLight ? '#eee' : '#102224' },
       },
       timeScale: { timeVisible: true },
     });
