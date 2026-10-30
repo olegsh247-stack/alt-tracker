@@ -318,6 +318,7 @@ export default function HomePage() {
           {!curSelectMode ? (
             <>
               <ThemeToggle />
+              <a href="/account" style={{ ...sortModeBtn, textDecoration: 'none' }} title="Аккаунт и восстановление доступа" aria-label="Аккаунт">⚙</a>
               {!isPool && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>}
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить">–</button>}
               {!isAssets && !isPool && curPairs.length > 1 && (
