@@ -306,3 +306,37 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 }
 
 .pool-retry { margin-left: 6px; padding: 4px 12px; min-height: 32px; border-radius: 999px; border: 1px solid var(--accent-text); background: none; color: var(--accent-text); font-size: 14px; cursor: pointer; }
+
+/* ───── Две колонки: слева страницы, справа график и новости ───── */
+.app-shell { max-width: 860px; margin: 0 auto; }
+.side-panel { padding: 0 16px 24px; display: flex; flex-direction: column; gap: 16px; }
+.side-chart, .side-news { border: 1px solid var(--card-border); border-radius: 10px; background: var(--bg); overflow: hidden; }
+.tv-box { display: flex; flex-direction: column; }
+.tv-head { min-height: 120px; }
+.tv-chart { height: 380px; }
+.side-title { padding: 10px 14px 0; font-size: 15px; font-weight: 600; color: var(--text-dim); }
+
+.news-filters { display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px; scrollbar-width: none; }
+.news-filters::-webkit-scrollbar { display: none; }
+.news-chip { flex: none; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--card-border); background: var(--input-bg); color: var(--text-dim); font-size: 14px; cursor: pointer; }
+.news-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.news-list { max-height: 460px; overflow-y: auto; }
+.news-item { display: block; padding: 10px 14px; border-top: 1px solid var(--card-border); text-decoration: none; color: var(--text); }
+.news-item:hover { background: var(--input-bg); }
+.news-meta { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--text-dim); margin-bottom: 3px; }
+.news-tag { padding: 0 7px; border-radius: 999px; border: 1px solid var(--card-border); font-size: 12px; }
+.news-time { margin-left: auto; font-variant-numeric: tabular-nums; }
+.news-title { font-size: 15px; line-height: 1.35; }
+.news-empty, .news-foot { padding: 14px; font-size: 14px; color: var(--text-dim); }
+
+@media (min-width: 1200px) {
+  .app-shell { max-width: 1640px; display: grid; grid-template-columns: minmax(0, 860px) minmax(420px, 1fr); gap: 8px; align-items: start; }
+  .app-shell .page-wrap { margin: 0 !important; width: 100%; }
+  .side-panel { position: sticky; top: 0; height: 100vh; padding: 16px 16px 16px 0; gap: 12px; }
+  .side-chart { flex: 0 0 52%; display: flex; }
+  .tv-box { flex: 1; min-height: 0; width: 100%; }
+  .tv-chart { flex: 1; height: auto; min-height: 0; }
+  .side-news { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .news { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+  .news-list { max-height: none; flex: 1; min-height: 0; }
+}

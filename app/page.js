@@ -5,6 +5,8 @@ import PriceValue from '../components/PriceValue';
 import { shortTickerFor, enLabelFor } from '../lib/commodities';
 import PoolSearch from '../components/PoolSearch';
 import PoolTable from '../components/PoolTable';
+import TvChart from '../components/TvChart';
+import NewsFeed from '../components/NewsFeed';
 
 function icon(asset) {
   return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
@@ -282,6 +284,7 @@ export default function HomePage() {
   const curConfirmDelete = isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
+    <div className="app-shell">
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
         <span className="header-login" style={{ color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>{login || '\u00A0'}</span>
@@ -452,6 +455,11 @@ export default function HomePage() {
           </a>
         );
       })}
+    </div>
+    <aside className="side-panel">
+      <section className="side-chart"><TvChart symbol="BINANCE:BTCUSDT" /></section>
+      <section className="side-news"><div className="side-title">Новости</div><NewsFeed /></section>
+    </aside>
     </div>
   );
 }
