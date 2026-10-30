@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Logo from '../../components/Logo';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
@@ -24,6 +25,7 @@ export default function RegisterPage() {
 
   return (
     <div style={box}>
+      <div style={{ marginBottom: 14 }}><Logo size={56} /></div>
       <h1 style={{ fontSize: 24 }}>Регистрация</h1>
       {login ? (
         <p>Ваш логин: <b>{login}</b><br />Запомните его — переходим на главную...</p>

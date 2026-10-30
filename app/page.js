@@ -7,6 +7,7 @@ import PoolSearch from '../components/PoolSearch';
 import PoolTable from '../components/PoolTable';
 import TvChart from '../components/TvChart';
 import NewsFeed from '../components/NewsFeed';
+import Logo from '../components/Logo';
 
 function icon(asset) {
   return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
@@ -313,7 +314,10 @@ export default function HomePage() {
     <div className="app-shell">
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-        <span className="header-login" style={{ color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>{login || '\u00A0'}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Logo size={28} />
+          <span className="header-login" style={{ color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>{login || '\u00A0'}</span>
+        </span>
         <div style={{ display: 'flex', gap: 8 }}>
           {!curSelectMode ? (
             <>

@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Logo from '../../components/Logo';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -34,6 +35,7 @@ export default function LoginPage() {
 
   return (
     <div style={box}>
+      <div style={{ marginBottom: 14 }}><Logo size={56} /></div>
       <h1 style={{ fontSize: 24 }}>Вход</h1>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <input placeholder="Логин (00000001)" value={login} onChange={e => setLogin(e.target.value)} style={input} />
