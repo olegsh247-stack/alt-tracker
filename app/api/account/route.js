@@ -9,13 +9,20 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const userId = getUserId();
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
-  const { data, error } = await supabase.from('users').select('login, google_sub, google_email').eq('id', userId).single();
+  let { data, error } = await supabase.from('users').select('login, google_sub, google_email').eq('id', userId).single();
+  let dbReady = true;
+  if (error) {
+    // нет полей под Google (не выполнен SQL migration_4) — отдаём хотя бы логин
+    dbReady = false;
+    ({ data, error } = await supabase.from('users').select('login').eq('id', userId).single());
+  }
   if (error || !data) return NextResponse.json({ error: 'Не найден' }, { status: 404 });
   return NextResponse.json({
     login: data.login,
     googleLinked: !!data.google_sub,
     googleEmail: data.google_email || null,
     googleConfigured: googleConfigured(),
+    dbReady,
   });
 }
 

@@ -17,11 +17,13 @@ export default function AccountPage() {
   const [bad, setBad] = useState(false);
   const [pwd, setPwd] = useState('');
   const [busy, setBusy] = useState(false);
+  const [loadErr, setLoadErr] = useState(false);
 
   async function load() {
     const r = await fetch('/api/account');
     if (r.status === 401) { window.location.href = '/login'; return; }
     if (r.ok) setInfo(await r.json());
+    else { setLoadErr(true); }
   }
   useEffect(() => {
     load();
@@ -52,13 +54,19 @@ export default function AccountPage() {
       <a href="/" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>← Назад</a>
       <h1 style={{ fontSize: 24, margin: '12px 0' }}>Аккаунт</h1>
       {note && <p style={{ color: bad ? 'var(--danger)' : 'var(--up)', fontSize: 15 }}>{note}</p>}
-      {!info ? <p style={{ color: 'var(--text-dim)' }}>Загрузка…</p> : (
+      {!info && loadErr && <p style={{ color: 'var(--danger)' }}>Не удалось загрузить данные аккаунта. Обновите страницу или попробуйте позже.</p>}
+      {!info && !loadErr ? <p style={{ color: 'var(--text-dim)' }}>Загрузка…</p> : !info ? null : (
         <>
           <div style={card}>
             <div style={label}>Ваш логин</div>
             <div style={{ fontSize: 22, fontVariantNumeric: 'tabular-nums', letterSpacing: 1 }}>{info.login}</div>
           </div>
 
+          {info.dbReady === false && (
+            <div style={{ ...card, borderColor: 'var(--danger)' }}>
+              <div style={{ color: 'var(--danger)' }}>В базе данных пока нет полей под Google. Выполните SQL из файла sql/migration_4.sql в Supabase (SQL Editor), затем обновите страницу.</div>
+            </div>
+          )}
           <div style={card}>
             <div style={label}>Google — вход и восстановление доступа</div>
             {info.googleLinked ? (
