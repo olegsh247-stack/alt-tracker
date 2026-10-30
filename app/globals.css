@@ -313,7 +313,11 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .side-chart, .side-news { border: 1px solid var(--card-border); border-radius: 10px; background: var(--bg); overflow: hidden; }
 .tv-box { display: flex; flex-direction: column; }
 .tv-head { min-height: 120px; }
-.tv-chart { height: 380px; }
+.tv-chart { height: 400px; }
+.tv-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); width: 100%; }
+.tv-pair .tv-box + .tv-box { border-top: 1px solid var(--card-border); }
+.open-pair { margin-left: 6px; padding: 0 6px; border-radius: 6px; color: var(--text-dim); text-decoration: none; font-size: 15px; }
+.open-pair:hover { color: var(--text); background: var(--input-bg); }
 .side-title { padding: 10px 14px 0; font-size: 15px; font-weight: 600; color: var(--text-dim); }
 
 .news-filters { display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px; scrollbar-width: none; }
@@ -330,13 +334,21 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .news-empty, .news-foot { padding: 14px; font-size: 14px; color: var(--text-dim); }
 
 @media (min-width: 1200px) {
-  .app-shell { max-width: 1640px; display: grid; grid-template-columns: minmax(0, 860px) minmax(420px, 1fr); gap: 8px; align-items: start; }
+  .app-shell { max-width: none; display: grid; grid-template-columns: minmax(780px, 900px) minmax(0, 1fr); gap: 8px; align-items: start; }
   .app-shell .page-wrap { margin: 0 !important; width: 100%; }
   .side-panel { position: sticky; top: 0; height: 100vh; padding: 16px 16px 16px 0; gap: 12px; }
-  .side-chart { flex: 0 0 52%; display: flex; }
+  .side-chart { flex: 0 0 62%; display: flex; }
+  .tv-pair { flex: 1; min-height: 0; grid-auto-rows: minmax(0, 1fr); }
+  .tv-pair .tv-box + .tv-box { border-top: none; border-left: 1px solid var(--card-border); }
   .tv-box { flex: 1; min-height: 0; width: 100%; }
   .tv-chart { flex: 1; height: auto; min-height: 0; }
   .side-news { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .news { display: flex; flex-direction: column; min-height: 0; flex: 1; }
   .news-list { max-height: none; flex: 1; min-height: 0; }
+}
+
+/* Средние экраны: правая колонка узкая — графики друг под другом, им отдаём больше высоты */
+@media (min-width: 1200px) and (max-width: 1599px) {
+  .side-chart { flex-basis: 74%; }
+  .tv-head { min-height: 96px; }
 }

@@ -244,6 +244,32 @@ export default function HomePage() {
     setCDeleting(false);
   }
 
+  // ───── графики справа (только вкладка Spot): монеты выбранной пары, по умолчанию BTC и ETH ─────
+  const [chartPairId, setChartPairId] = useState(null);
+  useEffect(() => { try { const v = localStorage.getItem('chartPairId'); if (v) setChartPairId(v); } catch {} }, []);
+  function pickChartPair(id) {
+    setChartPairId(String(id));
+    try { localStorage.setItem('chartPairId', String(id)); } catch {}
+    if (typeof window !== 'undefined' && window.innerWidth < 1200) {
+      setTimeout(() => document.querySelector('.side-chart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  }
+  const TV_PREFIX = { BINANCE: 'BINANCE', BYBIT: 'BYBIT', OKX: 'OKX', GATE: 'GATEIO', MEXC: 'MEXC' };
+  const STABLE_COINS = new Set(['USDT', 'USDC', 'USD', 'DAI', 'FDUSD', 'BUSD', 'TUSD']);
+  function chartSymbolsFor(pair) {
+    if (!pair) return ['BINANCE:BTCUSDT', 'BINANCE:ETHUSDT'];
+    const out = [];
+    [[pair.asset1, pair.exchange1], [pair.asset2, pair.exchange2]].forEach(([a, ex]) => {
+      const coin = String(a || '').toUpperCase();
+      if (!coin || STABLE_COINS.has(coin)) return;
+      const sym = `${TV_PREFIX[String(ex || '').toUpperCase()] || 'BINANCE'}:${coin}USDT`;
+      if (!out.includes(sym)) out.push(sym);
+    });
+    return out.length ? out : ['BINANCE:BTCUSDT', 'BINANCE:ETHUSDT'];
+  }
+  const chartPair = pairs.find(p => String(p.id) === chartPairId) || null;
+  const chartSymbols = chartSymbolsFor(chartPair);
+
   const isAssets = tab === 'assets';
   const isPair = tab === 'pair';
   const isCommodities = tab === 'commodities';
@@ -386,12 +412,14 @@ export default function HomePage() {
         const pctColor = pct == null ? 'var(--text-dim)' : pct >= 0 ? 'var(--up)' : 'var(--down)';
         const isSelected = selected.has(p.id);
         return (
-          <a
+          <div
             key={p.id}
-            href={`/pair/${p.id}`}
+            role="button"
+            tabIndex={0}
             className={`pair-row pair-grid${selectMode ? ' sort-active' : ''}`}
-            style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
-            onClick={(e) => onRowClick(e, p.id)}
+            style={{ ...row, cursor: 'pointer', background: isSelected ? 'var(--danger-bg)' : String(p.id) === chartPairId ? 'var(--input-bg)' : 'transparent' }}
+            onClick={(e) => { if (selectMode) onRowClick(e, p.id); else pickChartPair(p.id); }}
+            onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); if (selectMode) toggleSelected(p.id); else pickChartPair(p.id); } }}
           >
             {selectMode && (
               <input type="checkbox" checked={isSelected} onChange={() => toggleSelected(p.id)} onClick={(e) => e.stopPropagation()} className="cell-order" style={{ width: 18, height: 18 }} />
@@ -400,7 +428,7 @@ export default function HomePage() {
               <img className="pair-icon" src={icon(p.asset1)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
               <img className="pair-icon" src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/<wbr />{p.asset2}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/<wbr />{p.asset2}{!selectMode && <a href={`/pair/${p.id}`} className="open-pair" title="Открыть страницу пары" aria-label="Открыть страницу пары" onClick={(e) => e.stopPropagation()}>↗</a>}</div>
             {!selectMode && (
               <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {swappingId === p.id ? '…' : '⇄'}
@@ -413,7 +441,7 @@ export default function HomePage() {
             <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 16, color: pctColor }}>
               {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
             </div>
-          </a>
+          </div>
         );
       })}
 
@@ -457,7 +485,7 @@ export default function HomePage() {
       })}
     </div>
     <aside className="side-panel">
-      <section className="side-chart"><TvChart symbol="BINANCE:BTCUSDT" /></section>
+      {isCrypto && <section className="side-chart"><TvChart symbols={chartSymbols} /></section>}
       <section className="side-news"><div className="side-title">Новости</div><NewsFeed /></section>
     </aside>
     </div>
