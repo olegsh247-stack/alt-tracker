@@ -43,7 +43,7 @@ export default function LoginPage() {
         {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
         <button style={btn}>Войти</button>
         <a href="/api/auth/google/start?mode=login" style={googleBtn}>Войти через Google</a>
-        <a href="/register" style={{ color: 'var(--accent)', textAlign: 'center' }}>Зарегистрироваться</a>
+        <a href="/register" style={{ color: 'var(--accent-text)', textAlign: 'center' }}>Зарегистрироваться</a>
       </form>
     </div>
   );

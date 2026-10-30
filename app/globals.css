@@ -21,23 +21,25 @@
 }
 
 html[data-theme='light'] {
-  /* === СВЕТЛАЯ ТЕМА (Clean Paper) === */
-  --bg: #f6f8fa;
+  /* === СВЕТЛАЯ ТЕМА (белая) === */
+  --bg: #ffffff;
   --bg-elevated: #ffffff;
   --text: #1f2328;
   --text-dim: #656d76;
   --card-border: #d0d7de;
-  --input-bg: #ffffff;
+  --input-bg: #f6f8fa;
   --input-border: #d0d7de;
-  --accent: #0f766e;
-  --accent-hover: #115e59;
+  /* кнопки и выделение — тот же бирюзовый, что и в тёмной теме */
+  --accent: #14b8a6;
+  --accent-hover: #0d9488;
+  /* для текста и ссылок на белом — темнее, неоновый на белом плохо читается */
   --accent-text: #0f766e;
-  --accent-soft: rgba(15, 118, 110, 0.10);
+  --accent-soft: rgba(20, 184, 166, 0.14);
   --danger: #cf222e;
   --danger-bg: rgba(207, 34, 46, 0.08);
   --up: #1a7f37;
   --down: #cf222e;
-  --on-accent: #ffffff;
+  --on-accent: #02130f;
   --on-danger: #ffffff;
 }
 
@@ -210,9 +212,9 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .pool-table .pt-row:hover td { background: var(--input-bg); }
 .pool-table .pt-row.pt-selected td { background: var(--danger-bg); }
 .pool-table .pt-row.pt-disabled { cursor: default; }
-.pool-table .pt-row.pt-disabled .pt-action { color: var(--accent); }
+.pool-table .pt-row.pt-disabled .pt-action { color: var(--accent-text); }
 
-.pool-table .pt-mark { color: var(--accent); font-weight: 700; }
+.pool-table .pt-mark { color: var(--accent-text); font-weight: 700; }
 
 /* --- Pool: мобильная раскладка без горизонтальной прокрутки ---
    строка = 2 линии: сверху пара и вид пула, ниже 5 значений; шапка одна — над значениями */

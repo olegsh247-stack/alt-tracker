@@ -192,5 +192,5 @@ const count = { color: 'var(--text-dim)', fontSize: 14 };
 const empty = { padding: 18, border: '1px dashed var(--card-border)', borderRadius: 10, color: 'var(--text-dim)' };
 const row = { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 4px', borderBottom: '1px solid var(--card-border)' };
 const priceStyle = { minWidth: 100, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--text-dim)', fontSize: 15 };
-const addBtn = { border: '1px solid var(--accent)', background: 'none', color: 'var(--accent)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', fontWeight: 600 };
+const addBtn = { border: '1px solid var(--accent)', background: 'none', color: 'var(--accent-text)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', fontWeight: 600 };
 const addedBtn = { border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text-dim)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' };

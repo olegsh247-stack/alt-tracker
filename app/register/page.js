@@ -37,7 +37,7 @@ export default function RegisterPage() {
           />
           {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
           <button style={btn}>Зарегистрироваться</button>
-          <a href="/login" style={{ color: 'var(--accent)', textAlign: 'center' }}>У меня уже есть логин</a>
+          <a href="/login" style={{ color: 'var(--accent-text)', textAlign: 'center' }}>У меня уже есть логин</a>
         </form>
       )}
     </div>

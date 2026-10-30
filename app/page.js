@@ -329,7 +329,7 @@ export default function HomePage() {
                 <div ref={sortMenuRef} style={{ position: 'relative' }}>
                   <button
                     onClick={() => setSortMenuOpen(v => !v)}
-                    style={{ ...sortModeBtn, ...(curSortDir ? { borderColor: 'var(--accent)', color: 'var(--accent)' } : {}) }}
+                    style={{ ...sortModeBtn, ...(curSortDir ? { borderColor: 'var(--accent)', color: 'var(--accent-text)' } : {}) }}
                     title="Сортировка"
                   >⇅</button>
                   {sortMenuOpen && (
@@ -337,13 +337,13 @@ export default function HomePage() {
                       <div style={sortHead}>По алфавиту</div>
                       {[['alpha_asc', 'A → Z'], ['alpha_desc', 'Z → A']].map(([k, t]) => (
                         <button key={k} onClick={() => chooseSort(k)} style={sortItem}>
-                          <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent)' }}>✓</span>}
+                          <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
                         </button>
                       ))}
                       <div style={sortHead}>По изменению за 24ч</div>
                       {[['pct_asc', 'По возрастанию'], ['pct_desc', 'По убыванию']].map(([k, t], idx) => (
                         <button key={k} onClick={() => chooseSort(k)} style={{ ...sortItem, ...(idx === 1 ? { borderBottom: 'none' } : {}) }}>
-                          <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent)' }}>✓</span>}
+                          <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
                         </button>
                       ))}
                     </div>

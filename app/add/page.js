@@ -51,6 +51,6 @@ export default function AddPairPage() {
 }
 
 const label = { fontSize: 15, opacity: 0.7, marginBottom: 6 };
-const pickedNote = { color: 'var(--accent)' };
+const pickedNote = { color: 'var(--accent-text)' };
 const okBtn = { flex: 1, padding: 12, borderRadius: 8, border: 'none', background: 'var(--accent)', color: 'var(--on-accent)', fontWeight: 600 };
 const cancelBtn = { flex: 1, padding: 12, borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)' };
