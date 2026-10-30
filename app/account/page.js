@@ -80,6 +80,11 @@ export default function AccountPage() {
                   Привяжите Google, чтобы входить одной кнопкой и вернуть доступ, если забудете пароль или номер.
                 </p>
                 <a href="/api/auth/google/start?mode=link" style={btn}>Привязать Google</a>
+                {info.redirectUri && (
+                  <p style={{ color: 'var(--text-dim)', fontSize: 13, wordBreak: 'break-all', margin: '6px 0 0' }}>
+                    Адрес возврата для Google (должен быть в списке «Разрешённые URI перенаправления» ровно такой): <b style={{ color: 'var(--text)' }}>{info.redirectUri}</b>
+                  </p>
+                )}
                 {!info.googleConfigured && <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Сервер пока не видит ключи Google{info.googleMissing?.length ? ` (нет переменных: ${info.googleMissing.join(', ')})` : ''}. Проверьте их в Vercel и сделайте Redeploy.</p>}
               </>
             )}

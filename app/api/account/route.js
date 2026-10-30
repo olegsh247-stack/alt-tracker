@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { supabase } from '../../../lib/supabaseClient';
 import { getUserId } from '../../../lib/getUser';
-import { googleConfigured } from '../../../lib/google';
+import { googleConfigured, redirectUri } from '../../../lib/google';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req) {
   const userId = getUserId();
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
   let { data, error } = await supabase.from('users').select('login, google_sub, google_email').eq('id', userId).single();
@@ -23,6 +23,7 @@ export async function GET() {
     googleEmail: data.google_email || null,
     googleConfigured: googleConfigured(),
     dbReady,
+    redirectUri: redirectUri(req),
     googleMissing: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'].filter(k => !process.env[k]),
   });
 }
