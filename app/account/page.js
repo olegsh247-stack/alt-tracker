@@ -80,7 +80,7 @@ export default function AccountPage() {
                   Привяжите Google, чтобы входить одной кнопкой и вернуть доступ, если забудете пароль или номер.
                 </p>
                 <a href="/api/auth/google/start?mode=link" style={btn}>Привязать Google</a>
-                {!info.googleConfigured && <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Сервер пока не настроен для Google — привязка заработает после настройки.</p>}
+                {!info.googleConfigured && <p style={{ color: 'var(--text-dim)', fontSize: 14 }}>Сервер пока не видит ключи Google{info.googleMissing?.length ? ` (нет переменных: ${info.googleMissing.join(', ')})` : ''}. Проверьте их в Vercel и сделайте Redeploy.</p>}
               </>
             )}
           </div>

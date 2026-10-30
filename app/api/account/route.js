@@ -23,6 +23,7 @@ export async function GET() {
     googleEmail: data.google_email || null,
     googleConfigured: googleConfigured(),
     dbReady,
+    googleMissing: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'].filter(k => !process.env[k]),
   });
 }
 
