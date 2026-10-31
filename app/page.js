@@ -13,6 +13,7 @@ import PoolChart from '../components/PoolChart';
 
 export default function HomePage() {
   const [login, setLogin] = useState('');
+  const [googleLinked, setGoogleLinked] = useState(null);
   const [tab, setTab] = useState('assets');
   const [loading, setLoading] = useState(true);
 
@@ -173,6 +174,7 @@ export default function HomePage() {
     (sparkRes.sparklines || []).forEach(s => { smap[s.id] = s; });
     setSparks(smap);
     if (meRes.login) setLogin(meRes.login);
+    if (typeof meRes.googleLinked === 'boolean') setGoogleLinked(meRes.googleLinked);
 
     setCPairs(cpRes.pairs || []);
     const cmap = {};
@@ -336,22 +338,28 @@ export default function HomePage() {
         </nav>
         </div>
         <div className="hd-right">
-          <span className="hd-login header-login">{login || '\u00A0'}</span>
           <ThemeToggle />
-          <a href="/account" style={{ ...sortModeBtn, textDecoration: 'none' }} title="Аккаунт и восстановление доступа" aria-label="Аккаунт">⚙</a>
-          <button onClick={logout} style={logoutBtn}>Выйти</button>
+          <a
+            href="/account"
+            className={`hd-btn hd-id${googleLinked === true ? ' ok' : googleLinked === false ? ' no' : ''}`}
+            data-tip={googleLinked === true ? 'Google подключён' : googleLinked === false ? 'Google не подключён — нажмите, чтобы привязать' : 'Аккаунт'}
+            aria-label={`Аккаунт ${login}${googleLinked === true ? ', Google подключён' : googleLinked === false ? ', Google не подключён' : ''}`}
+          >{login || '\u00A0'}</a>
+          <button onClick={logout} className="hd-btn">Выйти</button>
         </div>
         <div className="hd-actions">
           {!curSelectMode ? (
             <>
-              {!isPool && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>}
-              {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить">–</button>}
+              {!isPool && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} className="hd-btn hd-sm add" title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>Добавить</a>}
+              {curPairs.length > 0 && <button onClick={curToggleSelectMode} className="hd-btn hd-sm del" title="Выбрать для удаления">Удалить</button>}
           {!isAssets && !isPool && curPairs.length > 1 && (
             <div ref={sortMenuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setSortMenuOpen(v => !v)}
-                style={{ ...sortModeBtn, ...(curSortDir ? { borderColor: 'var(--accent)', color: 'var(--accent-text)' } : {}) }}
+                className="hd-btn hd-sm hd-icon"
+                style={curSortDir ? { borderColor: 'var(--accent)', color: 'var(--accent-text)' } : undefined}
                 title="Сортировка"
+                aria-label="Сортировка"
               >⇅</button>
               {sortMenuOpen && (
                 <div style={sortMenu}>
@@ -374,8 +382,8 @@ export default function HomePage() {
             </>
           ) : (
             <>
-              <button onClick={curToggleSelectMode} style={logoutBtn}>Отмена</button>
-              <button onClick={curConfirmDelete} disabled={curDeleting} style={confirmDeleteBtn}>
+              <button onClick={curToggleSelectMode} className="hd-btn hd-sm">Отмена</button>
+              <button onClick={curConfirmDelete} disabled={curDeleting} className="hd-btn hd-sm del solid">
                 {curDeleting ? '...' : `Удалить (${curSelected.size})`}
               </button>
             </>

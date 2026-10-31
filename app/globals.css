@@ -419,10 +419,33 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .hd-tabs button { flex: none; white-space: nowrap; }
 .hd-right { grid-area: right; display: flex; align-items: center; gap: 8px; }
 .hd-actions { grid-area: actions; display: flex; justify-content: flex-end; gap: 8px; min-height: 32px; }
-.hd-login { color: var(--text-dim); font-variant-numeric: tabular-nums; margin-right: 4px; }
 @media (max-width: 720px) {
   .app-header { grid-template-areas: "lt lt" "right actions"; column-gap: 10px; }
   .hd-lt { gap: 10px; }
   .hd-tabs button { padding: 7px 9px !important; font-size: 15px; }
 }
-@media (max-width: 520px) { .hd-login { display: none; } }
+
+/* Кнопки шапки: одинаковая высота и шрифт */
+.hd-btn { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--input-border); background: none; color: var(--text); font: inherit; font-size: 14px; line-height: 1; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.hd-btn:hover { background: var(--input-bg); }
+.hd-btn:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+.hd-btn:disabled { opacity: .6; cursor: default; }
+.hd-icon { width: 32px; padding: 0; font-size: 16px; }
+.hd-sm { height: 30px; padding: 0 11px; }
+.hd-sm.hd-icon { width: 30px; padding: 0; }
+.hd-btn.add { color: var(--accent-text); }
+.hd-btn.del { color: var(--down); }
+.hd-btn.del.solid { background: var(--danger); color: var(--on-danger); border-color: var(--danger); font-weight: 600; }
+.hd-id { position: relative; font-variant-numeric: tabular-nums; letter-spacing: .3px; }
+.hd-id.ok { color: var(--up); }
+.hd-id.no { color: var(--down); }
+.hd-id[data-tip]:hover::after { content: attr(data-tip); position: absolute; top: calc(100% + 6px); right: 0; z-index: 60; white-space: nowrap; background: var(--bg-elevated); color: var(--text); border: 1px solid var(--input-border); border-radius: 6px; padding: 5px 9px; font-size: 12px; letter-spacing: 0; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
+@media (max-width: 520px) {
+  .hd-btn { padding: 0 9px; font-size: 13px; }
+  .hd-icon { padding: 0; }
+  .hd-right, .hd-actions { gap: 6px; }
+}
+@media (max-width: 420px) {
+  .app-header { grid-template-areas: "lt" "right" "actions"; grid-template-columns: minmax(0, 1fr); }
+  .hd-right, .hd-actions { justify-content: flex-end; }
+}

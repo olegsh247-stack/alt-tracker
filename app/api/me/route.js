@@ -6,8 +6,9 @@ export async function GET() {
   const userId = getUserId();
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
 
-  const { data, error } = await supabase.from('users').select('login').eq('id', userId).single();
+  let { data, error } = await supabase.from('users').select('login, google_sub').eq('id', userId).single();
+  if (error) ({ data, error } = await supabase.from('users').select('login').eq('id', userId).single());
   if (error || !data) return NextResponse.json({ error: 'Не найден' }, { status: 404 });
 
-  return NextResponse.json({ login: data.login });
+  return NextResponse.json({ login: data.login, googleLinked: !!data.google_sub });
 }
