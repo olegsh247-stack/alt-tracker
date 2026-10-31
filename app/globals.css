@@ -445,3 +445,8 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .hd-icon { padding: 0; }
   .hd-right, .list-actions { gap: 6px; }
 }
+
+/* ☆/↗ всегда в одной колонке: прижаты к правому краю ячейки пары */
+.pool-table .pt-pair-name { align-items: center; }
+.pool-table .pt-pair-name > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pool-table .pt-pair-name .pt-extra { margin-left: auto; flex: none; width: 24px; justify-content: center; }
