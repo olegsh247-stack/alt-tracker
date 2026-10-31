@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getNews } from '../../../lib/news';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 // Новости общие для всех (не привязаны к пользователю): кэшируем на час и в памяти, и на CDN.
 export async function GET() {

@@ -409,3 +409,20 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .side-chart > .pool-chart { flex: 1; min-height: 0; }
   .pool-chart-frame { flex: 1; height: auto; min-height: 0; }
 }
+
+/* Шапка: логотип и вкладки в одном ряду; справа — тема, аккаунт, выход; ниже справа — + – ⇅ */
+.app-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lt right" ". actions"; align-items: center; column-gap: 12px; row-gap: 8px; margin-bottom: 14px; }
+.hd-lt { grid-area: lt; display: flex; align-items: center; gap: 12px; min-width: 0; }
+.hd-logo { display: flex; flex: none; }
+.hd-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 0 1 auto; }
+.hd-tabs::-webkit-scrollbar { display: none; }
+.hd-tabs button { flex: none; white-space: nowrap; }
+.hd-right { grid-area: right; display: flex; align-items: center; gap: 8px; }
+.hd-actions { grid-area: actions; display: flex; justify-content: flex-end; gap: 8px; min-height: 32px; }
+.hd-login { color: var(--text-dim); font-variant-numeric: tabular-nums; margin-right: 4px; }
+@media (max-width: 720px) {
+  .app-header { grid-template-areas: "lt lt" "right actions"; column-gap: 10px; }
+  .hd-lt { gap: 10px; }
+  .hd-tabs button { padding: 7px 9px !important; font-size: 15px; }
+}
+@media (max-width: 520px) { .hd-login { display: none; } }

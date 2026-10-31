@@ -325,44 +325,52 @@ export default function HomePage() {
   return (
     <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}`}>
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Logo size={28} />
-          <span className="header-login" style={{ color: 'var(--text-dim)', fontVariantNumeric: 'tabular-nums' }}>{login || '\u00A0'}</span>
-        </span>
-        <div style={{ display: 'flex', gap: 8 }}>
+      <header className="app-header">
+        <div className="hd-lt">
+        <span className="hd-logo"><Logo size={30} /></span>
+        <nav className="hd-tabs" aria-label="Разделы">
+          <button onClick={() => changeTab('assets')} style={tab === 'assets' ? tabActive : tabInactive}>Assets</button>
+          <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>Spot</button>
+          <button onClick={() => changeTab('pool')} style={tab === 'pool' ? tabActive : tabInactive}>Pool</button>
+          <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
+        </nav>
+        </div>
+        <div className="hd-right">
+          <span className="hd-login header-login">{login || '\u00A0'}</span>
+          <ThemeToggle />
+          <a href="/account" style={{ ...sortModeBtn, textDecoration: 'none' }} title="Аккаунт и восстановление доступа" aria-label="Аккаунт">⚙</a>
+          <button onClick={logout} style={logoutBtn}>Выйти</button>
+        </div>
+        <div className="hd-actions">
           {!curSelectMode ? (
             <>
-              <ThemeToggle />
-              <a href="/account" style={{ ...sortModeBtn, textDecoration: 'none' }} title="Аккаунт и восстановление доступа" aria-label="Аккаунт">⚙</a>
               {!isPool && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} style={plusBtn} title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>+</a>}
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} style={deleteModeBtn} title="Удалить">–</button>}
-              {!isAssets && !isPool && curPairs.length > 1 && (
-                <div ref={sortMenuRef} style={{ position: 'relative' }}>
-                  <button
-                    onClick={() => setSortMenuOpen(v => !v)}
-                    style={{ ...sortModeBtn, ...(curSortDir ? { borderColor: 'var(--accent)', color: 'var(--accent-text)' } : {}) }}
-                    title="Сортировка"
-                  >⇅</button>
-                  {sortMenuOpen && (
-                    <div style={sortMenu}>
-                      <div style={sortHead}>По алфавиту</div>
-                      {[['alpha_asc', 'A → Z'], ['alpha_desc', 'Z → A']].map(([k, t]) => (
-                        <button key={k} onClick={() => chooseSort(k)} style={sortItem}>
-                          <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
-                        </button>
-                      ))}
-                      <div style={sortHead}>По изменению за 24ч</div>
-                      {[['pct_asc', 'По возрастанию'], ['pct_desc', 'По убыванию']].map(([k, t], idx) => (
-                        <button key={k} onClick={() => chooseSort(k)} style={{ ...sortItem, ...(idx === 1 ? { borderBottom: 'none' } : {}) }}>
-                          <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+          {!isAssets && !isPool && curPairs.length > 1 && (
+            <div ref={sortMenuRef} style={{ position: 'relative' }}>
+              <button
+                onClick={() => setSortMenuOpen(v => !v)}
+                style={{ ...sortModeBtn, ...(curSortDir ? { borderColor: 'var(--accent)', color: 'var(--accent-text)' } : {}) }}
+                title="Сортировка"
+              >⇅</button>
+              {sortMenuOpen && (
+                <div style={sortMenu}>
+                  <div style={sortHead}>По алфавиту</div>
+                  {[['alpha_asc', 'A → Z'], ['alpha_desc', 'Z → A']].map(([k, t]) => (
+                    <button key={k} onClick={() => chooseSort(k)} style={sortItem}>
+                      <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
+                    </button>
+                  ))}
+                  <div style={sortHead}>По изменению за 24ч</div>
+                  {[['pct_asc', 'По возрастанию'], ['pct_desc', 'По убыванию']].map(([k, t], idx) => (
+                    <button key={k} onClick={() => chooseSort(k)} style={{ ...sortItem, ...(idx === 1 ? { borderBottom: 'none' } : {}) }}>
+                      <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
+                    </button>
+                  ))}
                 </div>
               )}
-              <button onClick={logout} style={logoutBtn}>Выйти</button>
+            </div>
+          )}
             </>
           ) : (
             <>
@@ -373,14 +381,7 @@ export default function HomePage() {
             </>
           )}
         </div>
-      </div>
-
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
-        <button onClick={() => changeTab('assets')} style={tab === 'assets' ? tabActive : tabInactive}>Assets</button>
-        <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>Spot</button>
-        <button onClick={() => changeTab('pool')} style={tab === 'pool' ? tabActive : tabInactive}>Pool</button>
-        <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
-      </div>
+      </header>
 
       {loading && <p>Загрузка...</p>}
 

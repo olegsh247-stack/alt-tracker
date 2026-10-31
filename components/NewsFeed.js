@@ -59,13 +59,13 @@ export default function NewsFeed() {
         {error && !data && <div className="news-empty">Новости временно недоступны. Обновятся автоматически.</div>}
         {data && items.length === 0 && <div className="news-empty">В этом разделе пока ничего нет.</div>}
         {items.map(it => (
-          <a key={it.id} href={it.link} target="_blank" rel="noopener noreferrer" className="news-item">
+          <a key={it.id} href={it.link} target="_blank" rel="noopener noreferrer" className="news-item" title={it.titleRu ? it.title : undefined}>
             <div className="news-meta">
               <span>{it.source}</span>
               {it.label && <span className="news-tag">{it.label}</span>}
               <span className="news-time">{ago(it.ts)}</span>
             </div>
-            <div className="news-title">{it.title}</div>
+            <div className="news-title">{it.titleRu || it.title}</div>
           </a>
         ))}
         {data?.failed?.length > 0 && <div className="news-foot">Не ответили: {data.failed.join(', ')}</div>}
