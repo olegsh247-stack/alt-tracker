@@ -4,8 +4,8 @@ export default function Logo({ size = 28 }) {
     <svg width={size} height={size} viewBox="0 0 120 120" role="img" aria-label="Alt Tracker" style={{ flex: 'none', display: 'block' }}>
       <defs>
         <linearGradient id="logo-g" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stopColor="#0b4a6e" />
-          <stop offset="1" stopColor="#1f8fb8" />
+          <stop offset="0" stopColor="#0a3d73" />
+          <stop offset="1" stopColor="#2a7fc4" />
         </linearGradient>
       </defs>
       <rect width="120" height="120" rx="26" fill="#08141a" stroke="#17302f" strokeWidth="2" />

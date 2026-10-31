@@ -1,5 +1,6 @@
 'use client';
 
+import CoinIcon from '../../components/CoinIcon';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -153,14 +154,7 @@ export default function AssetsPage() {
 function AssetRow({ asset, price, added, onToggle }) {
   return (
     <div style={row}>
-      <img
-        src={icon(asset.symbol)}
-        width={34}
-        height={34}
-        alt=""
-        onError={e => { e.currentTarget.style.display = 'none'; }}
-        style={{ borderRadius: '50%' }}
-      />
+      <CoinIcon symbol={asset.symbol} size={34} />
       <div style={{ flex: 1, minWidth: 150 }}>
         <div style={{ fontWeight: 700 }}>{asset.symbol}</div>
         <div style={{ color: 'var(--text-dim)', fontSize: 15 }}>{asset.name}</div>

@@ -8,10 +8,7 @@ import PoolTable from '../components/PoolTable';
 import TvChart from '../components/TvChart';
 import NewsFeed from '../components/NewsFeed';
 import Logo from '../components/Logo';
-
-function icon(asset) {
-  return `https://assets.coincap.io/assets/icons/${asset.toLowerCase()}@2x.png`;
-}
+import CoinIcon from '../components/CoinIcon';
 
 export default function HomePage() {
   const [login, setLogin] = useState('');
@@ -251,7 +248,7 @@ export default function HomePage() {
   function pickChartPair(id) {
     setChartPairId(String(id));
     try { localStorage.setItem('chartPairId', String(id)); } catch {}
-    if (typeof window !== 'undefined' && window.innerWidth < 1200) {
+    if (typeof window !== 'undefined' && window.innerWidth < 1300) {
       setTimeout(() => document.querySelector('.side-chart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     }
   }
@@ -311,7 +308,7 @@ export default function HomePage() {
   const curConfirmDelete = isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}`}>
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -401,7 +398,7 @@ export default function HomePage() {
         return (
           <div key={asset.asset_id} className="pair-row" style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }} onClick={() => assetSelectMode && toggleAssetSelect(asset.asset_id)}>
             {assetSelectMode && <input type="checkbox" checked={isSelected} onChange={() => toggleAssetSelect(asset.asset_id)} onClick={e => e.stopPropagation()} style={{ width: 18, height: 18 }} />}
-            <img src={icon(asset.symbol)} width={28} height={28} alt="" onError={e => e.currentTarget.style.visibility='hidden'} />
+            <CoinIcon symbol={asset.symbol} size={28} />
             <div style={{ minWidth: 90, fontWeight: 700 }}>{asset.symbol}</div>
             <div style={{ flex: 1, color: 'var(--text-dim)' }}>{asset.name}</div>
             <div style={cell}>{price == null ? '—' : Number(price).toLocaleString('en-US', { maximumFractionDigits: price >= 1000 ? 2 : price >= 1 ? 4 : 8 })}</div>
@@ -430,8 +427,8 @@ export default function HomePage() {
               <input type="checkbox" checked={isSelected} onChange={() => toggleSelected(p.id)} onClick={(e) => e.stopPropagation()} className="cell-order" style={{ width: 18, height: 18 }} />
             )}
             <div className="cell-icons" style={{ display: 'flex', gap: 4 }}>
-              <img className="pair-icon" src={icon(p.asset1)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
-              <img className="pair-icon" src={icon(p.asset2)} width={24} height={24} onError={e => e.target.style.visibility = 'hidden'} />
+              <CoinIcon className="pair-icon" symbol={p.asset1} size={24} />
+              <CoinIcon className="pair-icon" symbol={p.asset2} size={24} />
             </div>
             <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/<wbr />{p.asset2}{!selectMode && <a href={`/pair/${p.id}`} className="open-pair" title="Открыть страницу пары" aria-label="Открыть страницу пары" onClick={(e) => e.stopPropagation()}>↗</a>}</div>
             {!selectMode && (

@@ -348,7 +348,7 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .news-title { font-size: 15px; line-height: 1.35; }
 .news-empty, .news-foot { padding: 14px; font-size: 14px; color: var(--text-dim); }
 
-@media (min-width: 1200px) {
+@media (min-width: 1300px) {
   .app-shell { max-width: none; display: grid; grid-template-columns: minmax(780px, 900px) minmax(0, 1fr); gap: 8px; align-items: start; }
   .app-shell .page-wrap { margin: 0 !important; width: 100%; }
   .side-panel { position: sticky; top: 0; height: 100vh; padding: 16px 16px 16px 0; gap: 12px; }
@@ -362,7 +362,28 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 }
 
 /* Средние экраны: правая колонка узкая — графики друг под другом, им отдаём больше высоты */
-@media (min-width: 1200px) and (max-width: 1599px) {
+@media (min-width: 1300px) and (max-width: 1599px) {
   .side-chart { flex-basis: 74%; }
   .tv-head { min-height: 96px; }
+}
+
+/* Spot: колонки одинаковой ширины, список на 1px мельче */
+@media (min-width: 1300px) {
+  .app-shell.tab-spot { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .app-shell.tab-spot .page-wrap { max-width: none !important; }
+}
+.tab-spot .pair-row { font-size: 16px; }
+.tab-spot .pair-row .cell-exchange { font-size: 13px !important; }
+.tab-spot .pair-row .cell-pct { font-size: 15px !important; }
+
+/* Шапки графиков: мельче шрифт */
+.tv-head { zoom: 0.8; min-height: 0; }
+
+/* Spot на средних экранах (колонка ~600–800px): компактнее колонки, чтобы цифры не наезжали друг на друга */
+@media (min-width: 1300px) and (max-width: 1599px) {
+  .tab-spot .pair-row.pair-grid { grid-template-columns: 52px minmax(0, 1.5fr) 26px 78px minmax(0, 0.95fr) minmax(0, 0.8fr) minmax(0, 1.45fr) 52px; column-gap: 6px !important; }
+  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px minmax(0, 1.5fr) 26px 78px minmax(0, 0.95fr) minmax(0, 0.8fr) minmax(0, 1.45fr) 52px; }
+  .tab-spot .pair-row .pair-icon { width: 20px !important; height: 20px !important; }
+  .tab-spot .pair-row .cell-ratio { font-size: 14px; }
+  .tab-spot .pair-row .cell-exchange { font-size: 12px !important; }
 }
