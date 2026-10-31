@@ -558,8 +558,9 @@ const swapBtn = {
   borderRadius: 6, cursor: 'pointer', fontSize: 15, padding: 0,
 };
 const tabActive = {
-  padding: '8px 10px', borderRadius: 8, border: '1px solid var(--accent)',
-  background: 'var(--accent)', color: 'var(--on-accent)', fontWeight: 600, cursor: 'pointer',
+  padding: '8px 10px', borderRadius: 8, border: '1px solid var(--input-border)',
+  background: 'var(--bg-elevated)', color: 'var(--text)', fontWeight: 600, cursor: 'pointer',
+  boxShadow: 'inset 0 -2px 0 var(--accent)',
 };
 const tabInactive = {
   padding: '8px 10px', borderRadius: 8, border: '1px solid var(--input-border)',

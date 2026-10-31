@@ -43,4 +43,4 @@ export default function PairChartPage() {
 
 const backBtn = { background: 'none', border: 'none', color: 'var(--accent-text)', fontSize: 16, cursor: 'pointer', padding: 0 };
 const tab = { padding: '8px 16px', borderRadius: 8, border: '1px solid var(--input-border)', background: 'none', color: 'var(--text-dim)' };
-const tabActive = { ...tab, background: 'var(--accent)', color: 'var(--on-accent)', borderColor: 'var(--accent)' };
+const tabActive = { ...tab, background: 'var(--bg-elevated)', color: 'var(--text)', borderColor: 'var(--input-border)', fontWeight: 600, boxShadow: 'inset 0 -2px 0 var(--accent)' };
