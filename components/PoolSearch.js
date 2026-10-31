@@ -24,7 +24,7 @@ const SORTS = [['tvl', 'TVL'], ['apr', 'APR'], ['vol24', 'Объём']];
 
 // favSet — множество "сеть:адрес" уже добавленных пулов; onAdded() — после успешного добавления;
 // onActiveChange(bool) — сообщает странице, что идёт поиск (чтобы спрятать избранное)
-export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
+export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPool, isActivePool }) {
   const [nets, setNets] = useState(['bsc']); // выбранные сети (можно несколько); при открытии — BNB Chain
   const [failed, setFailed] = useState([]);
   const [query, setQuery] = useState('');   // Актив 1
@@ -137,10 +137,12 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
     setAddingKey(null);
     if (!r.ok && r.status !== 409) { setErr(d.error || 'Не удалось добавить'); return; }
     [t1, t2].filter(x => x && x.length < 30).reverse().forEach(rememberCoin);
-    setQuery('');
-    setQuery2('');
     onAdded && onAdded();
   }
+
+  const starFor = (p) => favSet.has(`${p.network}:${p.address}`)
+    ? <span className="pt-star on" title="В избранном" aria-label="В избранном">★</span>
+    : <button type="button" className="pt-star" title="Добавить в избранное" aria-label="Добавить в избранное" disabled={addingKey === p.address} onClick={() => add(p)}>☆</button>;
 
   const base = results.filter(p => (!hideSmall || (p.tvl || 0) >= MIN_TVL) && (!stableOnly || p.hasStable));
   const isDead = (p) => !(p.vol24 >= MIN_VOL);
@@ -236,9 +238,9 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
             rows={defRows}
             getKey={p => `${p.network}:${p.address}`}
             showAge
-            onRowClick={add}
-            isDisabled={p => favSet.has(`${p.network}:${p.address}`) || addingKey === p.address}
-            markDisabled
+            onSelect={onSelectPool}
+            isActive={isActivePool}
+            pairExtra={starFor}
           />
         </>
       )}
@@ -261,9 +263,9 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange }) {
           rows={shown}
           getKey={p => `${p.network}:${p.address}`}
           showAge
-          onRowClick={add}
-          isDisabled={p => favSet.has(`${p.network}:${p.address}`) || addingKey === p.address}
-          markDisabled
+          onSelect={onSelectPool}
+          isActive={isActivePool}
+          pairExtra={starFor}
         />
       )}
     </div>

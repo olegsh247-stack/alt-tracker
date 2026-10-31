@@ -9,6 +9,7 @@ import TvChart from '../components/TvChart';
 import NewsFeed from '../components/NewsFeed';
 import Logo from '../components/Logo';
 import CoinIcon from '../components/CoinIcon';
+import PoolChart from '../components/PoolChart';
 
 export default function HomePage() {
   const [login, setLogin] = useState('');
@@ -268,6 +269,20 @@ export default function HomePage() {
   const chartPair = pairs.find(p => String(p.id) === chartPairId) || null;
   const chartSymbols = chartSymbolsFor(chartPair);
 
+  // график пула (вкладка Pool): выбранная строка, по умолчанию — первое избранное
+  const [chartPool, setChartPool] = useState(null);
+  useEffect(() => { try { const v = JSON.parse(localStorage.getItem('chartPool') || 'null'); if (v?.address) setChartPool(v); } catch {} }, []);
+  function selectPool(p) {
+    const v = { network: p.network, address: p.address, base: p.base, quote: p.quote, dex: p.dex, feePct: p.feePct ?? null, feeApprox: !!p.feeApprox, change24: p.change24 ?? null };
+    setChartPool(v);
+    try { localStorage.setItem('chartPool', JSON.stringify(v)); } catch {}
+    if (typeof window !== 'undefined' && window.innerWidth < 1300) {
+      setTimeout(() => document.querySelector('.side-chart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  }
+  const poolForChart = chartPool || (poolFavs[0] ? { ...poolFavs[0] } : null);
+  const isActivePool = (p) => !!poolForChart && poolForChart.network === p.network && poolForChart.address === p.address;
+
   const isAssets = tab === 'assets';
   const isPair = tab === 'pair';
   const isCommodities = tab === 'commodities';
@@ -308,7 +323,7 @@ export default function HomePage() {
   const curConfirmDelete = isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
-    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}`}>
+    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}`}>
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -374,6 +389,8 @@ export default function HomePage() {
           favSet={new Set(poolFavs.map(f => `${f.network}:${f.address}`))}
           onAdded={loadPools}
           onActiveChange={setPoolSearching}
+          onSelectPool={selectPool}
+          isActivePool={isActivePool}
         />
       )}
       {isPool && !poolSearching && poolFavs.length > 0 && <div style={{ fontSize: 14, color: 'var(--text-dim)', margin: '4px 0 2px' }}>Избранное</div>}
@@ -384,7 +401,9 @@ export default function HomePage() {
           rows={poolFavs}
           showAge
           getKey={f => f.id}
-          onRowClick={f => window.open(`https://www.geckoterminal.com/${f.network}/pools/${f.address}`, '_blank', 'noopener,noreferrer')}
+          onSelect={selectPool}
+          isActive={isActivePool}
+          pairExtra={f => <a href={`https://www.geckoterminal.com/${f.network}/pools/${f.address}`} target="_blank" rel="noopener noreferrer" className="open-pair" title="Открыть на GeckoTerminal" aria-label="Открыть на GeckoTerminal">↗</a>}
           select={{ mode: poolSelectMode, selected: poolSelected, onToggle: f => togglePoolSelected(f.id) }}
         />
       )}
@@ -488,6 +507,7 @@ export default function HomePage() {
     </div>
     <aside className="side-panel">
       {isCrypto && <section className="side-chart"><TvChart symbols={chartSymbols} /></section>}
+      {isPool && <section className="side-chart"><PoolChart pool={poolForChart} /></section>}
       <section className="side-news"><div className="side-title">Новости</div><NewsFeed /></section>
     </aside>
     </div>

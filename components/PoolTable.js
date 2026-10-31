@@ -11,8 +11,10 @@ import { fmtUsd, fmtPct, fmtFee, fmtApr, fmtAge } from '../lib/format';
 //   action(p)   — содержимое последней колонки (например «☆ добавить»), необязательно
 //   actionTitle — заголовок этой колонки
 //   showAge     — показывать возраст пула под парой
+//   onSelect(p) — клик по строке выбирает пул (например, для графика); isActive(p) — подсветить выбранную строку
+//   pairExtra(p) — маленький элемент справа от названия пары (☆ в избранное, ↗ открыть)
 //   isDisabled  — строка неактивна (например, уже в избранном); markDisabled — рисовать у такой пары галочку
-export default function PoolTable({ rows, getKey, onRowClick, select, action, actionTitle = '', showAge = false, isDisabled, markDisabled = false }) {
+export default function PoolTable({ rows, getKey, onRowClick, onSelect, isActive, pairExtra, select, action, actionTitle = '', showAge = false, isDisabled, markDisabled = false }) {
   const selectMode = !!select?.mode;
   return (
     <div className="pool-table-wrap">
@@ -40,15 +42,15 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
             return (
               <tr
                 key={key}
-                className={`pt-row${isSel ? ' pt-selected' : ''}${disabled ? ' pt-disabled' : ''}`}
+                className={`pt-row${isSel ? ' pt-selected' : ''}${disabled ? ' pt-disabled' : ''}${!isSel && isActive && isActive(p) ? ' pt-active' : ''}`}
                 tabIndex={disabled && !selectMode ? -1 : 0}
                 aria-disabled={disabled || undefined}
                 aria-label={`${p.base}/${p.quote}, ${p.dex || ''}`}
-                onClick={() => (selectMode ? select.onToggle(p) : !disabled && onRowClick && onRowClick(p))}
+                onClick={() => (selectMode ? select.onToggle(p) : onSelect ? onSelect(p) : !disabled && onRowClick && onRowClick(p))}
                 onKeyDown={(e) => {
                   if (e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return;
                   e.preventDefault();
-                  if (selectMode) select.onToggle(p); else if (!disabled && onRowClick) onRowClick(p);
+                  if (selectMode) select.onToggle(p); else if (onSelect) onSelect(p); else if (!disabled && onRowClick) onRowClick(p);
                 }}
               >
                 {selectMode && (
@@ -60,6 +62,7 @@ export default function PoolTable({ rows, getKey, onRowClick, select, action, ac
                   <div className="pt-pair-name">
                     <span>{p.base}/{p.quote}{markDisabled && disabled && <span className="pt-mark" title="В избранном"> ✓</span>}</span>
                     {showAge && <span className="pt-age" title="Возраст пула">{fmtAge(p.createdAt)}</span>}
+                    {pairExtra && !selectMode && <span className="pt-extra" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>{pairExtra(p)}</span>}
                   </div>
                 </td>
                 <td className="pt-kind">

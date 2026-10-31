@@ -387,3 +387,25 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .tab-spot .pair-row .cell-ratio { font-size: 14px; }
   .tab-spot .pair-row .cell-exchange { font-size: 12px !important; }
 }
+
+/* Pool: слева список, справа график пула и новости */
+@media (min-width: 1300px) {
+  .app-shell.tab-pool { grid-template-columns: minmax(820px, 1fr) minmax(0, 1fr); }
+  .app-shell.tab-pool .page-wrap { max-width: none !important; }
+}
+.pool-table .pt-row.pt-active td { background: var(--accent-soft); }
+.pt-extra { display: inline-flex; align-items: center; margin-left: 4px; }
+.pt-star { background: none; border: none; padding: 0 5px; color: var(--text-dim); font-size: 17px; line-height: 1; cursor: pointer; }
+.pt-star:hover { color: var(--accent-text); }
+.pt-star.on { color: var(--accent-text); cursor: default; }
+.pool-chart { display: flex; flex-direction: column; width: 100%; }
+.pool-chart-empty { min-height: 200px; align-items: center; justify-content: center; color: var(--text-dim); font-size: 15px; padding: 24px; text-align: center; }
+.pool-chart-head { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--card-border); flex-wrap: wrap; }
+.pool-chart-name { font-weight: 600; font-size: 16px; }
+.pool-chart-sub { color: var(--text-dim); font-size: 13px; }
+.pool-chart-chg { margin-left: auto; font-weight: 600; font-size: 14px; }
+.pool-chart-frame { width: 100%; height: 440px; border: 0; background: var(--bg); }
+@media (min-width: 1300px) {
+  .side-chart > .pool-chart { flex: 1; min-height: 0; }
+  .pool-chart-frame { flex: 1; height: auto; min-height: 0; }
+}
