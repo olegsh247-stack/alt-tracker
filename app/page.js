@@ -326,8 +326,7 @@ export default function HomePage() {
 
   return (
     <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}`}>
-    <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: 16 }}>
-      <header className="app-header">
+    <header className="app-header">
         <div className="hd-lt">
         <span className="hd-logo"><Logo size={30} /></span>
         <nav className="hd-tabs" aria-label="Разделы">
@@ -336,16 +335,6 @@ export default function HomePage() {
           <button onClick={() => changeTab('pool')} style={tab === 'pool' ? tabActive : tabInactive}>Pool</button>
           <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
         </nav>
-        </div>
-        <div className="hd-right">
-          <ThemeToggle />
-          <a
-            href="/account"
-            className={`hd-btn hd-id${googleLinked === true ? ' ok' : googleLinked === false ? ' no' : ''}`}
-            data-tip={googleLinked === true ? 'Google подключён' : googleLinked === false ? 'Google не подключён — нажмите, чтобы привязать' : 'Аккаунт'}
-            aria-label={`Аккаунт ${login}${googleLinked === true ? ', Google подключён' : googleLinked === false ? ', Google не подключён' : ''}`}
-          >{login || '\u00A0'}</a>
-          <button onClick={logout} className="hd-btn">Выйти</button>
         </div>
         <div className="hd-actions">
           {!curSelectMode ? (
@@ -389,7 +378,18 @@ export default function HomePage() {
             </>
           )}
         </div>
+        <div className="hd-right">
+          <ThemeToggle />
+          <a
+            href="/account"
+            className={`hd-btn hd-id${googleLinked === true ? ' ok' : googleLinked === false ? ' no' : ''}`}
+            data-tip={googleLinked === true ? 'Google подключён' : googleLinked === false ? 'Google не подключён — нажмите, чтобы привязать' : 'Аккаунт'}
+            aria-label={`Аккаунт ${login}${googleLinked === true ? ', Google подключён' : googleLinked === false ? ', Google не подключён' : ''}`}
+          >{login || '\u00A0'}</a>
+          <button onClick={logout} className="hd-btn">Выйти</button>
+        </div>
       </header>
+    <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '0 16px 16px' }}>
 
       {loading && <p>Загрузка...</p>}
 

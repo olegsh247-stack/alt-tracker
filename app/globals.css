@@ -351,7 +351,7 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 @media (min-width: 1300px) {
   .app-shell { max-width: none; display: grid; grid-template-columns: minmax(780px, 900px) minmax(0, 1fr); gap: 8px; align-items: start; }
   .app-shell .page-wrap { margin: 0 !important; width: 100%; }
-  .side-panel { position: sticky; top: 0; height: 100vh; padding: 16px 16px 16px 0; gap: 12px; }
+  .side-panel { position: sticky; top: 0; height: calc(100vh - 64px); padding: 4px 16px 16px 0; gap: 12px; }
   .side-chart { flex: 0 0 62%; display: flex; }
   .tv-pair { flex: 1; min-height: 0; grid-auto-rows: minmax(0, 1fr); }
   .tv-box { flex: 1; min-height: 0; width: 100%; }
@@ -411,18 +411,19 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 }
 
 /* Шапка: логотип и вкладки в одном ряду; справа — тема, аккаунт, выход; ниже справа — + – ⇅ */
-.app-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "lt right" ". actions"; align-items: center; column-gap: 12px; row-gap: 8px; margin-bottom: 14px; }
-.hd-lt { grid-area: lt; display: flex; align-items: center; gap: 12px; min-width: 0; }
+.app-header { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; padding: 12px 16px; margin-bottom: 4px; max-width: 100%; }
+.hd-lt { flex: 1 1 auto; display: flex; align-items: center; gap: 12px; min-width: 0; }
 .hd-logo { display: flex; flex: none; }
 .hd-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 0 1 auto; }
 .hd-tabs::-webkit-scrollbar { display: none; }
 .hd-tabs button { flex: none; white-space: nowrap; }
-.hd-right { grid-area: right; display: flex; align-items: center; gap: 8px; }
-.hd-actions { grid-area: actions; display: flex; justify-content: flex-end; gap: 8px; min-height: 32px; }
+.hd-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding-right: 12px; border-right: 1px solid var(--card-border); min-height: 30px; }
+.hd-actions:empty { display: none; }
+.hd-right { display: flex; align-items: center; gap: 8px; }
 @media (max-width: 720px) {
-  .app-header { grid-template-areas: "lt lt" "right actions"; column-gap: 10px; }
-  .hd-lt { gap: 10px; }
+  .hd-lt { flex-basis: 100%; gap: 10px; }
   .hd-tabs button { padding: 7px 9px !important; font-size: 15px; }
+  .hd-actions { flex: 1 1 auto; justify-content: flex-start; border-right: 0; padding-right: 0; }
 }
 
 /* Кнопки шапки: одинаковая высота и шрифт */
@@ -444,8 +445,4 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .hd-btn { padding: 0 9px; font-size: 13px; }
   .hd-icon { padding: 0; }
   .hd-right, .hd-actions { gap: 6px; }
-}
-@media (max-width: 420px) {
-  .app-header { grid-template-areas: "lt" "right" "actions"; grid-template-columns: minmax(0, 1fr); }
-  .hd-right, .hd-actions { justify-content: flex-end; }
 }
