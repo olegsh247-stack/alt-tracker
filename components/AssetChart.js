@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import TvChart from './TvChart';
 
 // График выбранной монеты: TradingView (если она торгуется на крупной бирже), иначе главный DEX-пул (DexScreener).
+const memo = new Map(); // SYMBOL -> ответ сервера: повторный выбор монеты открывается мгновенно
+
 export default function AssetChart({ symbol, name }) {
   const [res, setRes] = useState(null);
   const [light, setLight] = useState(false);
@@ -18,9 +20,11 @@ export default function AssetChart({ symbol, name }) {
   useEffect(() => {
     if (!symbol) { setRes(null); return; }
     let alive = true;
+    const cached = memo.get(symbol);
+    if (cached) { setRes(cached); return () => { alive = false; }; }
     setRes(null);
     fetch(`/api/chart-symbol?s=${encodeURIComponent(symbol)}`)
-      .then(r => r.json()).then(j => { if (alive) setRes(j); })
+      .then(r => r.json()).then(j => { if (j && j.kind && j.kind !== 'none') memo.set(symbol, j); if (alive) setRes(j); })
       .catch(() => { if (alive) setRes({ kind: 'none' }); });
     return () => { alive = false; };
   }, [symbol]);
