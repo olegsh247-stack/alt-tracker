@@ -62,5 +62,5 @@ export async function GET(req) {
   if (hit && Date.now() - hit.ts < TTL) return NextResponse.json(hit.value);
   const value = await resolve(sym);
   if (value.kind !== 'none') answers.set(sym, { ts: Date.now(), value });
-  return NextResponse.json(value, { headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=86400' } });
+  return NextResponse.json(value, { headers: { 'Cache-Control': 'no-store' } });
 }

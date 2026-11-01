@@ -545,7 +545,7 @@ export default function HomePage() {
     </div>
     <aside className="side-panel">
       {isCrypto && <section className="side-chart"><TvChart symbols={chartSymbols} /></section>}
-      {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} /></section>}
+      {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} name={chartAsset?.name} /></section>}
       {isPool && <section className="side-chart"><PoolChart pool={poolForChart} /></section>}
       <section className="side-news"><div className="side-title">Новости</div><NewsFeed /></section>
     </aside>

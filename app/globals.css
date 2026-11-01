@@ -466,3 +466,10 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .asset-row.sel { grid-template-columns: 22px 32px minmax(0, 1.4fr) 44px 64px minmax(0, 1fr); }
   .ar-sup { display: none; }
 }
+
+/* Assets: подпись с тикером над графиком */
+.asset-chart { display: flex; flex-direction: column; width: 100%; min-height: 0; flex: 1; }
+.asset-chart-title { display: flex; align-items: baseline; gap: 8px; padding: 8px 14px 0; font-size: 15px; }
+.asset-chart-title b { font-size: 17px; }
+.asset-chart-title span { color: var(--text-dim); font-size: 13px; }
+.asset-chart > .tv-pair { flex: 1; min-height: 0; }

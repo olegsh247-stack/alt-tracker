@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import TvChart from './TvChart';
 
 // График выбранной монеты: TradingView (если она торгуется на крупной бирже), иначе главный DEX-пул (DexScreener).
-export default function AssetChart({ symbol }) {
+export default function AssetChart({ symbol, name }) {
   const [res, setRes] = useState(null);
   const [light, setLight] = useState(false);
 
@@ -28,7 +28,12 @@ export default function AssetChart({ symbol }) {
   if (!symbol) return <div className="pool-chart pool-chart-empty">Выберите монету в списке, чтобы увидеть график</div>;
   if (!res) return <div className="pool-chart pool-chart-empty">Загрузка графика…</div>;
   if (res.kind === 'stable') return <div className="pool-chart pool-chart-empty">{symbol} — стейблкоин, его цена держится у $1, график не показываем.</div>;
-  if (res.kind === 'tv') return <TvChart key={res.symbol} symbols={[res.symbol]} />;
+  if (res.kind === 'tv') return (
+    <div className="asset-chart">
+      <div className="asset-chart-title"><b>{symbol}</b>{name && name.toUpperCase() !== symbol ? <span>{name}</span> : null}</div>
+      <TvChart key={res.symbol} symbols={[res.symbol]} />
+    </div>
+  );
   if (res.kind === 'dex') {
     const src = `https://dexscreener.com/${res.chain}/${res.pair}?embed=1&theme=${light ? 'light' : 'dark'}&trades=0&info=0`;
     return (
