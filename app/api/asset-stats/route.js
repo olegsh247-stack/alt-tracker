@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { loadStats } from '../../../lib/coins';
+import { loadStats, binancePrices } from '../../../lib/coins';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic';
 // s=BTC,ETH — по тикерам (ключ ответа = тикер); ids=cg:bitcoin~BTC,pp:btc-bitcoin~BTC — по ключам (ключ ответа = ключ).
 const TTL = 3 * 60 * 1000;
 const cache = new Map(); // key -> { ts, data }
+const STABLE = new Set(['USDT', 'USDC', 'DAI', 'FDUSD', 'TUSD', 'USDE']);
 
 export async function GET(req) {
   const sp = new URL(req.url).searchParams;
@@ -19,6 +20,11 @@ export async function GET(req) {
   if (hit && Date.now() - hit.ts < TTL) return NextResponse.json({ stats: hit.data });
   try {
     const data = await loadStats(symbols, items);
+    // цену берём с Binance (как на графике), если монета там торгуется; остальное (рейтинг, предложение, 24h) — из агрегатора
+    const bn = await binancePrices();
+    const override = (k, sym) => { if (data[k] && bn[sym] && !STABLE.has(sym)) data[k] = { ...data[k], price: bn[sym] }; };
+    symbols.forEach(sy => override(sy, sy));
+    items.forEach(i => override(i.key, i.symbol));
     cache.set(key, { ts: Date.now(), data });
     return NextResponse.json({ stats: data });
   } catch {

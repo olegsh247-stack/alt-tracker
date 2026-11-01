@@ -549,7 +549,7 @@ export default function HomePage() {
         const metrics = assetDetails[asset.asset_id]?.metrics || [];
         const m = metrics.find(x => x.metric_id === 'market.spot_price');
         const st = assetStats[asset.ext ? asset.asset_id : String(asset.symbol || '').toUpperCase()];
-        const price = m?.value ?? st?.price;
+        const price = st?.price ?? m?.value;
         const isSelected = assetSelected.has(asset.asset_id);
         const ch = st?.change24h;
         return (
