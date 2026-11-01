@@ -10,6 +10,8 @@ import NewsFeed from '../components/NewsFeed';
 import Logo from '../components/Logo';
 import CoinIcon from '../components/CoinIcon';
 import AssetChart from '../components/AssetChart';
+import Flag from '../components/Flag';
+import { CURRENCIES, currencyOf, DEFAULT_FOREX, DEFAULT_BASE } from '../lib/currencies';
 import PoolChart from '../components/PoolChart';
 
 export default function HomePage() {
@@ -47,6 +49,27 @@ export default function HomePage() {
   const [assetDetails, setAssetDetails] = useState({});
   const [assetStats, setAssetStats] = useState({});
   const [chartAssetKey, setChartAssetKey] = useState(null);
+
+  // --- Forex: список валют и база хранятся в браузере (как Assets) ---
+  const [forexCodes, setForexCodes] = useState(DEFAULT_FOREX);
+  const [forexBase, setForexBase] = useState(DEFAULT_BASE);
+  const [forexRates, setForexRates] = useState({});
+  const [forexLoaded, setForexLoaded] = useState(false);
+  const [forexError, setForexError] = useState(false);
+  const [fxSelectMode, setFxSelectMode] = useState(false);
+  const [fxSelected, setFxSelected] = useState(new Set());
+  const [fxChartCode, setFxChartCode] = useState(null);
+  useEffect(() => {
+    try {
+      const c = localStorage.getItem('forexCodes');
+      if (c) { const v = JSON.parse(c); if (Array.isArray(v)) setForexCodes(v); }
+      const b = localStorage.getItem('forexBase');
+      if (b) setForexBase(b);
+      const ch = localStorage.getItem('fxChartCode');
+      if (ch) setFxChartCode(ch);
+    } catch {}
+    setForexLoaded(true);
+  }, []);
   const [assetSelectMode, setAssetSelectMode] = useState(false);
   const [assetSelected, setAssetSelected] = useState(new Set());
   const [assetDeleting, setAssetDeleting] = useState(false);
@@ -115,6 +138,49 @@ export default function HomePage() {
     document.addEventListener('touchstart', onDown);
     return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('touchstart', onDown); };
   }, []);
+
+  useEffect(() => {
+    if (tab !== 'forex' || !forexLoaded) return;
+    const codes = forexCodes.filter(c => c !== forexBase);
+    if (codes.length === 0) { setForexRates({}); return; }
+    let alive = true;
+    const load = async () => {
+      try {
+        const r = await fetch(`/api/forex?base=${forexBase}&codes=${codes.join(',')}`);
+        const j = await r.json();
+        if (alive) { setForexRates(j.rates || {}); setForexError(!!j.error); }
+      } catch { if (alive) setForexError(true); }
+    };
+    load();
+    const t = setInterval(load, 15 * 60 * 1000);
+    return () => { alive = false; clearInterval(t); };
+  }, [tab, forexLoaded, forexBase, forexCodes]);
+
+  function changeForexBase(code) {
+    setForexBase(code);
+    setForexRates({});
+    try { localStorage.setItem('forexBase', code); } catch {}
+  }
+  function pickFxChart(code) {
+    setFxChartCode(code);
+    try { localStorage.setItem('fxChartCode', code); } catch {}
+    if (typeof window !== 'undefined' && window.innerWidth < 1300) {
+      setTimeout(() => document.querySelector('.side-chart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  }
+  function toggleFxSelectMode() { setFxSelectMode(v => !v); setFxSelected(new Set()); }
+  function toggleFxSelected(code) {
+    setFxSelected(prev => { const n = new Set(prev); n.has(code) ? n.delete(code) : n.add(code); return n; });
+  }
+  function confirmDeleteForex() {
+    if (fxSelected.size === 0) { setFxSelectMode(false); return; }
+    if (!confirm(`Удалить выбранные валюты (${fxSelected.size})?`)) return;
+    const next = forexCodes.filter(c => !fxSelected.has(c));
+    setForexCodes(next);
+    try { localStorage.setItem('forexCodes', JSON.stringify(next)); } catch {}
+    setFxSelected(new Set());
+    setFxSelectMode(false);
+  }
 
   async function loadAssets() {
     try {
@@ -315,12 +381,13 @@ export default function HomePage() {
   const isPair = tab === 'pair';
   const isCommodities = tab === 'commodities';
   const isPool = tab === 'pool';
+  const isForex = tab === 'forex';
   const isCrypto = isPair;
-  const curSelectMode = isPool ? poolSelectMode : isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
-  const curSelected = isPool ? poolSelected : isAssets ? assetSelected : (isCrypto ? selected : cSelected);
-  const curDeleting = isPool ? poolDeleting : isAssets ? assetDeleting : (isCrypto ? deleting : cDeleting);
-  const curPairs = isPool ? poolFavs : isAssets ? assets : (isCrypto ? pairs : cPairs);
-  const curToggleSelectMode = isPool ? togglePoolSelectMode : isAssets ? (() => { setAssetSelectMode(v => !v); setAssetSelected(new Set()); }) : (isCrypto ? toggleSelectMode : cToggleSelectMode);
+  const curSelectMode = isForex ? fxSelectMode : isPool ? poolSelectMode : isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
+  const curSelected = isForex ? fxSelected : isPool ? poolSelected : isAssets ? assetSelected : (isCrypto ? selected : cSelected);
+  const curDeleting = isForex ? false : isPool ? poolDeleting : isAssets ? assetDeleting : (isCrypto ? deleting : cDeleting);
+  const curPairs = isForex ? forexCodes : isPool ? poolFavs : isAssets ? assets : (isCrypto ? pairs : cPairs);
+  const curToggleSelectMode = isForex ? toggleFxSelectMode : isPool ? togglePoolSelectMode : isAssets ? (() => { setAssetSelectMode(v => !v); setAssetSelected(new Set()); }) : (isCrypto ? toggleSelectMode : cToggleSelectMode);
   const curSortDir = isCrypto ? sortDir : cSortDir;
   function chooseSort(dir) {
     // повторный выбор того же пункта возвращает исходный порядок
@@ -351,7 +418,7 @@ export default function HomePage() {
   const chartAsset = assets.find(a => a.asset_id === chartAssetKey) || assets[0] || null;
   const displayPairs = sortList(pairs, sparks, sortDir, p => `${p.asset1}/${p.asset2}`);
   const displayCPairs = sortList(cPairs, cSparks, cSortDir, p => `${enLabelFor(p.asset1)}/${enLabelFor(p.asset2)}`);
-  const curConfirmDelete = isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
+  const curConfirmDelete = isForex ? confirmDeleteForex : isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
     <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}`}>
@@ -363,6 +430,7 @@ export default function HomePage() {
           <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>Spot</button>
           <button onClick={() => changeTab('pool')} style={tab === 'pool' ? tabActive : tabInactive}>Pool</button>
           <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
+          <button onClick={() => changeTab('forex')} style={tab === 'forex' ? tabActive : tabInactive}>Forex</button>
         </nav>
         </div>
         <div className="hd-right">
@@ -378,11 +446,19 @@ export default function HomePage() {
       </header>
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '0 16px 16px' }}>
       <div className="list-actions">
+        {isForex && (
+          <label className="fx-base">
+            <span>Основная валюта</span>
+            <select value={forexBase} onChange={e => changeForexBase(e.target.value)} className="hd-btn hd-sm">
+              {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
+            </select>
+          </label>
+        )}
           {!curSelectMode ? (
             <>
-              {!isPool && <a href={isAssets ? '/assets' : isCrypto ? '/add' : '/add-commodity'} className="hd-btn hd-sm add" title={isAssets ? 'Добавить актив' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>Добавить</a>}
+              {!isPool && <a href={isAssets ? '/assets' : isForex ? '/add-currency' : isCrypto ? '/add' : '/add-commodity'} className="hd-btn hd-sm add" title={isAssets ? 'Добавить актив' : isForex ? 'Добавить валюту' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>Добавить</a>}
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} className="hd-btn hd-sm del" title="Выбрать для удаления">Удалить</button>}
-          {!isAssets && !isPool && curPairs.length > 1 && (
+          {!isAssets && !isPool && !isForex && curPairs.length > 1 && (
             <div ref={sortMenuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setSortMenuOpen(v => !v)}
@@ -521,6 +597,49 @@ export default function HomePage() {
         );
       })}
 
+      {isForex && forexLoaded && (() => {
+        const list = forexCodes.filter(c => c !== forexBase);
+        const fmt = (n) => (n == null ? '—' : Number(n).toLocaleString('en-US', { maximumFractionDigits: n >= 100 ? 2 : n >= 1 ? 4 : 6, minimumFractionDigits: n >= 100 ? 2 : 0 }));
+        const active = fxChartCode && list.includes(fxChartCode) ? fxChartCode : list[0];
+        return (
+          <>
+            {list.length === 0 && <p style={{ opacity: 0.7 }}>Валют пока нет — нажмите «Добавить», чтобы выбрать нужные.</p>}
+            {list.length > 0 && (
+              <div className={`fx-row fx-head${fxSelectMode ? ' sel' : ''}`}>
+                {fxSelectMode && <span />}
+                <span>Тикер</span><span>Флаг</span><span className="fx-name">Название</span><span className="ar-r">Цена</span><span className="ar-r">Изменение</span>
+              </div>
+            )}
+            {list.map(code => {
+              const c = currencyOf(code);
+              const rt = forexRates[code];
+              const ch = rt?.change;
+              const isSel = fxSelected.has(code);
+              return (
+                <div
+                  key={code}
+                  role="button"
+                  tabIndex={0}
+                  className={`fx-row${fxSelectMode ? ' sel' : ''}`}
+                  style={{ cursor: 'pointer', background: isSel ? 'var(--danger-bg)' : code === active ? 'var(--input-bg)' : 'transparent' }}
+                  onClick={() => (fxSelectMode ? toggleFxSelected(code) : pickFxChart(code))}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fxSelectMode ? toggleFxSelected(code) : pickFxChart(code); } }}
+                >
+                  {fxSelectMode && <input type="checkbox" checked={isSel} onChange={() => toggleFxSelected(code)} onClick={e => e.stopPropagation()} style={{ width: 18, height: 18 }} />}
+                  <b>{code}</b>
+                  <Flag cc={c.cc} width={28} />
+                  <span className="fx-name">{c.name}</span>
+                  <span className="ar-r" style={{ fontWeight: 600 }}>{fmt(rt?.price)}</span>
+                  <span className="ar-r" style={{ fontWeight: 600, color: ch == null ? 'var(--text-dim)' : ch >= 0 ? 'var(--up)' : 'var(--down)' }}>{ch == null ? '—' : `${ch >= 0 ? '+' : ''}${ch.toFixed(2).replace('.', ',')}%`}</span>
+                </div>
+              );
+            })}
+            {forexError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>Курсы временно недоступны — обновятся автоматически.</p>}
+            {list.length > 0 && <p style={{ color: 'var(--text-dim)', fontSize: 12, marginTop: 10 }}>Цена — сколько {forexBase} стоит 1 единица валюты. Обновляется раз в 15 минут.</p>}
+          </>
+        );
+      })()}
+
       {isCommodities && !loading && cPairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
       {isCommodities && displayCPairs.map((p) => {
         const price = cPrices[p.id];
@@ -566,6 +685,11 @@ export default function HomePage() {
       {isCrypto && <section className="side-chart"><TvChart symbols={chartSymbols} /></section>}
       {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} name={chartAsset?.name} /></section>}
       {isCommodities && <section className="side-chart"><TvChart symbols={cChartSymbols} /></section>}
+      {isForex && (() => {
+        const list = forexCodes.filter(c => c !== forexBase);
+        const active = fxChartCode && list.includes(fxChartCode) ? fxChartCode : list[0];
+        return active ? <section className="side-chart"><TvChart symbols={[`FX_IDC:${active}${forexBase}`]} /></section> : null;
+      })()}
       {isPool && <section className="side-chart"><PoolChart pool={poolForChart} /></section>}
       <section className="side-news"><div className="side-title">Новости</div><NewsFeed /></section>
     </aside>

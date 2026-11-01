@@ -473,3 +473,19 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .asset-chart-title b { font-size: 17px; }
 .asset-chart-title span { color: var(--text-dim); font-size: 13px; }
 .asset-chart > .tv-pair { flex: 1; min-height: 0; }
+
+/* Forex: таблица и выбор основной валюты */
+.fx-base { display: inline-flex; align-items: center; gap: 8px; margin-right: auto; color: var(--text-dim); font-size: 13px; min-width: 0; }
+.fx-base select { max-width: 220px; color: var(--text); }
+.fx-row { display: grid; grid-template-columns: 64px 36px minmax(0, 1fr) minmax(0, 1fr) 96px; align-items: center; column-gap: 10px; padding: 11px 6px; border-bottom: 1px solid var(--card-border); font-variant-numeric: tabular-nums; font-size: 15px; border-radius: 6px; }
+.fx-row.sel { grid-template-columns: 22px 64px 36px minmax(0, 1fr) minmax(0, 1fr) 96px; }
+.fx-row b { font-weight: 700; font-size: 16px; }
+.fx-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-dim); }
+.fx-head { font-size: 12px; color: var(--text-dim); padding-top: 4px; padding-bottom: 6px; }
+.fx-head > span { white-space: nowrap; }
+@media (max-width: 720px) {
+  .fx-row { grid-template-columns: 54px 32px minmax(0, 1fr) 84px; column-gap: 8px; }
+  .fx-row.sel { grid-template-columns: 22px 54px 32px minmax(0, 1fr) 84px; }
+  .fx-row .fx-name { display: none; }
+  .fx-base span { display: none; }
+}
