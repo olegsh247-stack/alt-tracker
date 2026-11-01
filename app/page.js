@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
-import { shortTickerFor, enLabelFor } from '../lib/commodities';
+import { shortTickerFor, enLabelFor, tvSymbolFor } from '../lib/commodities';
 import PoolSearch from '../components/PoolSearch';
 import PoolTable from '../components/PoolTable';
 import TvChart from '../components/TvChart';
@@ -244,7 +244,22 @@ export default function HomePage() {
   }
   function cToggleSelectMode() { setCSelectMode(v => !v); setCSelected(new Set()); }
   function cToggleSelected(id) { setCSelected(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; }); }
-  function cOnRowClick(e, id) { if (!cSelectMode) return; e.preventDefault(); cToggleSelected(id); }
+  const [cChartPairId, setCChartPairId] = useState(null);
+  useEffect(() => { try { const v = localStorage.getItem('cChartPairId'); if (v) setCChartPairId(v); } catch {} }, []);
+  function cPickChart(id) {
+    setCChartPairId(String(id));
+    try { localStorage.setItem('cChartPairId', String(id)); } catch {}
+    if (typeof window !== 'undefined' && window.innerWidth < 1300) {
+      setTimeout(() => document.querySelector('.side-chart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  }
+  function cOnRowClick(e, id) { if (cSelectMode) cToggleSelected(id); else cPickChart(id); }
+  function cChartSymbolsFor(pair) {
+    if (!pair) return ['TVC:GOLD', 'TVC:SILVER'];
+    const out = [];
+    [pair.asset1, pair.asset2].forEach(k => { const t = tvSymbolFor(k); if (t && !out.includes(t)) out.push(t); });
+    return out.length ? out : ['TVC:GOLD', 'TVC:SILVER'];
+  }
   async function cConfirmDeleteSelected() {
     if (cSelected.size === 0) { setCSelectMode(false); return; }
     if (!confirm(`Удалить выбранные пары (${cSelected.size})?`)) return;
@@ -331,6 +346,8 @@ export default function HomePage() {
       return sign * (va - vb);
     });
   }
+  const cChartPair = cPairs.find(p => String(p.id) === cChartPairId) || null;
+  const cChartSymbols = cChartSymbolsFor(cChartPair);
   const chartAsset = assets.find(a => a.asset_id === chartAssetKey) || assets[0] || null;
   const displayPairs = sortList(pairs, sparks, sortDir, p => `${p.asset1}/${p.asset2}`);
   const displayCPairs = sortList(cPairs, cSparks, cSortDir, p => `${enLabelFor(p.asset1)}/${enLabelFor(p.asset2)}`);
@@ -512,12 +529,14 @@ export default function HomePage() {
         const pctColor = pct == null ? 'var(--text-dim)' : pct >= 0 ? 'var(--up)' : 'var(--down)';
         const isSelected = cSelected.has(p.id);
         return (
-          <a
+          <div
             key={p.id}
-            href={`/commodity-pair/${p.id}`}
+            role="button"
+            tabIndex={0}
             className={`pair-row pair-grid${cSelectMode ? ' sort-active' : ''}`}
-            style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }}
+            style={{ ...row, cursor: 'pointer', background: isSelected ? 'var(--danger-bg)' : String(p.id) === String(cChartPair?.id) ? 'var(--input-bg)' : 'transparent' }}
             onClick={(e) => cOnRowClick(e, p.id)}
+            onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); cOnRowClick(e, p.id); } }}
           >
             {cSelectMode && (
               <input type="checkbox" checked={isSelected} onChange={() => cToggleSelected(p.id)} onClick={(e) => e.stopPropagation()} className="cell-order" style={{ width: 18, height: 18 }} />
@@ -526,7 +545,7 @@ export default function HomePage() {
               <span className="commodity-icon">{shortTickerFor(p.asset1)}</span>
               <span className="commodity-icon">{shortTickerFor(p.asset2)}</span>
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{enLabelFor(p.asset1)}/<wbr />{enLabelFor(p.asset2)}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{enLabelFor(p.asset1)}/<wbr />{enLabelFor(p.asset2)}{!cSelectMode && <a href={`/commodity-pair/${p.id}`} className="open-pair" title="Открыть страницу пары" aria-label="Открыть страницу пары" onClick={(e) => e.stopPropagation()}>↗</a>}</div>
             {!cSelectMode && (
               <button onClick={(e) => cSwapPair(e, p.id)} disabled={cSwappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
                 {cSwappingId === p.id ? '…' : '⇄'}
@@ -539,13 +558,14 @@ export default function HomePage() {
             <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 16, color: pctColor }}>
               {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
             </div>
-          </a>
+          </div>
         );
       })}
     </div>
     <aside className="side-panel">
       {isCrypto && <section className="side-chart"><TvChart symbols={chartSymbols} /></section>}
       {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} name={chartAsset?.name} /></section>}
+      {isCommodities && <section className="side-chart"><TvChart symbols={cChartSymbols} /></section>}
       {isPool && <section className="side-chart"><PoolChart pool={poolForChart} /></section>}
       <section className="side-news"><div className="side-title">Новости</div><NewsFeed /></section>
     </aside>
