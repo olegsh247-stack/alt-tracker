@@ -100,10 +100,11 @@ export default function HomePage() {
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const sortMenuRef = useRef(null);
   useEffect(() => {
+    setCSortDir('alpha_asc');
     try {
       const fix = (v) => (v === 'asc' || v === 'desc' ? `pct_${v}` : v || null);
       setSortDir(fix(localStorage.getItem('pairSortDir')));
-      setCSortDir(fix(localStorage.getItem('commoditySortDir')));
+      { const cv = localStorage.getItem('commoditySortDir'); setCSortDir(cv === 'off' ? null : (fix(cv) || 'alpha_asc')); }
     } catch {}
   }, []);
   useEffect(() => {
@@ -308,7 +309,7 @@ export default function HomePage() {
     const next = curSortDir === dir ? null : dir;
     const key = isCrypto ? 'pairSortDir' : 'commoditySortDir';
     (isCrypto ? setSortDir : setCSortDir)(next);
-    try { next ? localStorage.setItem(key, next) : localStorage.removeItem(key); } catch {}
+    try { next ? localStorage.setItem(key, next) : (isCrypto ? localStorage.removeItem(key) : localStorage.setItem(key, 'off')); } catch {}
     setSortMenuOpen(false);
   }
   function sortList(list, sparksMap, mode, nameOf) {
@@ -431,7 +432,7 @@ export default function HomePage() {
           <span />
           <span>Coin</span>
           <span className="ar-r">Rank</span>
-          <span className="ar-r ar-sup">Circulating supply</span>
+          <span className="ar-r ar-sup">Circ. supply</span>
           <span className="ar-r ar-sup">Max supply</span>
           <span className="ar-r">24h</span>
           <span className="ar-r">Price</span>
