@@ -39,7 +39,7 @@ export default function AssetChart({ symbol, name }) {
     </div>
   );
   if (res.kind === 'dex') {
-    const src = `https://dexscreener.com/${res.chain}/${res.pair}?embed=1&theme=${light ? 'light' : 'dark'}&trades=0&info=0`;
+    const src = `https://dexscreener.com/${res.chain}/${res.pair}?embed=1&theme=${light ? 'light' : 'dark'}&trades=0&info=0&interval=240`;
     return (
       <div className="pool-chart">
         <div className="pool-chart-head">

@@ -54,7 +54,7 @@ export default function TvChart({ symbols = ['BINANCE:BTCUSDT', 'BINANCE:ETHUSDT
             className="tv-chart"
             src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js"
             config={{
-              autosize: true, symbol, interval: '60', timezone: 'Europe/Moscow', theme, style: '1', locale: 'ru',
+              autosize: true, symbol, interval: '240', timezone: 'Europe/Moscow', theme, style: '1', locale: 'ru',
               backgroundColor: bg, gridColor: theme === 'light' ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)',
               allow_symbol_change: false, hide_side_toolbar: true, hide_top_toolbar: false, hide_legend: false,
               save_image: false, withdateranges: true, calendar: false, support_host: 'https://www.tradingview.com',

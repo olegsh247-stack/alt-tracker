@@ -36,7 +36,7 @@ export default function PoolChart({ pool }) {
   if (!pool) {
     return <div className="pool-chart pool-chart-empty">Выберите пул в списке, чтобы увидеть график</div>;
   }
-  const src = `https://www.geckoterminal.com/${pool.network}/pools/${pool.address}?embed=1&info=0&swaps=0&grayscale=0&light_chart=${light ? 1 : 0}&chart_type=price&resolution=15m`;
+  const src = `https://www.geckoterminal.com/${pool.network}/pools/${pool.address}?embed=1&info=0&swaps=0&grayscale=0&light_chart=${light ? 1 : 0}&chart_type=price&resolution=4h`;
   const ch = pool.change24;
   return (
     <div className="pool-chart">
