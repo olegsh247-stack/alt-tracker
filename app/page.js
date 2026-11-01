@@ -376,7 +376,7 @@ export default function HomePage() {
   const [chartPool, setChartPool] = useState(null);
   useEffect(() => { try { const v = JSON.parse(localStorage.getItem('chartPool') || 'null'); if (v?.address) setChartPool(v); } catch {} }, []);
   function selectPool(p) {
-    const v = { network: p.network, address: p.address, base: p.base, quote: p.quote, dex: p.dex, feePct: p.feePct ?? null, feeApprox: !!p.feeApprox, change24: p.change24 ?? null };
+    const v = { network: p.network, address: p.address, base: p.base, quote: p.quote, baseAddress: p.baseAddress || null, quoteAddress: p.quoteAddress || null, dex: p.dex, feePct: p.feePct ?? null, feeApprox: !!p.feeApprox, change24: p.change24 ?? null };
     setChartPool(v);
     try { localStorage.setItem('chartPool', JSON.stringify(v)); } catch {}
     if (typeof window !== 'undefined' && window.innerWidth < 1300) {

@@ -36,6 +36,8 @@ export async function GET() {
       address: f.address,
       base: s?.base || bs || '?',
       quote: s?.quote || qs || '?',
+      baseAddress: s?.baseAddress ?? null,
+      quoteAddress: s?.quoteAddress ?? null,
       dex: s?.dex || f.dex || null,
       feePct: s?.feePct ?? null,
       feeApprox: !!s?.feeApprox,
