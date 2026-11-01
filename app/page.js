@@ -9,6 +9,7 @@ import TvChart from '../components/TvChart';
 import NewsFeed from '../components/NewsFeed';
 import Logo from '../components/Logo';
 import CoinIcon from '../components/CoinIcon';
+import AssetChart from '../components/AssetChart';
 import PoolChart from '../components/PoolChart';
 
 export default function HomePage() {
@@ -45,6 +46,7 @@ export default function HomePage() {
   const [assets, setAssets] = useState([]);
   const [assetDetails, setAssetDetails] = useState({});
   const [assetStats, setAssetStats] = useState({});
+  const [chartAssetKey, setChartAssetKey] = useState(null);
   const [assetSelectMode, setAssetSelectMode] = useState(false);
   const [assetSelected, setAssetSelected] = useState(new Set());
   const [assetDeleting, setAssetDeleting] = useState(false);
@@ -329,6 +331,7 @@ export default function HomePage() {
       return sign * (va - vb);
     });
   }
+  const chartAsset = assets.find(a => a.asset_id === chartAssetKey) || assets[0] || null;
   const displayPairs = sortList(pairs, sparks, sortDir, p => `${p.asset1}/${p.asset2}`);
   const displayCPairs = sortList(cPairs, cSparks, cSortDir, p => `${enLabelFor(p.asset1)}/${enLabelFor(p.asset2)}`);
   const curConfirmDelete = isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
@@ -447,7 +450,7 @@ export default function HomePage() {
         const isSelected = assetSelected.has(asset.asset_id);
         const ch = st?.change24h;
         return (
-          <div key={asset.asset_id} className={`asset-row${assetSelectMode ? ' sel' : ''}`} style={{ background: isSelected ? 'var(--danger-bg)' : 'transparent' }} onClick={() => assetSelectMode && toggleAssetSelect(asset.asset_id)}>
+          <div key={asset.asset_id} className={`asset-row${assetSelectMode ? ' sel' : ''}`} style={{ cursor: 'pointer', background: isSelected ? 'var(--danger-bg)' : chartAsset?.asset_id === asset.asset_id ? 'var(--input-bg)' : 'transparent' }} onClick={() => { if (assetSelectMode) toggleAssetSelect(asset.asset_id); else { setChartAssetKey(asset.asset_id); setTimeout(() => document.querySelector('.side-chart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); } }}>
             {assetSelectMode && <input type="checkbox" checked={isSelected} onChange={() => toggleAssetSelect(asset.asset_id)} onClick={e => e.stopPropagation()} style={{ width: 18, height: 18 }} />}
             <CoinIcon symbol={asset.symbol} size={28} />
             <div className="ar-coin"><b>{asset.symbol}</b><span>{asset.name}</span></div>
@@ -542,6 +545,7 @@ export default function HomePage() {
     </div>
     <aside className="side-panel">
       {isCrypto && <section className="side-chart"><TvChart symbols={chartSymbols} /></section>}
+      {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} /></section>}
       {isPool && <section className="side-chart"><PoolChart pool={poolForChart} /></section>}
       <section className="side-news"><div className="side-title">Новости</div><NewsFeed /></section>
     </aside>
