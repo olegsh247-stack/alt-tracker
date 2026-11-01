@@ -504,3 +504,24 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .cal-box { height: 480px; }
 .tv-calendar { height: 100%; width: 100%; }
 @media (min-width: 1300px) { .cal-box { flex: 1; height: auto; min-height: 0; } }
+
+/* Commodities: шире название пары, кнопка «поменять местами» — справа */
+.pair-row.pair-grid.comm-grid {
+  grid-template-columns: 80px minmax(0, 2.6fr) minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.4fr) 62px 30px;
+  grid-template-areas: "icons name price1 price2 ratio pct swap";
+}
+.pair-row.pair-grid.comm-grid.sort-active {
+  grid-template-columns: 24px 80px minmax(0, 2.6fr) minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.4fr) 62px 30px;
+  grid-template-areas: "order icons name price1 price2 ratio pct swap";
+}
+.comm-grid .cell-swap { justify-self: end; }
+@media (max-width: 640px) {
+  .pair-row.pair-grid.comm-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.6fr) minmax(0, 0.9fr) 26px;
+    grid-template-areas: "icons name pct swap" "price1 price2 ratio ratio";
+  }
+  .pair-row.pair-grid.comm-grid.sort-active {
+    grid-template-columns: 24px minmax(0, 1fr) minmax(0, 2.6fr) minmax(0, 0.9fr) 26px;
+    grid-template-areas: "order icons name pct swap" "order price1 price2 ratio ratio";
+  }
+}

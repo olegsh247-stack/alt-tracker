@@ -687,7 +687,7 @@ export default function HomePage() {
             key={p.id}
             role="button"
             tabIndex={0}
-            className={`pair-row pair-grid${cSelectMode ? ' sort-active' : ''}`}
+            className={`pair-row pair-grid comm-grid${cSelectMode ? ' sort-active' : ''}`}
             style={{ ...row, cursor: 'pointer', background: isSelected ? 'var(--danger-bg)' : String(p.id) === String(cChartPair?.id) ? 'var(--input-bg)' : 'transparent' }}
             onClick={(e) => cOnRowClick(e, p.id)}
             onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); cOnRowClick(e, p.id); } }}
@@ -705,7 +705,6 @@ export default function HomePage() {
                 {cSwappingId === p.id ? '…' : '⇄'}
               </button>
             )}
-            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90 }}></div>
             <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>
