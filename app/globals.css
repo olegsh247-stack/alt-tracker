@@ -450,3 +450,19 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .pool-table .pt-pair-name { align-items: center; }
 .pool-table .pt-pair-name > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .pool-table .pt-pair-name .pt-extra { margin-left: auto; flex: none; width: 24px; justify-content: center; }
+
+/* Assets: таблица */
+.asset-row { display: grid; grid-template-columns: 36px minmax(0, 1.6fr) 56px minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr); align-items: center; column-gap: 10px; padding: 11px 6px; border-bottom: 1px solid var(--card-border); font-variant-numeric: tabular-nums; font-size: 15px; border-radius: 6px; }
+.asset-row.sel { grid-template-columns: 22px 36px minmax(0, 1.6fr) 56px minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr); }
+.asset-head { font-size: 12px; color: var(--text-dim); padding-top: 4px; padding-bottom: 6px; text-transform: none; }
+.ar-r { text-align: right; white-space: nowrap; }
+.ar-coin { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.ar-coin b { font-weight: 700; font-size: 16px; }
+.ar-coin span { color: var(--text-dim); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.asset-head > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 720px) {
+  .asset-row, .asset-row.sel { column-gap: 8px; }
+  .asset-row { grid-template-columns: 32px minmax(0, 1.4fr) 44px 64px minmax(0, 1fr); }
+  .asset-row.sel { grid-template-columns: 22px 32px minmax(0, 1.4fr) 44px 64px minmax(0, 1fr); }
+  .ar-sup { display: none; }
+}

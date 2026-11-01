@@ -44,6 +44,7 @@ export default function HomePage() {
   const [sortDir, setSortDir] = useState(null); // null | 'alpha_asc' | 'alpha_desc' | 'pct_asc' | 'pct_desc'
   const [assets, setAssets] = useState([]);
   const [assetDetails, setAssetDetails] = useState({});
+  const [assetStats, setAssetStats] = useState({});
   const [assetSelectMode, setAssetSelectMode] = useState(false);
   const [assetSelected, setAssetSelected] = useState(new Set());
   const [assetDeleting, setAssetDeleting] = useState(false);
@@ -127,6 +128,12 @@ export default function HomePage() {
         } catch { return [asset.asset_id, null]; }
       }));
       setAssetDetails(Object.fromEntries(rows));
+      if (mine.length) {
+        try {
+          const sr = await fetch(`/api/asset-stats?s=${encodeURIComponent(mine.map(a => a.symbol).join(','))}`);
+          if (sr.ok) setAssetStats((await sr.json()).stats || {});
+        } catch {}
+      }
     } catch {
       setAssets([]);
     }
@@ -418,18 +425,35 @@ export default function HomePage() {
       )}
 
       {isAssets && !loading && assets.length === 0 && <p style={{ opacity: 0.7 }}>Активов пока нет — нажмите "+", чтобы добавить первый.</p>}
+      {isAssets && !loading && assets.length > 0 && (
+        <div className={`asset-row asset-head${assetSelectMode ? ' sel' : ''}`}>
+          {assetSelectMode && <span />}
+          <span />
+          <span>Coin</span>
+          <span className="ar-r">Rank</span>
+          <span className="ar-r ar-sup">Circulating supply</span>
+          <span className="ar-r ar-sup">Max supply</span>
+          <span className="ar-r">24h</span>
+          <span className="ar-r">Price</span>
+        </div>
+      )}
       {isAssets && !loading && assets.map((asset) => {
         const metrics = assetDetails[asset.asset_id]?.metrics || [];
         const m = metrics.find(x => x.metric_id === 'market.spot_price');
-        const price = m?.value;
+        const st = assetStats[String(asset.symbol || '').toUpperCase()];
+        const price = m?.value ?? st?.price;
         const isSelected = assetSelected.has(asset.asset_id);
+        const ch = st?.change24h;
         return (
-          <div key={asset.asset_id} className="pair-row" style={{ ...row, background: isSelected ? 'var(--danger-bg)' : 'transparent' }} onClick={() => assetSelectMode && toggleAssetSelect(asset.asset_id)}>
+          <div key={asset.asset_id} className={`asset-row${assetSelectMode ? ' sel' : ''}`} style={{ background: isSelected ? 'var(--danger-bg)' : 'transparent' }} onClick={() => assetSelectMode && toggleAssetSelect(asset.asset_id)}>
             {assetSelectMode && <input type="checkbox" checked={isSelected} onChange={() => toggleAssetSelect(asset.asset_id)} onClick={e => e.stopPropagation()} style={{ width: 18, height: 18 }} />}
             <CoinIcon symbol={asset.symbol} size={28} />
-            <div style={{ minWidth: 90, fontWeight: 700 }}>{asset.symbol}</div>
-            <div style={{ flex: 1, color: 'var(--text-dim)' }}>{asset.name}</div>
-            <div style={cell}>{price == null ? '—' : Number(price).toLocaleString('en-US', { maximumFractionDigits: price >= 1000 ? 2 : price >= 1 ? 4 : 8 })}</div>
+            <div className="ar-coin"><b>{asset.symbol}</b><span>{asset.name}</span></div>
+            <div className="ar-r">{st?.rank ? `#${st.rank}` : '—'}</div>
+            <div className="ar-r ar-sup">{fmtSupply(st?.circulating)}</div>
+            <div className="ar-r ar-sup">{st ? (st.max == null ? '∞' : fmtSupply(st.max)) : '—'}</div>
+            <div className="ar-r" style={{ fontWeight: 600, color: ch == null ? 'var(--text-dim)' : ch >= 0 ? 'var(--up)' : 'var(--down)' }}>{ch == null ? '—' : `${ch >= 0 ? '+' : ''}${ch.toFixed(1).replace('.', ',')}%`}</div>
+            <div className="ar-r" style={{ fontWeight: 600 }}>{price == null ? '—' : Number(price).toLocaleString('en-US', { maximumFractionDigits: price >= 1000 ? 2 : price >= 1 ? 4 : 8 })}</div>
           </div>
         );
       })}
@@ -528,6 +552,16 @@ const row = {
   borderBottom: '1px solid var(--card-border)', textDecoration: 'none', color: 'var(--text)',
   borderRadius: 6,
 };
+function fmtSupply(v) {
+  if (v == null || !Number.isFinite(Number(v))) return '—';
+  const n = Number(v);
+  const f = (x, u) => `${x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2)}${u}`;
+  if (n >= 1e12) return f(n / 1e12, 'T');
+  if (n >= 1e9) return f(n / 1e9, 'B');
+  if (n >= 1e6) return f(n / 1e6, 'M');
+  if (n >= 1e3) return f(n / 1e3, 'K');
+  return n.toFixed(0);
+}
 const cell = { minWidth: 90, textAlign: 'right', fontVariantNumeric: 'tabular-nums' };
 const plusBtn = {
   width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
