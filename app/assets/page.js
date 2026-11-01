@@ -5,104 +5,94 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const API = 'https://crypto-api.olegsh247.workers.dev';
+const MAX_SHOWN = 100;
 
-function icon(symbol) {
-  return `https://assets.coincap.io/assets/icons/${symbol.toLowerCase()}@2x.png`;
-}
-
+// Ключ актива: если монета есть в старом списке (Crypto Universe) — его asset_id, иначе "cg:<id CoinGecko>".
 export default function AssetsPage() {
   const router = useRouter();
-  const [assets, setAssets] = useState([]);
+  const [coins, setCoins] = useState([]);       // топ-500 CoinGecko
+  const [worker, setWorker] = useState([]);     // старый список Crypto Universe
   const [tracked, setTracked] = useState([]);
-  const [details, setDetails] = useState({});
+  const [meta, setMeta] = useState({});
+  const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('cryptoTrackedAssets') || '[]');
-    setTracked(Array.isArray(saved) ? saved : []);
-
-    fetch(`${API}/api/assets`)
-      .then(async r => {
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error || 'Не удалось загрузить список активов');
-        return data;
-      })
-      .then(data => setAssets(data.assets || []))
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
+    try {
+      const saved = JSON.parse(localStorage.getItem('cryptoTrackedAssets') || '[]');
+      setTracked(Array.isArray(saved) ? saved : []);
+      setMeta(JSON.parse(localStorage.getItem('cryptoTrackedMeta') || '{}') || {});
+    } catch {}
+    Promise.allSettled([
+      fetch('/api/coin-list').then(r => r.json()),
+      fetch(`${API}/api/assets`).then(r => r.json()),
+    ]).then(([c, w]) => {
+      const cl = c.status === 'fulfilled' ? c.value.coins || [] : [];
+      const wl = w.status === 'fulfilled' ? w.value.assets || [] : [];
+      setCoins(cl);
+      setWorker(wl);
+      if (cl.length === 0 && wl.length === 0) setError('Не удалось загрузить список монет. Попробуйте позже.');
+    }).finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (!assets.length) return;
-    let cancelled = false;
-
-    Promise.all(
-      assets.map(async asset => {
-        try {
-          const r = await fetch(`${API}/api/assets/${asset.asset_id}`);
-          if (!r.ok) return [asset.asset_id, null];
-          return [asset.asset_id, await r.json()];
-        } catch {
-          return [asset.asset_id, null];
-        }
-      })
-    ).then(rows => {
-      if (!cancelled) setDetails(Object.fromEntries(rows));
+  // единый список: монеты CoinGecko + монеты старого списка, которых в топ-500 нет
+  const all = useMemo(() => {
+    const byWorkerSym = new Map(worker.map(a => [String(a.symbol).toUpperCase(), a]));
+    const list = coins.map(c => {
+      const w = byWorkerSym.get(c.symbol);
+      return { key: w ? w.asset_id : `cg:${c.id}`, symbol: c.symbol, name: c.name, rank: c.rank, cgId: c.id };
     });
+    const have = new Set(list.map(x => x.key));
+    for (const a of worker) if (!have.has(a.asset_id)) list.push({ key: a.asset_id, symbol: String(a.symbol).toUpperCase(), name: a.name, rank: null });
+    return list;
+  }, [coins, worker]);
 
-    return () => { cancelled = true; };
-  }, [assets]);
+  const info = (key) => all.find(x => x.key === key) || (meta[key] ? { key, symbol: meta[key].symbol, name: meta[key].name, rank: null } : null);
 
-  function persist(next) {
+  function persist(next, nextMeta) {
     setTracked(next);
-    localStorage.setItem('cryptoTrackedAssets', JSON.stringify(next));
+    setMeta(nextMeta);
+    try {
+      localStorage.setItem('cryptoTrackedAssets', JSON.stringify(next));
+      localStorage.setItem('cryptoTrackedMeta', JSON.stringify(nextMeta));
+    } catch {}
   }
 
-  function toggle(assetId) {
-    const next = tracked.includes(assetId)
-      ? tracked.filter(id => id !== assetId)
-      : [...tracked, assetId];
-    persist(next);
+  function toggle(item) {
+    if (tracked.includes(item.key)) {
+      persist(tracked.filter(id => id !== item.key), meta);
+    } else {
+      const nextMeta = item.key.startsWith('cg:') ? { ...meta, [item.key]: { symbol: item.symbol, name: item.name } } : meta;
+      persist([...tracked, item.key], nextMeta);
+    }
   }
 
-  const trackedAssets = useMemo(
-    () => tracked.map(id => assets.find(a => a.asset_id === id)).filter(Boolean),
-    [tracked, assets]
-  );
+  const mine = tracked.map(info).filter(Boolean);
 
-  const availableAssets = useMemo(
-    () => assets.filter(a => !tracked.includes(a.asset_id)),
-    [assets, tracked]
-  );
-
-  function priceFor(assetId) {
-    const metrics = details[assetId]?.metrics || [];
-    const m = metrics.find(x => x.metric_id === 'market.spot_price');
-    return m?.value;
-  }
-
-  function formatPrice(value) {
-    if (value == null || !Number.isFinite(Number(value))) return '—';
-    const n = Number(value);
-    return n >= 1000
-      ? n.toLocaleString('en-US', { maximumFractionDigits: 2 })
-      : n >= 1
-        ? n.toLocaleString('en-US', { maximumFractionDigits: 4 })
-        : n.toLocaleString('en-US', { maximumFractionDigits: 8 });
-  }
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const items = all.filter(x => !tracked.includes(x.key));
+    if (!q) return items;
+    const score = (x) => {
+      const s = x.symbol.toLowerCase(), n = x.name.toLowerCase();
+      if (s === q) return 0;
+      if (s.startsWith(q)) return 1;
+      if (n.startsWith(q)) return 2;
+      if (n.split(/[\s.\-_]+/).some(w => w.startsWith(q))) return 3;
+      return 9;
+    };
+    return items.map(x => [score(x), x]).filter(([sc]) => sc < 9)
+      .sort((a, b) => a[0] - b[0] || (a[1].rank ?? 1e9) - (b[1].rank ?? 1e9))
+      .map(([, x]) => x);
+  }, [all, tracked, query]);
 
   return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: 16 }}>
       <div style={header}>
         <button onClick={() => router.push('/?tab=assets')} style={backBtn}>← Assets</button>
         <h1 style={{ margin: 0, fontSize: 26 }}>Активы</h1>
-        <span style={{ color: 'var(--text-dim)', fontSize: 15 }}>{assets.length}/50</span>
       </div>
-
-      <p style={{ color: 'var(--text-dim)', marginTop: 8 }}>
-        Выбирайте монеты из утверждённого списка. Сейчас доступны только активы Crypto Universe.
-      </p>
 
       {loading && <p>Загрузка списка…</p>}
       {error && <p style={{ color: 'var(--danger)' }}>{error}</p>}
@@ -112,38 +102,33 @@ export default function AssetsPage() {
           <section style={section}>
             <div style={sectionTitle}>
               <h2 style={h2}>Мои активы</h2>
-              <span style={count}>{trackedAssets.length}</span>
+              <span style={count}>{mine.length}</span>
             </div>
-
-            {trackedAssets.length === 0 ? (
-              <div style={empty}>Пока ничего не добавлено. Ниже выберите нужные активы.</div>
-            ) : (
-              trackedAssets.map(asset => (
-                <AssetRow
-                  key={asset.asset_id}
-                  asset={asset}
-                  price={priceFor(asset.asset_id)}
-                  added
-                  onToggle={() => toggle(asset.asset_id)}
-                />
-              ))
-            )}
+            {mine.length === 0 ? (
+              <div style={empty}>Пока ничего не добавлено. Найдите монету ниже.</div>
+            ) : mine.map(it => <AssetRow key={it.key} item={it} added onToggle={() => toggle(it)} />)}
           </section>
 
           <section style={section}>
             <div style={sectionTitle}>
-              <h2 style={h2}>Доступные активы</h2>
-              <span style={count}>{availableAssets.length}</span>
+              <h2 style={h2}>Добавить монету</h2>
+              <span style={count}>топ-500 по капитализации</span>
             </div>
-
-            {availableAssets.map(asset => (
-              <AssetRow
-                key={asset.asset_id}
-                asset={asset}
-                price={priceFor(asset.asset_id)}
-                onToggle={() => toggle(asset.asset_id)}
-              />
-            ))}
+            <input
+              type="search"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Тикер или название: B, BN, ETH…"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              style={input}
+            />
+            <div style={{ color: 'var(--text-dim)', fontSize: 13, margin: '6px 2px 4px' }}>
+              {query.trim() ? `Найдено: ${results.length}` : `Доступно: ${results.length}`}{results.length > MAX_SHOWN ? ` · показаны первые ${MAX_SHOWN}, уточните запрос` : ''}
+            </div>
+            {results.slice(0, MAX_SHOWN).map(it => <AssetRow key={it.key} item={it} onToggle={() => toggle(it)} />)}
+            {results.length === 0 && <div style={empty}>Ничего не найдено.</div>}
           </section>
         </>
       )}
@@ -151,40 +136,29 @@ export default function AssetsPage() {
   );
 }
 
-function AssetRow({ asset, price, added, onToggle }) {
+function AssetRow({ item, added, onToggle }) {
   return (
     <div style={row}>
-      <CoinIcon symbol={asset.symbol} size={34} />
-      <div style={{ flex: 1, minWidth: 150 }}>
-        <div style={{ fontWeight: 700 }}>{asset.symbol}</div>
-        <div style={{ color: 'var(--text-dim)', fontSize: 15 }}>{asset.name}</div>
+      <CoinIcon symbol={item.symbol} size={32} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontWeight: 700 }}>{item.symbol}</div>
+        <div style={{ color: 'var(--text-dim)', fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
       </div>
-      <div style={priceStyle}>{formatPrice(price)}{price != null ? ' USD' : ''}</div>
-      <button onClick={onToggle} style={added ? addedBtn : addBtn}>
-        {added ? '✓ Добавлено' : '+ Добавить'}
-      </button>
+      <div style={rankStyle}>{item.rank ? `#${item.rank}` : ''}</div>
+      <button onClick={onToggle} style={added ? addedBtn : addBtn}>{added ? '✓ Добавлено' : '+ Добавить'}</button>
     </div>
   );
-}
-
-function formatPrice(value) {
-  if (value == null || !Number.isFinite(Number(value))) return '—';
-  const n = Number(value);
-  return n >= 1000
-    ? n.toLocaleString('en-US', { maximumFractionDigits: 2 })
-    : n >= 1
-      ? n.toLocaleString('en-US', { maximumFractionDigits: 4 })
-      : n.toLocaleString('en-US', { maximumFractionDigits: 8 });
 }
 
 const header = { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 };
 const backBtn = { border: '1px solid var(--input-border)', background: 'none', color: 'var(--text)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' };
 const section = { marginTop: 24 };
-const sectionTitle = { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 };
+const sectionTitle = { display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 };
 const h2 = { margin: 0, fontSize: 18 };
 const count = { color: 'var(--text-dim)', fontSize: 14 };
 const empty = { padding: 18, border: '1px dashed var(--card-border)', borderRadius: 10, color: 'var(--text-dim)' };
-const row = { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 4px', borderBottom: '1px solid var(--card-border)' };
-const priceStyle = { minWidth: 100, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--text-dim)', fontSize: 15 };
-const addBtn = { border: '1px solid var(--accent)', background: 'none', color: 'var(--accent-text)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', fontWeight: 600 };
-const addedBtn = { border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text-dim)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' };
+const input = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', fontSize: 16, borderRadius: 8, border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text)' };
+const row = { display: 'flex', alignItems: 'center', gap: 12, padding: '10px 4px', borderBottom: '1px solid var(--card-border)' };
+const rankStyle = { minWidth: 44, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: 'var(--text-dim)', fontSize: 14 };
+const addBtn = { border: '1px solid var(--up)', background: 'none', color: 'var(--up)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' };
+const addedBtn = { border: '1px solid var(--input-border)', background: 'var(--input-bg)', color: 'var(--text-dim)', borderRadius: 8, padding: '8px 12px', cursor: 'pointer', whiteSpace: 'nowrap' };
