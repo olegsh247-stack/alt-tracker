@@ -526,10 +526,9 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   }
 }
 
-/* Pool: адреса контрактов монет над графиком (слева — первая, справа — вторая) */
-.pool-chart-addrs { display: flex; justify-content: space-between; gap: 8px; padding: 6px 12px; border-bottom: 1px solid var(--card-border); }
-.pc-addr { display: inline-flex; align-items: baseline; gap: 6px; min-width: 0; background: none; border: none; padding: 2px 4px; border-radius: 6px; color: var(--text-dim); font: inherit; font-size: 12px; cursor: pointer; }
+/* Pool: адреса контрактов монет над графиком (рядом: первая, затем вторая) */
+.pool-chart-addrs { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 4px 16px; padding: 7px 12px; border-bottom: 1px solid var(--card-border); }
+.pc-addr { display: inline-flex; align-items: baseline; gap: 7px; min-width: 0; background: none; border: none; padding: 2px 4px; border-radius: 6px; color: var(--text-dim); font: inherit; font-size: 14px; cursor: pointer; }
 .pc-addr:hover:not(:disabled) { background: var(--input-bg); color: var(--text); }
-.pc-addr.q { flex-direction: row-reverse; }
 .pc-sym { font-weight: 700; color: var(--text); }
 .pc-hex { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
