@@ -121,9 +121,9 @@ export default function HomePage() {
       try { all = (await (await fetch('https://crypto-api.olegsh247.workers.dev/api/assets')).json()).assets || []; } catch {}
       let meta = {};
       try { meta = JSON.parse(localStorage.getItem('cryptoTrackedMeta') || '{}') || {}; } catch {}
-      const mine = tracked.map(id => all.find(a => a.asset_id === id) || (String(id).startsWith('cg:') && meta[id] ? { asset_id: id, symbol: meta[id].symbol, name: meta[id].name, cgId: String(id).slice(3) } : null)).filter(Boolean);
+      const mine = tracked.map(id => all.find(a => a.asset_id === id) || (/^(cg|pp):/.test(String(id)) && meta[id] ? { asset_id: id, symbol: meta[id].symbol, name: meta[id].name, ext: true } : null)).filter(Boolean);
       setAssets(mine);
-      const rows = await Promise.all(mine.filter(a => !a.cgId).map(async asset => {
+      const rows = await Promise.all(mine.filter(a => !a.ext).map(async asset => {
         try {
           const rr = await fetch(`https://crypto-api.olegsh247.workers.dev/api/assets/${asset.asset_id}`);
           return [asset.asset_id, rr.ok ? await rr.json() : null];
@@ -132,7 +132,7 @@ export default function HomePage() {
       setAssetDetails(Object.fromEntries(rows));
       if (mine.length) {
         try {
-          const sr = await fetch(`/api/asset-stats?s=${encodeURIComponent(mine.filter(a => !a.cgId).map(a => a.symbol).join(','))}&ids=${encodeURIComponent(mine.filter(a => a.cgId).map(a => a.cgId).join(','))}`);
+          const sr = await fetch(`/api/asset-stats?s=${encodeURIComponent(mine.filter(a => !a.ext).map(a => a.symbol).join(','))}&ids=${encodeURIComponent(mine.filter(a => a.ext).map(a => `${a.asset_id}~${a.symbol}`).join(','))}`);
           if (sr.ok) setAssetStats((await sr.json()).stats || {});
         } catch {}
       }
@@ -442,7 +442,7 @@ export default function HomePage() {
       {isAssets && !loading && assets.map((asset) => {
         const metrics = assetDetails[asset.asset_id]?.metrics || [];
         const m = metrics.find(x => x.metric_id === 'market.spot_price');
-        const st = assetStats[asset.cgId ? `cg:${asset.cgId}` : String(asset.symbol || '').toUpperCase()];
+        const st = assetStats[asset.ext ? asset.asset_id : String(asset.symbol || '').toUpperCase()];
         const price = m?.value ?? st?.price;
         const isSelected = assetSelected.has(asset.asset_id);
         const ch = st?.change24h;

@@ -41,7 +41,7 @@ export default function AssetsPage() {
     const byWorkerSym = new Map(worker.map(a => [String(a.symbol).toUpperCase(), a]));
     const list = coins.map(c => {
       const w = byWorkerSym.get(c.symbol);
-      return { key: w ? w.asset_id : `cg:${c.id}`, symbol: c.symbol, name: c.name, rank: c.rank, cgId: c.id };
+      return { key: w ? w.asset_id : c.id, symbol: c.symbol, name: c.name, rank: c.rank };
     });
     const have = new Set(list.map(x => x.key));
     for (const a of worker) if (!have.has(a.asset_id)) list.push({ key: a.asset_id, symbol: String(a.symbol).toUpperCase(), name: a.name, rank: null });
@@ -63,7 +63,7 @@ export default function AssetsPage() {
     if (tracked.includes(item.key)) {
       persist(tracked.filter(id => id !== item.key), meta);
     } else {
-      const nextMeta = item.key.startsWith('cg:') ? { ...meta, [item.key]: { symbol: item.symbol, name: item.name } } : meta;
+      const nextMeta = /^(cg|pp):/.test(item.key) ? { ...meta, [item.key]: { symbol: item.symbol, name: item.name } } : meta;
       persist([...tracked, item.key], nextMeta);
     }
   }
