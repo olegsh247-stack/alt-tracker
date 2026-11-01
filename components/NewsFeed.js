@@ -1,6 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 
+const FX_FILTERS = [
+  { key: 'key', label: 'Важное' },
+  { key: 'cb', label: 'Центробанки' },
+  { key: 'macro', label: 'Макроданные' },
+  { key: 'geo', label: 'Геополитика' },
+  { key: 'all', label: 'Все' },
+];
 const FILTERS = [
   { key: 'key', label: 'Важное' },
   { key: 'security', label: 'Безопасность' },
@@ -21,7 +28,8 @@ function ago(ts) {
   return `${Math.floor(h / 24)}д`;
 }
 
-export default function NewsFeed() {
+export default function NewsFeed({ kind = 'crypto' }) {
+  const filters = kind === 'fx' ? FX_FILTERS : FILTERS;
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState('key');
@@ -30,7 +38,7 @@ export default function NewsFeed() {
     let alive = true;
     const load = async () => {
       try {
-        const r = await fetch('/api/news');
+        const r = await fetch(kind === 'fx' ? '/api/news?kind=fx' : '/api/news');
         if (!r.ok) throw new Error(String(r.status));
         const j = await r.json();
         if (alive) { setData(j); setError(false); }
@@ -39,7 +47,7 @@ export default function NewsFeed() {
     load();
     const t = setInterval(load, 15 * 60 * 1000);
     return () => { alive = false; clearInterval(t); };
-  }, []);
+  }, [kind]);
 
   const items = (data?.items || []).filter(it => {
     if (filter === 'all') return true;
@@ -50,7 +58,7 @@ export default function NewsFeed() {
   return (
     <div className="news">
       <div className="news-filters">
-        {FILTERS.map(f => (
+        {filters.map(f => (
           <button key={f.key} onClick={() => setFilter(f.key)} className={`news-chip${filter === f.key ? ' active' : ''}`}>{f.label}</button>
         ))}
       </div>

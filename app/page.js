@@ -11,6 +11,7 @@ import Logo from '../components/Logo';
 import CoinIcon from '../components/CoinIcon';
 import AssetChart from '../components/AssetChart';
 import Flag from '../components/Flag';
+import TvCalendar from '../components/TvCalendar';
 import { CURRENCIES, currencyOf, DEFAULT_FOREX, DEFAULT_BASE } from '../lib/currencies';
 import PoolChart from '../components/PoolChart';
 
@@ -59,6 +60,7 @@ export default function HomePage() {
   const [fxSelectMode, setFxSelectMode] = useState(false);
   const [fxSelected, setFxSelected] = useState(new Set());
   const [fxChartCode, setFxChartCode] = useState(null);
+  const [sideView, setSideView] = useState('news');
   const [fxAmt, setFxAmt] = useState('1');
   const [fxFrom, setFxFrom] = useState(null);
   const [fxTo, setFxTo] = useState(null);
@@ -724,7 +726,17 @@ export default function HomePage() {
         return active ? <section className="side-chart"><TvChart symbols={[`FX_IDC:${active}${forexBase}`]} /></section> : null;
       })()}
       {isPool && <section className="side-chart"><PoolChart pool={poolForChart} /></section>}
-      <section className="side-news"><div className="side-title">Новости</div><NewsFeed /></section>
+      {isForex ? (
+        <section className="side-news">
+          <div className="side-title side-tabs">
+            <button className={sideView === 'news' ? 'active' : ''} onClick={() => setSideView('news')}>Новости</button>
+            <button className={sideView === 'cal' ? 'active' : ''} onClick={() => setSideView('cal')}>Календарь</button>
+          </div>
+          {sideView === 'cal' ? <div className="cal-box"><TvCalendar /></div> : <NewsFeed key="fx" kind="fx" />}
+        </section>
+      ) : (
+        <section className="side-news"><div className="side-title">Новости</div><NewsFeed key="crypto" /></section>
+      )}
     </aside>
     </div>
   );

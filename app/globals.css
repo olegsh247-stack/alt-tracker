@@ -496,3 +496,11 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .fx-calc select.hd-btn { color: var(--text); }
 .fx-calc-res { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; margin-left: 4px; overflow-wrap: anywhere; }
 .fx-calc-res b { color: var(--accent-text); }
+
+/* Forex: переключатель Новости / Календарь */
+.side-tabs { display: flex; gap: 6px; }
+.side-tabs button { background: none; border: 1px solid transparent; color: var(--text-dim); font: inherit; font-size: inherit; padding: 2px 10px; border-radius: 8px; cursor: pointer; }
+.side-tabs button.active { background: var(--bg-elevated); color: var(--text); font-weight: 600; border-color: var(--input-border); box-shadow: inset 0 -2px 0 var(--accent); }
+.cal-box { height: 480px; }
+.tv-calendar { height: 100%; width: 100%; }
+@media (min-width: 1300px) { .cal-box { flex: 1; height: auto; min-height: 0; } }

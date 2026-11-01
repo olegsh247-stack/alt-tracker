@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 // Шапка (цена, изменение) и график — бесплатные встраиваемые виджеты TradingView, без ключей.
 // Тема следует за переключателем сайта (data-theme на <html>).
-function useTheme() {
+export function useTheme() {
   const [theme, setTheme] = useState('dark');
   useEffect(() => {
     const read = () => setTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
@@ -15,7 +15,7 @@ function useTheme() {
   return theme;
 }
 
-function Widget({ src, config, className, style }) {
+export function Widget({ src, config, className, style }) {
   const ref = useRef(null);
   const json = JSON.stringify(config);
   useEffect(() => {
