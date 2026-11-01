@@ -17,6 +17,8 @@ async function getJson(url, ms = 8000) {
 }
 
 const EXCHANGES = [
+  // Binance первым: как в Spot (там шапка виджета короткая). data-api.binance.vision — публичное зеркало без блокировок по региону
+  { name: 'Binance', tv: (s) => `BINANCE:${s}USDT`, load: async () => new Set((await getJson('https://data-api.binance.vision/api/v3/ticker/price', 12000)).filter(x => /USDT$/.test(x.symbol)).map(x => x.symbol.slice(0, -4).toUpperCase())) },
   { name: 'OKX', tv: (s) => `OKX:${s}USDT`, load: async () => new Set((await getJson('https://www.okx.com/api/v5/public/instruments?instType=SPOT')).data.filter(x => x.state === 'live' && x.quoteCcy === 'USDT').map(x => String(x.baseCcy).toUpperCase())) },
   { name: 'Coinbase', tv: (s) => `COINBASE:${s}USD`, load: async () => new Set((await getJson('https://api.exchange.coinbase.com/products')).filter(x => x.status === 'online' && x.quote_currency === 'USD').map(x => String(x.base_currency).toUpperCase())) },
   { name: 'KuCoin', tv: (s) => `KUCOIN:${s}USDT`, load: async () => new Set((await getJson('https://api.kucoin.com/api/v2/symbols')).data.filter(x => x.enableTrading && x.quoteCurrency === 'USDT').map(x => String(x.baseCurrency).toUpperCase())) },
