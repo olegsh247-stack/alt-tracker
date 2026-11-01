@@ -59,6 +59,9 @@ export default function HomePage() {
   const [fxSelectMode, setFxSelectMode] = useState(false);
   const [fxSelected, setFxSelected] = useState(new Set());
   const [fxChartCode, setFxChartCode] = useState(null);
+  const [fxAmt, setFxAmt] = useState('1');
+  const [fxFrom, setFxFrom] = useState(null);
+  const [fxTo, setFxTo] = useState(null);
   useEffect(() => {
     try {
       const c = localStorage.getItem('forexCodes');
@@ -67,6 +70,8 @@ export default function HomePage() {
       if (b) setForexBase(b);
       const ch = localStorage.getItem('fxChartCode');
       if (ch) setFxChartCode(ch);
+      const calc = JSON.parse(localStorage.getItem('fxCalc') || 'null');
+      if (calc) { if (calc.amt) setFxAmt(String(calc.amt)); if (calc.from) setFxFrom(calc.from); if (calc.to) setFxTo(calc.to); }
     } catch {}
     setForexLoaded(true);
   }, []);
@@ -167,6 +172,9 @@ export default function HomePage() {
     if (typeof window !== 'undefined' && window.innerWidth < 1300) {
       setTimeout(() => document.querySelector('.side-chart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     }
+  }
+  function saveCalc(amt, from, to) {
+    try { localStorage.setItem('fxCalc', JSON.stringify({ amt, from, to })); } catch {}
   }
   function toggleFxSelectMode() { setFxSelectMode(v => !v); setFxSelected(new Set()); }
   function toggleFxSelected(code) {
@@ -601,8 +609,33 @@ export default function HomePage() {
         const list = forexCodes.filter(c => c !== forexBase);
         const fmt = (n) => (n == null ? '—' : Number(n).toLocaleString('en-US', { maximumFractionDigits: n >= 100 ? 2 : n >= 1 ? 4 : 6, minimumFractionDigits: n >= 100 ? 2 : 0 }));
         const active = fxChartCode && list.includes(fxChartCode) ? fxChartCode : list[0];
+        const opts = [forexBase, ...list];
+        const from = opts.includes(fxFrom) ? fxFrom : forexBase;
+        const to = opts.includes(fxTo) && fxTo !== from ? fxTo : (opts.find(c => c !== from) || from);
+        const priceOf = (c) => (c === forexBase ? 1 : forexRates[c]?.price);
+        const amtNum = Number(String(fxAmt).replace(/\s/g, '').replace(',', '.'));
+        const pf = priceOf(from), pt = priceOf(to);
+        const result = Number.isFinite(amtNum) && pf > 0 && pt > 0 ? (amtNum * pf) / pt : null;
+        const fmtRes = (n) => n.toLocaleString('en-US', { maximumFractionDigits: n >= 100 ? 2 : n >= 1 ? 4 : 8 });
         return (
           <>
+            {list.length > 0 && (
+              <div className="fx-calc">
+                <input
+                  type="text" inputMode="decimal" value={fxAmt} aria-label="Сумма"
+                  onChange={e => { setFxAmt(e.target.value); saveCalc(e.target.value, from, to); }}
+                  className="fx-calc-amt"
+                />
+                <select value={from} onChange={e => { setFxFrom(e.target.value); saveCalc(fxAmt, e.target.value, to); }} className="hd-btn" aria-label="Из валюты">
+                  {opts.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <button type="button" className="hd-btn hd-icon" title="Поменять местами" aria-label="Поменять местами" onClick={() => { setFxFrom(to); setFxTo(from); saveCalc(fxAmt, to, from); }}>⇄</button>
+                <select value={to} onChange={e => { setFxTo(e.target.value); saveCalc(fxAmt, from, e.target.value); }} className="hd-btn" aria-label="В валюту">
+                  {opts.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <span className="fx-calc-res">= {result == null ? '—' : fmtRes(result)} <b>{to}</b></span>
+              </div>
+            )}
             {list.length === 0 && <p style={{ opacity: 0.7 }}>Валют пока нет — нажмите «Добавить», чтобы выбрать нужные.</p>}
             {list.length > 0 && (
               <div className={`fx-row fx-head${fxSelectMode ? ' sel' : ''}`}>

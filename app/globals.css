@@ -489,3 +489,10 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .fx-row .fx-name { display: none; }
   .fx-base span { display: none; }
 }
+
+/* Forex: калькулятор */
+.fx-calc { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; margin: 0 0 12px; border: 1px solid var(--card-border); border-radius: 10px; background: var(--bg-elevated); }
+.fx-calc-amt { width: 120px; height: 32px; box-sizing: border-box; padding: 0 10px; font: inherit; font-size: 15px; font-variant-numeric: tabular-nums; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text); }
+.fx-calc select.hd-btn { color: var(--text); }
+.fx-calc-res { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; margin-left: 4px; overflow-wrap: anywhere; }
+.fx-calc-res b { color: var(--accent-text); }
