@@ -25,8 +25,7 @@ export default function HomePage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get('tab');
-    const fromStorage = localStorage.getItem('activeTab');
-    const raw = fromUrl || fromStorage || 'assets';
+    const raw = fromUrl || 'assets'; // главная страница сайта — Assets; другая вкладка открывается только по ссылке ?tab=
     const normalized = raw === 'crypto' ? 'pair' : raw === 'dex' ? 'pool' : raw;
     setTab(normalized);
   }, []);
@@ -434,7 +433,7 @@ export default function HomePage() {
     <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}`}>
     <header className="app-header">
         <div className="hd-lt">
-        <span className="hd-logo"><Logo size={30} /></span>
+        <a href="/" className="hd-logo" title="На главную (Assets)" aria-label="На главную" onClick={(e) => { e.preventDefault(); changeTab('assets'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>
         <nav className="hd-tabs" aria-label="Разделы">
           <button onClick={() => changeTab('assets')} style={tab === 'assets' ? tabActive : tabInactive}>Assets</button>
           <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>Spot</button>
