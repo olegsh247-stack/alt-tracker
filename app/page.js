@@ -617,7 +617,7 @@ export default function HomePage() {
         const amtNum = Number(String(fxAmt).replace(/\s/g, '').replace(',', '.'));
         const pf = priceOf(from), pt = priceOf(to);
         const result = Number.isFinite(amtNum) && pf > 0 && pt > 0 ? (amtNum * pf) / pt : null;
-        const fmtRes = (n) => n.toLocaleString('en-US', { maximumFractionDigits: n >= 100 ? 2 : n >= 1 ? 4 : 8 });
+        const fmtRes = (n) => n.toLocaleString('en-US', { maximumFractionDigits: n >= 100 ? 2 : n >= 1 ? 4 : n >= 0.01 ? 5 : 8 });
         return (
           <>
             {list.length > 0 && (

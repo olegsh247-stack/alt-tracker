@@ -175,8 +175,8 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 /* --- Pool: таблица пулов (одна шапка на все строки) --- */
 .pool-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 4px -4px 8px; padding: 0 4px; }
 .pool-table { width: 100%; min-width: 780px; border-collapse: collapse; font-variant-numeric: tabular-nums; table-layout: fixed; }
-.pool-table th.pt-pair { width: 22%; }
-.pool-table th.pt-kind { width: 24%; }
+.pool-table th.pt-pair { width: 25%; }
+.pool-table th.pt-kind { width: 23%; }
 .pool-table th.pt-num { width: 10.8%; }
 .pool-table th.pt-apr { width: 10%; }
 .pool-table th.pt-tvl { width: 9.5%; }
@@ -381,8 +381,8 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 
 /* Spot на средних экранах (колонка ~600–800px): компактнее колонки, чтобы цифры не наезжали друг на друга */
 @media (min-width: 1300px) and (max-width: 1599px) {
-  .tab-spot .pair-row.pair-grid { grid-template-columns: 52px minmax(0, 1.5fr) 26px 78px minmax(0, 0.95fr) minmax(0, 0.8fr) minmax(0, 1.45fr) 52px; column-gap: 6px !important; }
-  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px minmax(0, 1.5fr) 26px 78px minmax(0, 0.95fr) minmax(0, 0.8fr) minmax(0, 1.45fr) 52px; }
+  .tab-spot .pair-row.pair-grid { grid-template-columns: 52px minmax(0, 1.3fr) 26px 70px minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) 52px; column-gap: 6px !important; }
+  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px minmax(0, 1.3fr) 26px 70px minmax(0, 1.2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) 52px; }
   .tab-spot .pair-row .pair-icon { width: 20px !important; height: 20px !important; }
   .tab-spot .pair-row .cell-ratio { font-size: 14px; }
   .tab-spot .pair-row .cell-exchange { font-size: 12px !important; }
@@ -532,3 +532,16 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .pc-addr:hover:not(:disabled) { background: var(--input-bg); color: var(--text); }
 .pc-sym { font-weight: 700; color: var(--text); }
 .pc-hex { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Телефон: ряд 1 — логотип и кнопки справа, ряд 2 — вкладки на всю ширину (все пять помещаются/прокручиваются) */
+@media (max-width: 520px) {
+  .app-header { gap: 8px; padding: 10px 16px; }
+  .hd-lt { display: contents; }
+  .hd-logo { order: 1; }
+  .hd-right { order: 2; margin-left: auto; }
+  .hd-tabs { order: 3; flex: 1 1 100%; }
+  .hd-tabs { gap: 4px; }
+  .hd-tabs button { padding: 6px 8px !important; font-size: 14px; }
+}
+.fx-base { flex: 1 1 140px; }
+.fx-base select { width: 100%; min-width: 0; max-width: 260px; }
