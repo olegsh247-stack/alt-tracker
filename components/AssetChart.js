@@ -34,7 +34,6 @@ export default function AssetChart({ symbol, name }) {
   if (res.kind === 'stable') return <div className="pool-chart pool-chart-empty">{symbol} — стейблкоин, его цена держится у $1, график не показываем.</div>;
   if (res.kind === 'tv') return (
     <div className="asset-chart">
-      <div className="asset-chart-title"><b>{symbol}</b></div>
       <TvChart key={res.symbol} symbols={[res.symbol]} />
     </div>
   );

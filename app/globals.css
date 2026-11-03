@@ -679,5 +679,6 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 .ar-sort:hover, .ar-sort.on { color: var(--accent-text); }
 
 /* Два графика рядом/друг под другом: граница между ними — цвет страницы (светло-серый), как между блоками */
-.side-chart:has(.tv-pair), .asset-chart:has(.tv-pair) { background: var(--page-bg); }
+.side-chart:has(.tv-pair) { background: var(--page-bg); }
+.tab-assets .side-chart { background: var(--bg); }
 .tv-pair .tv-box { background: var(--bg); border: none; border-radius: 12px; }
