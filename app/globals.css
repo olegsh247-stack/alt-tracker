@@ -627,3 +627,23 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 @media (min-width: 1300px) {
   .app-shell .page-wrap { max-width: none !important; width: 100%; }
 }
+
+/* Assets: три колонки — список (x), график (x), новости (x/2) */
+.ar-coin { justify-content: center; }
+@media (min-width: 1300px) {
+  .app-shell.tab-assets { grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr); }
+  .tab-assets .side-panel { display: contents; }
+  .tab-assets .side-chart, .tab-assets .side-news { position: sticky; top: 12px; height: calc(100vh - 88px); flex: none; min-width: 0; margin: 0; }
+  .tab-assets .side-chart { display: flex; flex-direction: column; }
+  .tab-assets .side-news { display: flex; flex-direction: column; }
+}
+
+/* Assets в три колонки: компактная таблица списка */
+@media (min-width: 1300px) {
+  .tab-assets .asset-row { grid-template-columns: 30px minmax(0, 1.1fr) 46px minmax(0, 1fr) minmax(0, 1fr) 62px minmax(80px, 1.2fr); column-gap: 6px; padding-left: 2px; padding-right: 2px; font-size: 14px; }
+  .tab-assets .asset-row.sel { grid-template-columns: 20px 30px minmax(0, 1.1fr) 46px minmax(0, 1fr) minmax(0, 1fr) 62px minmax(80px, 1.2fr); }
+  .tab-assets .asset-row .ar-coin b { font-size: 15px; }
+  .tab-assets .asset-row .coin-icon, .tab-assets .asset-row img { width: 26px !important; height: 26px !important; }
+  .tab-assets .asset-head { font-size: 11px; }
+  .tab-assets .asset-head > span { white-space: normal; line-height: 1.1; overflow: visible; }
+}

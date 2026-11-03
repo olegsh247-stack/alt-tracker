@@ -430,7 +430,7 @@ export default function HomePage() {
   const curConfirmDelete = isForex ? confirmDeleteForex : isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
-    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}`}>
+    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}${isAssets ? ' tab-assets' : ''}`}>
     <header className="app-header">
         <div className="hd-lt">
         <a href="/" className="hd-logo" title="На главную (Assets)" aria-label="На главную" onClick={(e) => { e.preventDefault(); changeTab('assets'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>
@@ -555,7 +555,7 @@ export default function HomePage() {
           <div key={asset.asset_id} className={`asset-row${assetSelectMode ? ' sel' : ''}`} style={{ cursor: 'pointer', background: isSelected ? 'var(--danger-bg)' : chartAsset?.asset_id === asset.asset_id ? 'var(--input-bg)' : 'transparent' }} onClick={() => { if (assetSelectMode) toggleAssetSelect(asset.asset_id); else { setChartAssetKey(asset.asset_id); setTimeout(() => document.querySelector('.side-chart')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); } }}>
             {assetSelectMode && <input type="checkbox" checked={isSelected} onChange={() => toggleAssetSelect(asset.asset_id)} onClick={e => e.stopPropagation()} style={{ width: 18, height: 18 }} />}
             <CoinIcon symbol={asset.symbol} size={28} />
-            <div className="ar-coin"><b>{asset.symbol}</b><span>{asset.name}</span></div>
+            <div className="ar-coin"><b>{asset.symbol}</b></div>
             <div className="ar-r">{st?.rank ? `#${st.rank}` : '—'}</div>
             <div className="ar-r ar-sup">{fmtSupply(st?.circulating)}</div>
             <div className="ar-r ar-sup">{st ? (st.max == null ? '∞' : fmtSupply(st.max)) : '—'}</div>
