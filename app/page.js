@@ -776,7 +776,7 @@ export default function HomePage() {
           {sideView === 'cal' ? <div className="cal-box"><TvCalendar /></div> : <NewsFeed key="fx" kind="fx" />}
         </section>
       ) : isAssets ? null : (
-        <section className="side-news"><div className="side-title">Новости</div>{isCommodities ? <NewsFeed key="com" kind="com" /> : <NewsFeed key="crypto" />}</section>
+        <section className="side-news"><div className="side-title">Новости</div>{isCommodities ? <NewsFeed key="com" kind="com" /> : isPool ? <NewsFeed key="pool" kind="pool" /> : <NewsFeed key="crypto" />}</section>
       )}
     </aside>
     </div>

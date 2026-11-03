@@ -14,6 +14,12 @@ const COM_FILTERS = [
   { key: 'metals', label: 'Металлы' },
   { key: 'agro', label: 'Агро' },
 ];
+const POOL_FILTERS = [
+  { key: 'all', label: 'Все' },
+  { key: 'liq', label: 'Ликвидность' },
+  { key: 'dex', label: 'DEX' },
+  { key: 'risk', label: 'Риски' },
+];
 const FILTERS = [
   { key: 'key', label: 'Важное' },
   { key: 'security', label: 'Безопасность' },
@@ -35,10 +41,10 @@ function ago(ts) {
 }
 
 export default function NewsFeed({ kind = 'crypto' }) {
-  const filters = kind === 'fx' ? FX_FILTERS : kind === 'com' ? COM_FILTERS : FILTERS;
+  const filters = kind === 'fx' ? FX_FILTERS : kind === 'com' ? COM_FILTERS : kind === 'pool' ? POOL_FILTERS : FILTERS;
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
-  const [filter, setFilter] = useState(kind === 'com' ? 'all' : 'key');
+  const [filter, setFilter] = useState(kind === 'com' || kind === 'pool' ? 'all' : 'key');
 
   useEffect(() => {
     let alive = true;
