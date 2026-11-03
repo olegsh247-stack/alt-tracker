@@ -454,8 +454,8 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .pool-table .pt-pair-name .pt-extra { margin-left: auto; flex: none; width: 24px; justify-content: center; }
 
 /* Assets: таблица */
-.asset-row { display: grid; grid-template-columns: 36px minmax(0, 1.6fr) 56px minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr); align-items: center; column-gap: 10px; padding: 11px 6px; border-bottom: 1px solid var(--card-border); font-variant-numeric: tabular-nums; font-size: 15px; border-radius: 6px; }
-.asset-row.sel { grid-template-columns: 22px 36px minmax(0, 1.6fr) 56px minmax(0, 1fr) minmax(0, 1fr) 72px minmax(0, 1fr); }
+.asset-row { display: grid; grid-template-columns: 36px minmax(0, 1.6fr) 56px 72px 72px 72px minmax(0, 1fr); align-items: center; column-gap: 10px; padding: 11px 6px; border-bottom: 1px solid var(--card-border); font-variant-numeric: tabular-nums; font-size: 15px; border-radius: 6px; }
+.asset-row.sel { grid-template-columns: 22px 36px minmax(0, 1.6fr) 56px 72px 72px 72px minmax(0, 1fr); }
 .asset-head { font-size: 12px; color: var(--text-dim); padding-top: 4px; padding-bottom: 6px; text-transform: none; }
 .ar-r { text-align: right; white-space: nowrap; }
 .ar-coin { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
@@ -640,8 +640,8 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 
 /* Assets в три колонки: компактная таблица списка */
 @media (min-width: 1300px) {
-  .tab-assets .asset-row { grid-template-columns: 30px minmax(0, 1.1fr) 46px minmax(0, 1fr) minmax(0, 1fr) 62px minmax(80px, 1.2fr); column-gap: 6px; padding-left: 2px; padding-right: 2px; font-size: 14px; }
-  .tab-assets .asset-row.sel { grid-template-columns: 20px 30px minmax(0, 1.1fr) 46px minmax(0, 1fr) minmax(0, 1fr) 62px minmax(80px, 1.2fr); }
+  .tab-assets .asset-row { grid-template-columns: 30px minmax(0, 1.1fr) 46px 66px 66px 66px minmax(80px, 1.2fr); column-gap: 6px; padding-left: 2px; padding-right: 2px; font-size: 14px; }
+  .tab-assets .asset-row.sel { grid-template-columns: 20px 30px minmax(0, 1.1fr) 46px 66px 66px 66px minmax(80px, 1.2fr); }
   .tab-assets .asset-row .ar-coin b { font-size: 15px; }
   .tab-assets .asset-row .coin-icon, .tab-assets .asset-row img { width: 26px !important; height: 26px !important; }
   .tab-assets .asset-head { font-size: 11px; }
