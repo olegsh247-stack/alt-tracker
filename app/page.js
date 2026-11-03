@@ -435,11 +435,11 @@ export default function HomePage() {
         <div className="hd-lt">
         <a href="/" className="hd-logo" title="На главную (Assets)" aria-label="На главную" onClick={(e) => { e.preventDefault(); changeTab('assets'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>
         <nav className="hd-tabs" aria-label="Разделы">
-          <button onClick={() => changeTab('assets')} style={tab === 'assets' ? tabActive : tabInactive}>Assets</button>
-          <button onClick={() => changeTab('pair')} style={tab === 'pair' ? tabActive : tabInactive}>Spot</button>
-          <button onClick={() => changeTab('pool')} style={tab === 'pool' ? tabActive : tabInactive}>Pool</button>
-          <button onClick={() => changeTab('commodities')} style={tab === 'commodities' ? tabActive : tabInactive}>Commodities</button>
-          <button onClick={() => changeTab('forex')} style={tab === 'forex' ? tabActive : tabInactive}>Forex</button>
+          <button onClick={() => changeTab('assets')} className={`hd-tab${tab === 'assets' ? ' on' : ''}`}>Assets</button>
+          <button onClick={() => changeTab('pair')} className={`hd-tab${tab === 'pair' ? ' on' : ''}`}>Spot</button>
+          <button onClick={() => changeTab('pool')} className={`hd-tab${tab === 'pool' ? ' on' : ''}`}>Pool</button>
+          <button onClick={() => changeTab('commodities')} className={`hd-tab${tab === 'commodities' ? ' on' : ''}`}>Commodities</button>
+          <button onClick={() => changeTab('forex')} className={`hd-tab${tab === 'forex' ? ' on' : ''}`}>Forex</button>
         </nav>
         </div>
         <div className="hd-right">
