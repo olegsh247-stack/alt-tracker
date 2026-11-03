@@ -8,6 +8,12 @@ const FX_FILTERS = [
   { key: 'geo', label: 'Геополитика' },
   { key: 'all', label: 'Все' },
 ];
+const COM_FILTERS = [
+  { key: 'all', label: 'Все' },
+  { key: 'energy', label: 'Энергия' },
+  { key: 'metals', label: 'Металлы' },
+  { key: 'agro', label: 'Агро' },
+];
 const FILTERS = [
   { key: 'key', label: 'Важное' },
   { key: 'security', label: 'Безопасность' },
@@ -29,16 +35,16 @@ function ago(ts) {
 }
 
 export default function NewsFeed({ kind = 'crypto' }) {
-  const filters = kind === 'fx' ? FX_FILTERS : FILTERS;
+  const filters = kind === 'fx' ? FX_FILTERS : kind === 'com' ? COM_FILTERS : FILTERS;
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
-  const [filter, setFilter] = useState('key');
+  const [filter, setFilter] = useState(kind === 'com' ? 'all' : 'key');
 
   useEffect(() => {
     let alive = true;
     const load = async () => {
       try {
-        const r = await fetch(kind === 'fx' ? '/api/news?kind=fx' : '/api/news');
+        const r = await fetch(kind === 'crypto' ? '/api/news' : `/api/news?kind=${kind}`);
         if (!r.ok) throw new Error(String(r.status));
         const j = await r.json();
         if (alive) { setData(j); setError(false); }
