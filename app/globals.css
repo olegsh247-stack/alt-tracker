@@ -602,7 +602,7 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 .side-panel { padding: 0; margin-top: 12px; gap: 12px; }
 .app-header { background: var(--bg); border-radius: 12px; padding: 6px 14px; min-height: 52px; margin: 0 0 12px; box-sizing: border-box; }
 .hd-tabs { gap: 2px; }
-.hd-tab { background: none; border: none; border-bottom: 3px dashed transparent; border-radius: 0; padding: 8px 12px 5px; margin: 0; color: var(--text-dim); font: inherit; font-size: 16px; line-height: 1.2; cursor: pointer; white-space: nowrap; flex: none; }
+.hd-tab { background: none; border: none; border-bottom: 3px solid transparent; border-radius: 0; padding: 8px 12px 5px; margin: 0; color: var(--text-dim); font: inherit; font-size: 16px; line-height: 1.2; cursor: pointer; white-space: nowrap; flex: none; }
 .hd-tab:hover { color: var(--text); }
 .hd-tab.on { color: var(--accent-text); font-weight: 700; border-bottom-color: var(--accent); }
 .hd-tab:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
@@ -622,3 +622,8 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
   .hd-tabs { gap: 0; }
 }
 .lp-card { border: none; }
+
+/* Левый блок занимает всю свою колонку на любой вкладке: промежуток между колонками везде 12px, как под шапкой */
+@media (min-width: 1300px) {
+  .app-shell .page-wrap { max-width: none !important; width: 100%; }
+}
