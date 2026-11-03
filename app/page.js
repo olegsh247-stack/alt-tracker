@@ -431,7 +431,7 @@ export default function HomePage() {
   const curConfirmDelete = isForex ? confirmDeleteForex : isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
-    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}${isAssets ? ' tab-assets' : ''}`}>
+    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}${isAssets ? ' tab-assets' : ''}${isForex ? ' tab-forex' : ''}`}>
     <header className="app-header">
         <div className="hd-lt">
         <a href="/" className="hd-logo" title="На главную (Assets)" aria-label="На главную" onClick={(e) => { e.preventDefault(); changeTab('assets'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>

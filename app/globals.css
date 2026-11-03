@@ -663,3 +663,14 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
   .tab-assets .side-col3 .side-news { position: static; height: auto; flex: 1 1 0; min-height: 0; }
   .tab-assets .side-col3 .side-info { flex: none; }
 }
+
+/* Forex: три колонки — список (x), график (x), новости/календарь (x/2) */
+@media (min-width: 1300px) {
+  .app-shell.tab-forex { grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr); }
+  .tab-forex .side-panel { display: contents; }
+  .tab-forex .side-chart, .tab-forex .side-news { position: sticky; top: 12px; height: calc(100vh - 88px); flex: none; min-width: 0; margin: 0; display: flex; flex-direction: column; }
+  .tab-forex .fx-row { grid-template-columns: 56px 34px minmax(0, 1fr) minmax(80px, 1fr) 84px; column-gap: 8px; font-size: 14px; }
+  .tab-forex .fx-row.sel { grid-template-columns: 20px 56px 34px minmax(0, 1fr) minmax(80px, 1fr) 84px; }
+  .tab-forex .fx-calc { padding: 8px 10px; }
+  .tab-forex .fx-calc-amt { width: 100px; }
+}
