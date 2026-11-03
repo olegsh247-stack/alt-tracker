@@ -49,6 +49,7 @@ export default function HomePage() {
   const [assets, setAssets] = useState([]);
   const [assetDetails, setAssetDetails] = useState({});
   const [assetStats, setAssetStats] = useState({});
+  const [assetSort, setAssetSort] = useState(null); // {key, dir}
   const [chartAssetKey, setChartAssetKey] = useState(null);
 
   // --- Forex: список валют и база хранятся в браузере (как Assets) ---
@@ -423,6 +424,25 @@ export default function HomePage() {
       return sign * (va - vb);
     });
   }
+  const statOf = (a) => assetStats[a.ext ? a.asset_id : String(a.symbol || '').toUpperCase()];
+  const ASSET_SORT_VAL = { ticker: a => String(a.symbol || ''), y1: a => statOf(a)?.change1y, m1: a => statOf(a)?.change30d, h24: a => statOf(a)?.change24h };
+  function clickAssetSort(key) {
+    setAssetSort(cur => !cur || cur.key !== key ? { key, dir: key === 'ticker' ? 'asc' : 'desc' } : cur.dir === (key === 'ticker' ? 'asc' : 'desc') ? { key, dir: key === 'ticker' ? 'desc' : 'asc' } : null);
+  }
+  const displayAssets = !assetSort ? assets : [...assets].sort((a, b) => {
+    const get = ASSET_SORT_VAL[assetSort.key], sign = assetSort.dir === 'asc' ? 1 : -1;
+    const va = get(a), vb = get(b);
+    if (assetSort.key === 'ticker') return sign * va.localeCompare(vb, 'en', { sensitivity: 'base' });
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    return sign * (va - vb);
+  });
+  const sortHead = (key, label, cls) => (
+    <span className={`${cls || ''} ar-sort${assetSort?.key === key ? ' on' : ''}`} role="button" onClick={() => clickAssetSort(key)}>
+      {label}{assetSort?.key === key ? (assetSort.dir === 'asc' ? ' ↑' : ' ↓') : ''}
+    </span>
+  );
   const cChartPair = cPairs.find(p => String(p.id) === cChartPairId) || null;
   const cChartSymbols = cChartSymbolsFor(cChartPair);
   const chartAsset = assets.find(a => a.asset_id === chartAssetKey) || assets[0] || null;
@@ -537,15 +557,15 @@ export default function HomePage() {
         <div className={`asset-row asset-head${assetSelectMode ? ' sel' : ''}`}>
           {assetSelectMode && <span />}
           <span />
-          <span>Ticker</span>
+          {sortHead('ticker', 'Ticker')}
           <span className="ar-r">Rank</span>
-          <span className="ar-r ar-long">1Y</span>
-          <span className="ar-r ar-long">1M</span>
-          <span className="ar-r">24h</span>
+          {sortHead('y1', '1Y', 'ar-r ar-long')}
+          {sortHead('m1', '1M', 'ar-r ar-long')}
+          {sortHead('h24', '24h', 'ar-r')}
           <span className="ar-r">Price</span>
         </div>
       )}
-      {isAssets && !loading && assets.map((asset) => {
+      {isAssets && !loading && displayAssets.map((asset) => {
         const metrics = assetDetails[asset.asset_id]?.metrics || [];
         const m = metrics.find(x => x.metric_id === 'market.spot_price');
         const st = assetStats[asset.ext ? asset.asset_id : String(asset.symbol || '').toUpperCase()];

@@ -674,3 +674,6 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
   .tab-forex .fx-calc { padding: 8px 10px; }
   .tab-forex .fx-calc-amt { width: 100px; }
 }
+
+.ar-sort { cursor: pointer; user-select: none; }
+.ar-sort:hover, .ar-sort.on { color: var(--accent-text); }
