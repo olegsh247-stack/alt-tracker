@@ -49,7 +49,7 @@ export default function HomePage() {
   const [assets, setAssets] = useState([]);
   const [assetDetails, setAssetDetails] = useState({});
   const [assetStats, setAssetStats] = useState({});
-  const [assetSort, setAssetSort] = useState(null); // {key, dir}
+  const [assetSort, setAssetSort] = useState({ key: 'cap', dir: 'desc' }); // по умолчанию — по капитализации
   const [chartAssetKey, setChartAssetKey] = useState(null);
 
   // --- Forex: список валют и база хранятся в браузере (как Assets) ---
@@ -425,7 +425,7 @@ export default function HomePage() {
     });
   }
   const statOf = (a) => assetStats[a.ext ? a.asset_id : String(a.symbol || '').toUpperCase()];
-  const ASSET_SORT_VAL = { ticker: a => String(a.symbol || ''), y1: a => statOf(a)?.change1y, m1: a => statOf(a)?.change30d, h24: a => statOf(a)?.change24h };
+  const ASSET_SORT_VAL = { ticker: a => String(a.symbol || ''), y1: a => statOf(a)?.change1y, m1: a => statOf(a)?.change30d, h24: a => statOf(a)?.change24h, cap: a => statOf(a)?.marketCap };
   function clickAssetSort(key) {
     setAssetSort(cur => !cur || cur.key !== key ? { key, dir: key === 'ticker' ? 'asc' : 'desc' } : cur.dir === (key === 'ticker' ? 'asc' : 'desc') ? { key, dir: key === 'ticker' ? 'desc' : 'asc' } : null);
   }
@@ -558,7 +558,7 @@ export default function HomePage() {
           {assetSelectMode && <span />}
           <span />
           {sortHead('ticker', 'Ticker')}
-          <span className="ar-r">Rank</span>
+          {sortHead('cap', 'Rank', 'ar-r')}
           {sortHead('y1', '1Y', 'ar-r ar-long')}
           {sortHead('m1', '1M', 'ar-r ar-long')}
           {sortHead('h24', '24h', 'ar-r')}
@@ -748,6 +748,7 @@ export default function HomePage() {
               {!chartAsset ? <div className="si-empty">Выберите монету</div> : (
                 <>
                   <div className="si-head"><b>{chartAsset.symbol}</b><span>{chartAsset.name}</span></div>
+                  <div className="si-row"><span>Market cap</span><b>{st?.marketCap == null ? '—' : '$' + Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(st.marketCap)}</b></div>
                   <div className="si-row"><span>Circulating supply</span><b>{full(st?.circulating)}</b></div>
                   <div className="si-row"><span>Max supply</span><b>{st ? (st.max == null ? '∞' : full(st.max)) : '—'}</b></div>
                   {st?.max > 0 && st?.circulating > 0 && <div className="si-row"><span>Issued</span><b>{(st.circulating / st.max * 100).toFixed(1).replace('.', ',')}%</b></div>}
