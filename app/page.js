@@ -10,6 +10,7 @@ import NewsFeed from '../components/NewsFeed';
 import Logo from '../components/Logo';
 import CoinIcon from '../components/CoinIcon';
 import AssetChart from '../components/AssetChart';
+import { ALGOS } from '../lib/algos';
 import Flag from '../components/Flag';
 import TvCalendar from '../components/TvCalendar';
 import { CURRENCIES, currencyOf, DEFAULT_FOREX, DEFAULT_BASE } from '../lib/currencies';
@@ -536,10 +537,10 @@ export default function HomePage() {
         <div className={`asset-row asset-head${assetSelectMode ? ' sel' : ''}`}>
           {assetSelectMode && <span />}
           <span />
-          <span>Coin</span>
+          <span>Ticker</span>
           <span className="ar-r">Rank</span>
-          <span className="ar-r ar-sup">Circ. supply</span>
-          <span className="ar-r ar-sup">Max supply</span>
+          <span className="ar-r ar-long">1Y</span>
+          <span className="ar-r ar-long">1M</span>
           <span className="ar-r">24h</span>
           <span className="ar-r">Price</span>
         </div>
@@ -557,8 +558,8 @@ export default function HomePage() {
             <CoinIcon symbol={asset.symbol} size={28} />
             <div className="ar-coin"><b>{asset.symbol}</b></div>
             <div className="ar-r">{st?.rank ? `#${st.rank}` : '—'}</div>
-            <div className="ar-r ar-sup">{fmtSupply(st?.circulating)}</div>
-            <div className="ar-r ar-sup">{st ? (st.max == null ? '∞' : fmtSupply(st.max)) : '—'}</div>
+            <div className="ar-r ar-long"><Pct v={st?.change1y} /></div>
+            <div className="ar-r ar-long"><Pct v={st?.change30d} /></div>
             <div className="ar-r" style={{ fontWeight: 600, color: ch == null ? 'var(--text-dim)' : ch >= 0 ? 'var(--up)' : 'var(--down)' }}>{ch == null ? '—' : `${ch >= 0 ? '+' : ''}${ch.toFixed(1).replace('.', ',')}%`}</div>
             <div className="ar-r" style={{ fontWeight: 600 }}>{price == null ? '—' : Number(price).toLocaleString('en-US', { maximumFractionDigits: price >= 1000 ? 2 : price >= 1 ? 4 : 8 })}</div>
           </div>
@@ -717,6 +718,27 @@ export default function HomePage() {
     <aside className="side-panel">
       {isCrypto && <section className="side-chart"><TvChart symbols={chartSymbols} /></section>}
       {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} name={chartAsset?.name} /></section>}
+      {isAssets && (() => {
+        const st = chartAsset ? assetStats[chartAsset.ext ? chartAsset.asset_id : String(chartAsset.symbol || '').toUpperCase()] : null;
+        const algo = chartAsset ? ALGOS[String(chartAsset.symbol || '').toUpperCase()] : null;
+        const full = (v) => (v == null ? '—' : Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 }));
+        return (
+          <div className="side-col3">
+            <section className="side-info">
+              {!chartAsset ? <div className="si-empty">Выберите монету</div> : (
+                <>
+                  <div className="si-head"><b>{chartAsset.symbol}</b><span>{chartAsset.name}</span></div>
+                  <div className="si-row"><span>Circulating supply</span><b>{full(st?.circulating)}</b></div>
+                  <div className="si-row"><span>Max supply</span><b>{st ? (st.max == null ? '∞' : full(st.max)) : '—'}</b></div>
+                  {st?.max > 0 && st?.circulating > 0 && <div className="si-row"><span>Issued</span><b>{(st.circulating / st.max * 100).toFixed(1).replace('.', ',')}%</b></div>}
+                  <div className="si-row"><span>Algorithm</span><b>{algo || '—'}</b></div>
+                </>
+              )}
+            </section>
+            <section className="side-news"><div className="side-title">Новости</div><NewsFeed key="crypto" /></section>
+          </div>
+        );
+      })()}
       {isCommodities && <section className="side-chart"><TvChart symbols={cChartSymbols} /></section>}
       {isForex && (() => {
         const list = forexCodes.filter(c => c !== forexBase);
@@ -732,7 +754,7 @@ export default function HomePage() {
           </div>
           {sideView === 'cal' ? <div className="cal-box"><TvCalendar /></div> : <NewsFeed key="fx" kind="fx" />}
         </section>
-      ) : (
+      ) : isAssets ? null : (
         <section className="side-news"><div className="side-title">Новости</div><NewsFeed key="crypto" /></section>
       )}
     </aside>
@@ -745,6 +767,12 @@ const row = {
   borderBottom: '1px solid var(--card-border)', textDecoration: 'none', color: 'var(--text)',
   borderRadius: 6,
 };
+function Pct({ v }) {
+  if (v == null || !Number.isFinite(v)) return <span style={{ color: 'var(--text-dim)' }}>—</span>;
+  const a = Math.abs(v);
+  const t = a >= 1e4 ? `${Math.round(v / 1e3)}K%` : a >= 1000 ? `${Math.round(v)}%` : `${v.toFixed(a >= 100 ? 0 : 1).replace('.', ',')}%`;
+  return <span style={{ fontWeight: 600, color: v >= 0 ? 'var(--up)' : 'var(--down)' }}>{v >= 0 ? '+' : ''}{t}</span>;
+}
 function fmtSupply(v) {
   if (v == null || !Number.isFinite(Number(v))) return '—';
   const n = Number(v);

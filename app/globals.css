@@ -466,7 +466,7 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
   .asset-row, .asset-row.sel { column-gap: 8px; }
   .asset-row { grid-template-columns: 32px minmax(0, 1.4fr) 44px 64px minmax(0, 1fr); }
   .asset-row.sel { grid-template-columns: 22px 32px minmax(0, 1.4fr) 44px 64px minmax(0, 1fr); }
-  .ar-sup { display: none; }
+  .ar-long { display: none; }
 }
 
 /* Assets: подпись с тикером над графиком */
@@ -646,4 +646,20 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
   .tab-assets .asset-row .coin-icon, .tab-assets .asset-row img { width: 26px !important; height: 26px !important; }
   .tab-assets .asset-head { font-size: 11px; }
   .tab-assets .asset-head > span { white-space: normal; line-height: 1.1; overflow: visible; }
+}
+
+/* Assets: колонка 3 = карточка выбранной монеты + новости */
+.side-col3 { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.side-info { border: none; border-radius: 12px; background: var(--bg); padding: 12px 16px; }
+.si-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.si-head b { font-size: 20px; }
+.si-head span { color: var(--text-dim); font-size: 13px; }
+.si-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 7px 0; border-top: 1px solid var(--card-border); font-size: 14px; }
+.si-row span { color: var(--text-dim); white-space: nowrap; }
+.si-row b { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.si-empty { color: var(--text-dim); font-size: 14px; }
+@media (min-width: 1300px) {
+  .tab-assets .side-col3 { position: sticky; top: 12px; height: calc(100vh - 88px); }
+  .tab-assets .side-col3 .side-news { position: static; height: auto; flex: 1 1 0; min-height: 0; }
+  .tab-assets .side-col3 .side-info { flex: none; }
 }
