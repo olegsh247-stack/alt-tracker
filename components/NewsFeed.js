@@ -17,7 +17,7 @@ const COM_FILTERS = [
 const POOL_FILTERS = [
   { key: 'all', label: 'Все' },
   { key: 'liq', label: 'Ликвидность' },
-  { key: 'dex', label: 'DEX' },
+  { key: 'stake', label: 'Стейкинг' },
   { key: 'risk', label: 'Риски' },
 ];
 const FILTERS = [
