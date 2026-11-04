@@ -443,6 +443,13 @@ export default function HomePage() {
       {label}{assetSort?.key === key ? (assetSort.dir === 'asc' ? ' ↑' : ' ↓') : ''}
     </span>
   );
+  function clickSpotSort(kind) {
+    const first = kind === 'alpha' ? 'alpha_asc' : 'pct_desc', second = kind === 'alpha' ? 'alpha_desc' : 'pct_asc';
+    const next = sortDir === first ? second : sortDir === second ? null : first;
+    setSortDir(next);
+    try { next ? localStorage.setItem('pairSortDir', next) : localStorage.removeItem('pairSortDir'); } catch {}
+  }
+  const spotArrow = (kind) => (sortDir && sortDir.startsWith(kind) ? (sortDir.endsWith('asc') ? ' ↑' : ' ↓') : '');
   const cChartPair = cPairs.find(p => String(p.id) === cChartPairId) || null;
   const cChartSymbols = cChartSymbolsFor(cChartPair);
   const chartAsset = assets.find(a => a.asset_id === chartAssetKey) || assets[0] || null;
@@ -488,7 +495,7 @@ export default function HomePage() {
             <>
               {!isPool && <a href={isAssets ? '/assets' : isForex ? '/add-currency' : isCrypto ? '/add' : '/add-commodity'} className="hd-btn hd-sm add" title={isAssets ? 'Добавить актив' : isForex ? 'Добавить валюту' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>Добавить</a>}
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} className="hd-btn hd-sm del" title="Выбрать для удаления">Удалить</button>}
-          {!isAssets && !isPool && !isForex && curPairs.length > 1 && (
+          {!isAssets && !isPool && !isForex && !isCrypto && curPairs.length > 1 && (
             <div ref={sortMenuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setSortMenuOpen(v => !v)}
@@ -587,6 +594,13 @@ export default function HomePage() {
       })}
 
       {isCrypto && !loading && pairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
+      {isCrypto && !loading && pairs.length > 0 && (
+        <div className="pair-row pair-grid spot-head">
+          <span className={`ar-sort${sortDir?.startsWith('alpha') ? ' on' : ''}`} role="button" style={{ gridColumn: 'icons-start / name-end' }} onClick={() => clickSpotSort('alpha')}>Coin{spotArrow('alpha')}</span>
+          <span style={{ gridArea: 'ratio', textAlign: 'right' }}>Price</span>
+          <span className={`ar-sort${sortDir?.startsWith('pct') ? ' on' : ''}`} role="button" style={{ gridArea: 'pct', textAlign: 'right' }} onClick={() => clickSpotSort('pct')}>24h{spotArrow('pct')}</span>
+        </div>
+      )}
       {isCrypto && displayPairs.map((p) => {
         const price = prices[p.id];
         const spark = sparks[p.id];
