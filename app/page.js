@@ -15,6 +15,7 @@ import Flag from '../components/Flag';
 import TvCalendar from '../components/TvCalendar';
 import { CURRENCIES, currencyOf, DEFAULT_FOREX, DEFAULT_BASE } from '../lib/currencies';
 import PoolChart from '../components/PoolChart';
+import AddAssetModal from '../components/AddAssetModal';
 
 export default function HomePage() {
   const [login, setLogin] = useState('');
@@ -49,6 +50,8 @@ export default function HomePage() {
   const [assets, setAssets] = useState([]);
   const [assetDetails, setAssetDetails] = useState({});
   const [assetStats, setAssetStats] = useState({});
+  const [addOpen, setAddOpen] = useState(false);
+  const [assetBase, setAssetBase] = useState('USDT');
   const [assetSort, setAssetSort] = useState({ key: 'cap', dir: 'desc' }); // по умолчанию — по капитализации
   const [chartAssetKey, setChartAssetKey] = useState(null);
 
@@ -69,6 +72,7 @@ export default function HomePage() {
     try {
       const c = localStorage.getItem('forexCodes');
       if (c) { const v = JSON.parse(c); if (Array.isArray(v)) setForexCodes(v); }
+      { const ab = localStorage.getItem('assetBase'); if (ab === 'BTC' || ab === 'ETH' || ab === 'USDT') setAssetBase(ab); }
       const b = localStorage.getItem('forexBase');
       if (b) setForexBase(b);
       const ch = localStorage.getItem('fxChartCode');
@@ -211,7 +215,8 @@ export default function HomePage() {
       setAssetDetails(Object.fromEntries(rows));
       if (mine.length) {
         try {
-          const sr = await fetch(`/api/asset-stats?s=${encodeURIComponent(mine.filter(a => !a.ext).map(a => a.symbol).join(','))}&ids=${encodeURIComponent(mine.filter(a => a.ext).map(a => `${a.asset_id}~${a.symbol}`).join(','))}`);
+          const symList = [...new Set([...mine.filter(a => !a.ext).map(a => a.symbol), 'BTC', 'ETH'])];
+          const sr = await fetch(`/api/asset-stats?s=${encodeURIComponent(symList.join(','))}&ids=${encodeURIComponent(mine.filter(a => a.ext).map(a => `${a.asset_id}~${a.symbol}`).join(','))}`);
           if (sr.ok) setAssetStats((await sr.json()).stats || {});
         } catch {}
       }
@@ -424,7 +429,22 @@ export default function HomePage() {
       return sign * (va - vb);
     });
   }
-  const statOf = (a) => assetStats[a.ext ? a.asset_id : String(a.symbol || '').toUpperCase()];
+  const rawStatOf = (a) => assetStats[a.ext ? a.asset_id : String(a.symbol || '').toUpperCase()];
+  // Пересчёт в выбранную основную валюту (USDT ≈ USD — без изменений): цена и изменения считаются через курс BTC/ETH в USD
+  const baseStat = assetBase === 'USDT' ? null : assetStats[assetBase];
+  const statOf = (a) => {
+    const st = rawStatOf(a);
+    if (!baseStat) return st;
+    if (!st) return st;
+    if (String(a.symbol || '').toUpperCase() === assetBase) return { ...st, price: 1, change24h: 0, change30d: 0, change1y: 0 };
+    const chg = (c, cb) => (c == null || cb == null ? null : ((1 + c / 100) / (1 + cb / 100) - 1) * 100);
+    return {
+      ...st,
+      price: st.price != null && baseStat.price > 0 ? st.price / baseStat.price : null,
+      change24h: chg(st.change24h, baseStat.change24h), change30d: chg(st.change30d, baseStat.change30d), change1y: chg(st.change1y, baseStat.change1y),
+    };
+  };
+  function changeAssetBase(v) { setAssetBase(v); try { localStorage.setItem('assetBase', v); } catch {} }
   const ASSET_SORT_VAL = { ticker: a => String(a.symbol || ''), y1: a => statOf(a)?.change1y, m1: a => statOf(a)?.change30d, h24: a => statOf(a)?.change24h, cap: a => statOf(a)?.marketCap };
   function clickAssetSort(key) {
     setAssetSort(cur => !cur || cur.key !== key ? { key, dir: key === 'ticker' ? 'asc' : 'desc' } : cur.dir === (key === 'ticker' ? 'asc' : 'desc') ? { key, dir: key === 'ticker' ? 'desc' : 'asc' } : null);
@@ -481,8 +501,17 @@ export default function HomePage() {
           <button onClick={logout} className="hd-btn">Выйти</button>
         </div>
       </header>
+    {addOpen && <AddAssetModal onClose={() => setAddOpen(false)} onChange={loadAssets} />}
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '0 16px 16px' }}>
       <div className="list-actions">
+        {isAssets && (
+          <label className="fx-base">
+            <span>Основная валюта</span>
+            <select value={assetBase} onChange={e => changeAssetBase(e.target.value)} className="hd-btn hd-sm">
+              <option value="USDT">USDT</option><option value="BTC">BTC</option><option value="ETH">ETH</option>
+            </select>
+          </label>
+        )}
         {isForex && (
           <label className="fx-base">
             <span>Основная валюта</span>
@@ -493,7 +522,8 @@ export default function HomePage() {
         )}
           {!curSelectMode ? (
             <>
-              {!isPool && <a href={isAssets ? '/assets' : isForex ? '/add-currency' : isCrypto ? '/add' : '/add-commodity'} className="hd-btn hd-sm add" title={isAssets ? 'Добавить актив' : isForex ? 'Добавить валюту' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>Добавить</a>}
+              {isAssets && <button onClick={() => setAddOpen(true)} className="hd-btn hd-sm add" title="Добавить актив">Добавить</button>}
+              {!isPool && !isAssets && <a href={isForex ? '/add-currency' : isCrypto ? '/add' : '/add-commodity'} className="hd-btn hd-sm add" title={isAssets ? 'Добавить актив' : isForex ? 'Добавить валюту' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>Добавить</a>}
               {curPairs.length > 0 && <button onClick={curToggleSelectMode} className="hd-btn hd-sm del" title="Выбрать для удаления">Удалить</button>}
           {!isAssets && !isPool && !isForex && !isCrypto && curPairs.length > 1 && (
             <div ref={sortMenuRef} style={{ position: 'relative' }}>
@@ -575,8 +605,8 @@ export default function HomePage() {
       {isAssets && !loading && displayAssets.map((asset) => {
         const metrics = assetDetails[asset.asset_id]?.metrics || [];
         const m = metrics.find(x => x.metric_id === 'market.spot_price');
-        const st = assetStats[asset.ext ? asset.asset_id : String(asset.symbol || '').toUpperCase()];
-        const price = st?.price ?? m?.value;
+        const st = statOf(asset);
+        const price = assetBase === 'USDT' ? (st?.price ?? m?.value) : st?.price;
         const isSelected = assetSelected.has(asset.asset_id);
         const ch = st?.change24h;
         return (
@@ -588,7 +618,7 @@ export default function HomePage() {
             <div className="ar-r ar-long"><Pct v={st?.change1y} /></div>
             <div className="ar-r ar-long"><Pct v={st?.change30d} /></div>
             <div className="ar-r" style={{ fontWeight: 600, color: ch == null ? 'var(--text-dim)' : ch >= 0 ? 'var(--up)' : 'var(--down)' }}>{ch == null ? '—' : `${ch >= 0 ? '+' : ''}${ch.toFixed(1).replace('.', ',')}%`}</div>
-            <div className="ar-r" style={{ fontWeight: 600 }}>{price == null ? '—' : Number(price).toLocaleString('en-US', { maximumFractionDigits: price >= 1000 ? 2 : price >= 1 ? 4 : 8 })}</div>
+            <div className="ar-r" style={{ fontWeight: 600 }}>{price == null ? '—' : assetBase === 'USDT' ? Number(price).toLocaleString('en-US', { maximumFractionDigits: price >= 1000 ? 2 : price >= 1 ? 4 : 8 }) : Number(price).toFixed(8)}</div>
           </div>
         );
       })}
