@@ -834,7 +834,7 @@ export default function HomePage() {
 }
 
 const row = {
-  display: 'flex', alignItems: 'center', gap: 14, padding: '12px 6px', flexWrap: 'wrap',
+  display: 'flex', alignItems: 'center', gap: 14, padding: '9px 6px', flexWrap: 'wrap',
   borderBottom: '1px solid var(--card-border)', textDecoration: 'none', color: 'var(--text)',
   borderRadius: 6,
 };
