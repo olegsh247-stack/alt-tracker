@@ -721,3 +721,32 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
   .modal-box { max-width: none; max-height: none; height: 100%; border-radius: 0; border: none; }
   .modal-sub { display: none; }
 }
+
+/* Переключатель языка (флажок) */
+.lang-switch { position: relative; }
+.lang-btn { font-size: 18px; line-height: 1; }
+.lang-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 120; min-width: 150px; background: var(--bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+.lang-menu button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: none; background: none; color: var(--text); padding: 8px 10px; border-radius: 7px; cursor: pointer; font-size: 14px; }
+.lang-menu button:hover, .lang-menu button.on { background: var(--input-bg); }
+
+/* Assets: тикер чуть правее значка монеты */
+.asset-row .ar-coin, .asset-head .ar-tk { padding-left: 0.6cm; }
+.tab-spot .ex-short { display: none; }
+@media (max-width: 640px) {
+  .asset-row .ar-coin, .asset-head .ar-tk { padding-left: 0.4cm; }
+  /* Spot на телефоне: пара в одну строку, биржи сокращены до 3 букв */
+  .tab-spot .ex-full { display: none; }
+  .tab-spot .ex-short { display: inline; }
+  .tab-spot .pair-row.pair-grid { grid-template-columns: 28px minmax(0, 1fr) 22px 50px 74px 46px; column-gap: 4px !important; }
+  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 28px minmax(0, 1fr) 22px 50px 74px 46px; }
+  .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; font-size: 15px !important; }
+  .tab-spot .pair-row .cell-exchange { font-size: 11px !important; white-space: nowrap !important; overflow-wrap: normal !important; }
+  .tab-spot .pair-row .cell-ratio { font-size: 11px !important; }
+  .tab-spot .pair-row .cell-pct { font-size: 13px !important; }
+  .tab-spot .pair-row .open-pair { margin-left: 3px; }
+}
+
+@media (max-width: 640px) {
+  .tab-spot .pair-row.pair-grid { column-gap: 6px !important; }
+  .tab-spot .pair-row .cell-name { overflow: hidden; text-overflow: ellipsis; padding-right: 2px; }
+}

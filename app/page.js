@@ -1,5 +1,7 @@
 'use client';
+import { useT, useLang } from '../components/LangProvider';
 import { useEffect, useRef, useState } from 'react';
+import LangSwitch from '../components/LangSwitch';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
 import { shortTickerFor, enLabelFor, tvSymbolFor } from '../lib/commodities';
@@ -13,11 +15,14 @@ import AssetChart from '../components/AssetChart';
 import { ALGOS } from '../lib/algos';
 import Flag from '../components/Flag';
 import TvCalendar from '../components/TvCalendar';
-import { CURRENCIES, currencyOf, DEFAULT_FOREX, DEFAULT_BASE } from '../lib/currencies';
+import { CURRENCIES, currencyOf, currencyName, DEFAULT_FOREX, DEFAULT_BASE } from '../lib/currencies';
 import PoolChart from '../components/PoolChart';
 import AddAssetModal from '../components/AddAssetModal';
 
 export default function HomePage() {
+  const t = useT();
+  const { lang } = useLang();
+  const dec = lang === 'en' ? '.' : ',';
   const [login, setLogin] = useState('');
   const [googleLinked, setGoogleLinked] = useState(null);
   const [tab, setTab] = useState('assets');
@@ -124,7 +129,7 @@ export default function HomePage() {
   function togglePoolSelected(id) { setPoolSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; }); }
   async function confirmDeletePools() {
     if (poolSelected.size === 0) { setPoolSelectMode(false); return; }
-    if (!confirm(`Удалить выбранные пулы (${poolSelected.size})?`)) return;
+    if (!confirm(t('Удалить выбранные пулы ({n})?', { n: poolSelected.size }))) return;
     setPoolDeleting(true);
     await Promise.all([...poolSelected].map(id => fetch(`/api/pool-favorites/${id}`, { method: 'DELETE' })));
     setPoolFavs(prev => prev.filter(f => !poolSelected.has(f.id)));
@@ -189,7 +194,7 @@ export default function HomePage() {
   }
   function confirmDeleteForex() {
     if (fxSelected.size === 0) { setFxSelectMode(false); return; }
-    if (!confirm(`Удалить выбранные валюты (${fxSelected.size})?`)) return;
+    if (!confirm(t('Удалить выбранные валюты ({n})?', { n: fxSelected.size }))) return;
     const next = forexCodes.filter(c => !fxSelected.has(c));
     setForexCodes(next);
     try { localStorage.setItem('forexCodes', JSON.stringify(next)); } catch {}
@@ -238,7 +243,7 @@ export default function HomePage() {
       setAssetSelectMode(false);
       return;
     }
-    if (!confirm(`Удалить выбранные активы (${assetSelected.size})?`)) return;
+    if (!confirm(t('Удалить выбранные активы ({n})?', { n: assetSelected.size }))) return;
     setAssetDeleting(true);
     const tracked = JSON.parse(localStorage.getItem('cryptoTrackedAssets') || '[]');
     const next = tracked.filter(id => !assetSelected.has(id));
@@ -306,7 +311,7 @@ export default function HomePage() {
   function onRowClick(e, id) { if (!selectMode) return; e.preventDefault(); toggleSelected(id); }
   async function confirmDeleteSelected() {
     if (selected.size === 0) { setSelectMode(false); return; }
-    if (!confirm(`Удалить выбранные пары (${selected.size})?`)) return;
+    if (!confirm(t('Удалить выбранные пары ({n})?', { n: selected.size }))) return;
     setDeleting(true);
     await Promise.all([...selected].map(id => fetch(`/api/pairs/${id}`, { method: 'DELETE' })));
     setPairs(prev => prev.filter(p => !selected.has(p.id)));
@@ -344,7 +349,7 @@ export default function HomePage() {
   }
   async function cConfirmDeleteSelected() {
     if (cSelected.size === 0) { setCSelectMode(false); return; }
-    if (!confirm(`Удалить выбранные пары (${cSelected.size})?`)) return;
+    if (!confirm(t('Удалить выбранные пары ({n})?', { n: cSelected.size }))) return;
     setCDeleting(true);
     await Promise.all([...cSelected].map(id => fetch(`/api/commodities/${id}`, { method: 'DELETE' })));
     setCPairs(prev => prev.filter(p => !cSelected.has(p.id)));
@@ -481,8 +486,8 @@ export default function HomePage() {
     <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}${isAssets ? ' tab-assets' : ''}${isForex ? ' tab-forex' : ''}`}>
     <header className="app-header">
         <div className="hd-lt">
-        <a href="/" className="hd-logo" title="На главную (Assets)" aria-label="На главную" onClick={(e) => { e.preventDefault(); changeTab('assets'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>
-        <nav className="hd-tabs" aria-label="Разделы">
+        <a href="/" className="hd-logo" title={t('На главную (Assets)')} aria-label={t('На главную')} onClick={(e) => { e.preventDefault(); changeTab('assets'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>
+        <nav className="hd-tabs" aria-label={t('Разделы')}>
           <button onClick={() => changeTab('assets')} className={`hd-tab${tab === 'assets' ? ' on' : ''}`}>Assets</button>
           <button onClick={() => changeTab('pair')} className={`hd-tab${tab === 'pair' ? ' on' : ''}`}>Spot</button>
           <button onClick={() => changeTab('pool')} className={`hd-tab${tab === 'pool' ? ' on' : ''}`}>Pool</button>
@@ -492,13 +497,14 @@ export default function HomePage() {
         </div>
         <div className="hd-right">
           <ThemeToggle />
+          <LangSwitch />
           <a
             href="/account"
             className={`hd-btn hd-id${googleLinked === true ? ' ok' : googleLinked === false ? ' no' : ''}`}
-            data-tip={googleLinked === true ? 'Google подключён' : googleLinked === false ? 'Google не подключён — нажмите, чтобы привязать' : 'Аккаунт'}
-            aria-label={`Аккаунт ${login}${googleLinked === true ? ', Google подключён' : googleLinked === false ? ', Google не подключён' : ''}`}
+            data-tip={googleLinked === true ? t('Google подключён') : googleLinked === false ? t('Google не подключён — нажмите, чтобы привязать') : t('Аккаунт')}
+            aria-label={`${t('Аккаунт')} ${login}${googleLinked === true ? ', ' + t('Google подключён') : googleLinked === false ? ', ' + t('Google не подключён') : ''}`}
           >{login || '\u00A0'}</a>
-          <button onClick={logout} className="hd-btn">Выйти</button>
+          <button onClick={logout} className="hd-btn">{t('Выйти')}</button>
         </div>
       </header>
     {addOpen && <AddAssetModal onClose={() => setAddOpen(false)} onChange={loadAssets} />}
@@ -506,7 +512,7 @@ export default function HomePage() {
       <div className="list-actions">
         {isAssets && (
           <label className="fx-base">
-            <span>Основная валюта</span>
+            <span>{t('Основная валюта')}</span>
             <select value={assetBase} onChange={e => changeAssetBase(e.target.value)} className="hd-btn hd-sm">
               <option value="USDT">USDT</option><option value="BTC">BTC</option><option value="ETH">ETH</option>
             </select>
@@ -514,38 +520,38 @@ export default function HomePage() {
         )}
         {isForex && (
           <label className="fx-base">
-            <span>Основная валюта</span>
+            <span>{t('Основная валюта')}</span>
             <select value={forexBase} onChange={e => changeForexBase(e.target.value)} className="hd-btn hd-sm">
-              {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} — {c.name}</option>)}
+              {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} — {currencyName(c, lang)}</option>)}
             </select>
           </label>
         )}
           {!curSelectMode ? (
             <>
-              {isAssets && <button onClick={() => setAddOpen(true)} className="hd-btn hd-sm add" title="Добавить актив">Добавить</button>}
-              {!isPool && !isAssets && <a href={isForex ? '/add-currency' : isCrypto ? '/add' : '/add-commodity'} className="hd-btn hd-sm add" title={isAssets ? 'Добавить актив' : isForex ? 'Добавить валюту' : isCrypto ? 'Добавить пару' : 'Добавить commodity'}>Добавить</a>}
-              {curPairs.length > 0 && <button onClick={curToggleSelectMode} className="hd-btn hd-sm del" title="Выбрать для удаления">Удалить</button>}
+              {isAssets && <button onClick={() => setAddOpen(true)} className="hd-btn hd-sm add" title={t('Добавить актив')}>{t('Добавить')}</button>}
+              {!isPool && !isAssets && <a href={isForex ? '/add-currency' : isCrypto ? '/add' : '/add-commodity'} className="hd-btn hd-sm add" title={isAssets ? t('Добавить актив') : isForex ? t('Добавить валюту') : isCrypto ? t('Добавить пару') : t('Добавить commodity')}>{t('Добавить')}</a>}
+              {curPairs.length > 0 && <button onClick={curToggleSelectMode} className="hd-btn hd-sm del" title={t('Выбрать для удаления')}>{t('Удалить')}</button>}
           {!isAssets && !isPool && !isForex && !isCrypto && curPairs.length > 1 && (
             <div ref={sortMenuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setSortMenuOpen(v => !v)}
                 className="hd-btn hd-sm hd-icon"
                 style={curSortDir ? { borderColor: 'var(--accent)', color: 'var(--accent-text)' } : undefined}
-                title="Сортировка"
-                aria-label="Сортировка"
+                title={t('Сортировка')}
+                aria-label={t('Сортировка')}
               >⇅</button>
               {sortMenuOpen && (
                 <div style={sortMenu}>
-                  <div style={sortHead}>По алфавиту</div>
-                  {[['alpha_asc', 'A → Z'], ['alpha_desc', 'Z → A']].map(([k, t]) => (
+                  <div style={sortHead}>{t('По алфавиту')}</div>
+                  {[['alpha_asc', 'A → Z'], ['alpha_desc', 'Z → A']].map(([k, lbl]) => (
                     <button key={k} onClick={() => chooseSort(k)} style={sortItem}>
-                      <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
+                      <span>{lbl}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
                     </button>
                   ))}
-                  <div style={sortHead}>По изменению за 24ч</div>
-                  {[['pct_asc', 'По возрастанию'], ['pct_desc', 'По убыванию']].map(([k, t], idx) => (
+                  <div style={sortHead}>{t('По изменению за 24ч')}</div>
+                  {[['pct_asc', t('По возрастанию')], ['pct_desc', t('По убыванию')]].map(([k, lbl], idx) => (
                     <button key={k} onClick={() => chooseSort(k)} style={{ ...sortItem, ...(idx === 1 ? { borderBottom: 'none' } : {}) }}>
-                      <span>{t}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
+                      <span>{lbl}</span>{curSortDir === k && <span style={{ color: 'var(--accent-text)' }}>✓</span>}
                     </button>
                   ))}
                 </div>
@@ -555,15 +561,15 @@ export default function HomePage() {
             </>
           ) : (
             <>
-              <button onClick={curToggleSelectMode} className="hd-btn hd-sm">Отмена</button>
+              <button onClick={curToggleSelectMode} className="hd-btn hd-sm">{t('Отмена')}</button>
               <button onClick={curConfirmDelete} disabled={curDeleting} className="hd-btn hd-sm del solid">
-                {curDeleting ? '...' : `Удалить (${curSelected.size})`}
+                {curDeleting ? '...' : `${t('Удалить')} (${curSelected.size})`}
               </button>
             </>
           )}
         </div>
 
-      {loading && <p>Загрузка...</p>}
+      {loading && <p>{t('Загрузка...')}</p>}
 
       {isPool && (
         <PoolSearch
@@ -574,9 +580,9 @@ export default function HomePage() {
           isActivePool={isActivePool}
         />
       )}
-      {isPool && !poolSearching && poolFavs.length > 0 && <div style={{ fontSize: 14, color: 'var(--text-dim)', margin: '4px 0 2px' }}>Избранное</div>}
-      {isPool && !poolSearching && poolLoaded && poolFavs.length === 0 && <p style={{ opacity: 0.7 }}>Избранных пулов пока нет — найдите пул по монете выше и добавьте его.</p>}
-      {isPool && !poolSearching && poolStatsError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>Часть данных не загрузилась — источник временно недоступен, обновится автоматически.</p>}
+      {isPool && !poolSearching && poolFavs.length > 0 && <div style={{ fontSize: 14, color: 'var(--text-dim)', margin: '4px 0 2px' }}>{t('Избранное')}</div>}
+      {isPool && !poolSearching && poolLoaded && poolFavs.length === 0 && <p style={{ opacity: 0.7 }}>{t('Избранных пулов пока нет — найдите пул по монете выше и добавьте его.')}</p>}
+      {isPool && !poolSearching && poolStatsError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>{t('Часть данных не загрузилась — источник временно недоступен, обновится автоматически.')}</p>}
       {isPool && !poolSearching && poolFavs.length > 0 && (
         <PoolTable
           rows={poolFavs}
@@ -584,17 +590,17 @@ export default function HomePage() {
           getKey={f => f.id}
           onSelect={selectPool}
           isActive={isActivePool}
-          pairExtra={f => <a href={`https://www.geckoterminal.com/${f.network}/pools/${f.address}`} target="_blank" rel="noopener noreferrer" className="open-pair" title="Открыть на GeckoTerminal" aria-label="Открыть на GeckoTerminal">↗</a>}
+          pairExtra={f => <a href={`https://www.geckoterminal.com/${f.network}/pools/${f.address}`} target="_blank" rel="noopener noreferrer" className="open-pair" title={t('Открыть на GeckoTerminal')} aria-label={t('Открыть на GeckoTerminal')}>↗</a>}
           select={{ mode: poolSelectMode, selected: poolSelected, onToggle: f => togglePoolSelected(f.id) }}
         />
       )}
 
-      {isAssets && !loading && assets.length === 0 && <p style={{ opacity: 0.7 }}>Активов пока нет — нажмите "+", чтобы добавить первый.</p>}
+      {isAssets && !loading && assets.length === 0 && <p style={{ opacity: 0.7 }}>{t('Активов пока нет — нажмите "+", чтобы добавить первый.')}</p>}
       {isAssets && !loading && assets.length > 0 && (
         <div className={`asset-row asset-head${assetSelectMode ? ' sel' : ''}`}>
           {assetSelectMode && <span />}
           <span />
-          {sortHead('ticker', 'Ticker')}
+          {sortHead('ticker', 'Ticker', 'ar-tk')}
           {sortHead('cap', 'Rank', 'ar-r')}
           {sortHead('y1', '1Y', 'ar-r ar-long')}
           {sortHead('m1', '1M', 'ar-r ar-long')}
@@ -617,13 +623,13 @@ export default function HomePage() {
             <div className="ar-r">{st?.rank ? `#${st.rank}` : '—'}</div>
             <div className="ar-r ar-long"><Pct v={st?.change1y} /></div>
             <div className="ar-r ar-long"><Pct v={st?.change30d} /></div>
-            <div className="ar-r" style={{ fontWeight: 600, color: ch == null ? 'var(--text-dim)' : ch >= 0 ? 'var(--up)' : 'var(--down)' }}>{ch == null ? '—' : `${ch >= 0 ? '+' : ''}${ch.toFixed(1).replace('.', ',')}%`}</div>
+            <div className="ar-r" style={{ fontWeight: 600, color: ch == null ? 'var(--text-dim)' : ch >= 0 ? 'var(--up)' : 'var(--down)' }}>{ch == null ? '—' : `${ch >= 0 ? '+' : ''}${ch.toFixed(1).replace('.', dec)}%`}</div>
             <div className="ar-r" style={{ fontWeight: 600 }}>{price == null ? '—' : assetBase === 'USDT' ? Number(price).toLocaleString('en-US', { maximumFractionDigits: price >= 1000 ? 2 : price >= 1 ? 4 : 8 }) : Number(price).toFixed(8)}</div>
           </div>
         );
       })}
 
-      {isCrypto && !loading && pairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
+      {isCrypto && !loading && pairs.length === 0 && <p style={{ opacity: 0.7 }}>{t('Пар пока нет — нажмите "+", чтобы добавить первую.')}</p>}
       {isCrypto && !loading && pairs.length > 0 && (
         <div className="pair-row pair-grid spot-head">
           <span className={`ar-sort${sortDir?.startsWith('alpha') ? ' on' : ''}`} role="button" style={{ gridColumn: 'name-start / name-end' }} onClick={() => clickSpotSort('alpha')}>Coin{spotArrow('alpha')}</span>
@@ -654,18 +660,18 @@ export default function HomePage() {
               <CoinIcon className="pair-icon" symbol={p.asset1} size={24} />
               <CoinIcon className="pair-icon" symbol={p.asset2} size={24} />
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/<wbr />{p.asset2}{!selectMode && <a href={`/pair/${p.id}`} className="open-pair" title="Открыть страницу пары" aria-label="Открыть страницу пары" onClick={(e) => e.stopPropagation()}>↗</a>}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}{!selectMode && <a href={`/pair/${p.id}`} className="open-pair" title={t('Открыть страницу пары')} aria-label={t('Открыть страницу пары')} onClick={(e) => e.stopPropagation()}>↗</a>}</div>
             {!selectMode && (
-              <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
+              <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title={t('Поменять местами')}>
                 {swappingId === p.id ? '…' : '⇄'}
               </button>
             )}
-            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}>{p.exchange1}/<wbr />{p.exchange2}</div>
+            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}><span className="ex-full">{p.exchange1}/<wbr />{p.exchange2}</span><span className="ex-short">{String(p.exchange1).slice(0, 3)}/{String(p.exchange2).slice(0, 3)}</span></div>
             <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>
             <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 16, color: pctColor }}>
-              {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
+              {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', dec)}%` : '—'}
             </div>
           </div>
         );
@@ -688,25 +694,25 @@ export default function HomePage() {
             {list.length > 0 && (
               <div className="fx-calc">
                 <input
-                  type="text" inputMode="decimal" value={fxAmt} aria-label="Сумма"
+                  type="text" inputMode="decimal" value={fxAmt} aria-label={t('Сумма')}
                   onChange={e => { setFxAmt(e.target.value); saveCalc(e.target.value, from, to); }}
                   className="fx-calc-amt"
                 />
-                <select value={from} onChange={e => { setFxFrom(e.target.value); saveCalc(fxAmt, e.target.value, to); }} className="hd-btn" aria-label="Из валюты">
+                <select value={from} onChange={e => { setFxFrom(e.target.value); saveCalc(fxAmt, e.target.value, to); }} className="hd-btn" aria-label={t('Из валюты')}>
                   {opts.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-                <button type="button" className="hd-btn hd-icon" title="Поменять местами" aria-label="Поменять местами" onClick={() => { setFxFrom(to); setFxTo(from); saveCalc(fxAmt, to, from); }}>⇄</button>
-                <select value={to} onChange={e => { setFxTo(e.target.value); saveCalc(fxAmt, from, e.target.value); }} className="hd-btn" aria-label="В валюту">
+                <button type="button" className="hd-btn hd-icon" title={t('Поменять местами')} aria-label={t('Поменять местами')} onClick={() => { setFxFrom(to); setFxTo(from); saveCalc(fxAmt, to, from); }}>⇄</button>
+                <select value={to} onChange={e => { setFxTo(e.target.value); saveCalc(fxAmt, from, e.target.value); }} className="hd-btn" aria-label={t('В валюту')}>
                   {opts.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
                 <span className="fx-calc-res">= {result == null ? '—' : fmtRes(result)} <b>{to}</b></span>
               </div>
             )}
-            {list.length === 0 && <p style={{ opacity: 0.7 }}>Валют пока нет — нажмите «Добавить», чтобы выбрать нужные.</p>}
+            {list.length === 0 && <p style={{ opacity: 0.7 }}>{t('Валют пока нет — нажмите «Добавить», чтобы выбрать нужные.')}</p>}
             {list.length > 0 && (
               <div className={`fx-row fx-head${fxSelectMode ? ' sel' : ''}`}>
                 {fxSelectMode && <span />}
-                <span>Тикер</span><span>Флаг</span><span className="fx-name">Название</span><span className="ar-r">Цена</span><span className="ar-r">Изменение</span>
+                <span>{t('Тикер')}</span><span>{t('Флаг')}</span><span className="fx-name">{t('Название')}</span><span className="ar-r">{t('Цена')}</span><span className="ar-r">{t('Изменение')}</span>
               </div>
             )}
             {list.map(code => {
@@ -727,19 +733,19 @@ export default function HomePage() {
                   {fxSelectMode && <input type="checkbox" checked={isSel} onChange={() => toggleFxSelected(code)} onClick={e => e.stopPropagation()} style={{ width: 18, height: 18 }} />}
                   <b>{code}</b>
                   <Flag cc={c.cc} width={28} />
-                  <span className="fx-name">{c.name}</span>
+                  <span className="fx-name">{currencyName(c, lang)}</span>
                   <span className="ar-r" style={{ fontWeight: 600 }}>{fmt(rt?.price)}</span>
-                  <span className="ar-r" style={{ fontWeight: 600, color: ch == null ? 'var(--text-dim)' : ch >= 0 ? 'var(--up)' : 'var(--down)' }}>{ch == null ? '—' : `${ch >= 0 ? '+' : ''}${ch.toFixed(2).replace('.', ',')}%`}</span>
+                  <span className="ar-r" style={{ fontWeight: 600, color: ch == null ? 'var(--text-dim)' : ch >= 0 ? 'var(--up)' : 'var(--down)' }}>{ch == null ? '—' : `${ch >= 0 ? '+' : ''}${ch.toFixed(2).replace('.', dec)}%`}</span>
                 </div>
               );
             })}
-            {forexError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>Курсы временно недоступны — обновятся автоматически.</p>}
-            {list.length > 0 && <p style={{ color: 'var(--text-dim)', fontSize: 12, marginTop: 10 }}>Цена — сколько {forexBase} стоит 1 единица валюты. Обновляется раз в 15 минут.</p>}
+            {forexError && <p style={{ color: 'var(--danger)', fontSize: 14 }}>{t('Курсы временно недоступны — обновятся автоматически.')}</p>}
+            {list.length > 0 && <p style={{ color: 'var(--text-dim)', fontSize: 12, marginTop: 10 }}>{t('Цена — сколько {base} стоит 1 единица валюты. Обновляется раз в 15 минут.', { base: forexBase })}</p>}
           </>
         );
       })()}
 
-      {isCommodities && !loading && cPairs.length === 0 && <p style={{ opacity: 0.7 }}>Пар пока нет — нажмите "+", чтобы добавить первую.</p>}
+      {isCommodities && !loading && cPairs.length === 0 && <p style={{ opacity: 0.7 }}>{t('Пар пока нет — нажмите "+", чтобы добавить первую.')}</p>}
       {isCommodities && displayCPairs.map((p) => {
         const price = cPrices[p.id];
         const spark = cSparks[p.id];
@@ -763,9 +769,9 @@ export default function HomePage() {
               <span className="commodity-icon">{shortTickerFor(p.asset1)}</span>
               <span className="commodity-icon">{shortTickerFor(p.asset2)}</span>
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{enLabelFor(p.asset1)}/<wbr />{enLabelFor(p.asset2)}{!cSelectMode && <a href={`/commodity-pair/${p.id}`} className="open-pair" title="Открыть страницу пары" aria-label="Открыть страницу пары" onClick={(e) => e.stopPropagation()}>↗</a>}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{enLabelFor(p.asset1)}/<wbr />{enLabelFor(p.asset2)}{!cSelectMode && <a href={`/commodity-pair/${p.id}`} className="open-pair" title={t('Открыть страницу пары')} aria-label={t('Открыть страницу пары')} onClick={(e) => e.stopPropagation()}>↗</a>}</div>
             {!cSelectMode && (
-              <button onClick={(e) => cSwapPair(e, p.id)} disabled={cSwappingId === p.id} className="cell-swap" style={swapBtn} title="Поменять местами">
+              <button onClick={(e) => cSwapPair(e, p.id)} disabled={cSwappingId === p.id} className="cell-swap" style={swapBtn} title={t('Поменять местами')}>
                 {cSwappingId === p.id ? '…' : '⇄'}
               </button>
             )}
@@ -773,7 +779,7 @@ export default function HomePage() {
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>
             <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 16, color: pctColor }}>
-              {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', ',')}%` : '—'}
+              {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', dec)}%` : '—'}
             </div>
           </div>
         );
@@ -789,18 +795,18 @@ export default function HomePage() {
         return (
           <div className="side-col3">
             <section className="side-info">
-              {!chartAsset ? <div className="si-empty">Выберите монету</div> : (
+              {!chartAsset ? <div className="si-empty">{t('Выберите монету')}</div> : (
                 <>
                   <div className="si-head"><b>{chartAsset.symbol}</b><span>{chartAsset.name}</span></div>
                   <div className="si-row"><span>Market cap</span><b>{st?.marketCap == null ? '—' : '$' + Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(st.marketCap)}</b></div>
                   <div className="si-row"><span>Circulating supply</span><b>{full(st?.circulating)}</b></div>
                   <div className="si-row"><span>Max supply</span><b>{st ? (st.max == null ? '∞' : full(st.max)) : '—'}</b></div>
-                  {st?.max > 0 && st?.circulating > 0 && <div className="si-row"><span>Issued</span><b>{(st.circulating / st.max * 100).toFixed(1).replace('.', ',')}%</b></div>}
+                  {st?.max > 0 && st?.circulating > 0 && <div className="si-row"><span>Issued</span><b>{(st.circulating / st.max * 100).toFixed(1).replace('.', dec)}%</b></div>}
                   <div className="si-row"><span>Algorithm</span><b>{algo || '—'}</b></div>
                 </>
               )}
             </section>
-            <section className="side-news"><div className="side-title">Новости</div><NewsFeed key="crypto" /></section>
+            <section className="side-news"><div className="side-title">{t('Новости')}</div><NewsFeed key="crypto" /></section>
           </div>
         );
       })()}
@@ -814,13 +820,13 @@ export default function HomePage() {
       {isForex ? (
         <section className="side-news">
           <div className="side-title side-tabs">
-            <button className={sideView === 'news' ? 'active' : ''} onClick={() => setSideView('news')}>Новости</button>
-            <button className={sideView === 'cal' ? 'active' : ''} onClick={() => setSideView('cal')}>Календарь</button>
+            <button className={sideView === 'news' ? 'active' : ''} onClick={() => setSideView('news')}>{t('Новости')}</button>
+            <button className={sideView === 'cal' ? 'active' : ''} onClick={() => setSideView('cal')}>{t('Календарь')}</button>
           </div>
           {sideView === 'cal' ? <div className="cal-box"><TvCalendar /></div> : <NewsFeed key="fx" kind="fx" />}
         </section>
       ) : isAssets ? null : (
-        <section className="side-news"><div className="side-title">Новости</div>{isCommodities ? <NewsFeed key="com" kind="com" /> : isPool ? <NewsFeed key="pool" kind="pool" /> : <NewsFeed key="crypto" />}</section>
+        <section className="side-news"><div className="side-title">{t('Новости')}</div>{isCommodities ? <NewsFeed key="com" kind="com" /> : isPool ? <NewsFeed key="pool" kind="pool" /> : <NewsFeed key="crypto" />}</section>
       )}
     </aside>
     </div>
@@ -833,10 +839,12 @@ const row = {
   borderRadius: 6,
 };
 function Pct({ v }) {
+  const { lang } = useLang();
+  const dec = lang === 'en' ? '.' : ',';
   if (v == null || !Number.isFinite(v)) return <span style={{ color: 'var(--text-dim)' }}>—</span>;
   const a = Math.abs(v);
-  const t = a >= 1e4 ? `${Math.round(v / 1e3)}K%` : a >= 1000 ? `${Math.round(v)}%` : `${v.toFixed(a >= 100 ? 0 : 1).replace('.', ',')}%`;
-  return <span style={{ fontWeight: 600, color: v >= 0 ? 'var(--up)' : 'var(--down)' }}>{v >= 0 ? '+' : ''}{t}</span>;
+  const txt = a >= 1e4 ? `${Math.round(v / 1e3)}K%` : a >= 1000 ? `${Math.round(v)}%` : `${v.toFixed(a >= 100 ? 0 : 1).replace('.', dec)}%`;
+  return <span style={{ fontWeight: 600, color: v >= 0 ? 'var(--up)' : 'var(--down)' }}>{v >= 0 ? '+' : ''}{txt}</span>;
 }
 function fmtSupply(v) {
   if (v == null || !Number.isFinite(Number(v))) return '—';

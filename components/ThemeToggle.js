@@ -1,7 +1,9 @@
 'use client';
+import { useT } from './LangProvider';
 import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
+  const t = useT();
   const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
@@ -18,7 +20,7 @@ export default function ThemeToggle() {
   }
 
   return (
-    <button onClick={toggle} title="Сменить тему" aria-label="Сменить тему" className="hd-btn hd-icon">
+    <button onClick={toggle} title={t('Сменить тему')} aria-label={t('Сменить тему')} className="hd-btn hd-icon">
       {theme === 'dark' ? '☀\uFE0E' : '☾'}
     </button>
   );

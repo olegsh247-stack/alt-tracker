@@ -1,4 +1,5 @@
 'use client';
+import { useT, useLang } from './LangProvider';
 import NetworkBadge from './NetworkBadge';
 import { fmtUsd, fmtPct, fmtFee, fmtApr, fmtAge } from '../lib/format';
 
@@ -15,6 +16,8 @@ import { fmtUsd, fmtPct, fmtFee, fmtApr, fmtAge } from '../lib/format';
 //   pairExtra(p) — маленький элемент справа от названия пары (☆ в избранное, ↗ открыть)
 //   isDisabled  — строка неактивна (например, уже в избранном); markDisabled — рисовать у такой пары галочку
 export default function PoolTable({ rows, getKey, onRowClick, onSelect, isActive, pairExtra, select, action, actionTitle = '', showAge = false, isDisabled, markDisabled = false }) {
+  const t = useT();
+  const { lang } = useLang();
   const selectMode = !!select?.mode;
   return (
     <div className="pool-table-wrap">
@@ -22,13 +25,13 @@ export default function PoolTable({ rows, getKey, onRowClick, onSelect, isActive
         <thead>
           <tr>
             {selectMode && <th className="pt-check" />}
-            <th className="pt-pair">Пара</th>
-            <th className="pt-kind">Вид пула</th>
-            <th className="pt-num pt-apr">APR 24ч</th>
+            <th className="pt-pair">{t('Пара')}</th>
+            <th className="pt-kind">{t('Вид пула')}</th>
+            <th className="pt-num pt-apr">{t('APR 24ч')}</th>
             <th className="pt-num pt-tvl">TVL</th>
-            <th className="pt-num pt-vol"><span className="pt-long">Объём 24ч</span><span className="pt-short">Объём</span></th>
-            <th className="pt-num pt-fees"><span className="pt-long">Комиссии 24ч</span><span className="pt-short">Комисс.</span></th>
-            <th className="pt-num pt-chg">Цена 24ч</th>
+            <th className="pt-num pt-vol"><span className="pt-long">{t('Объём 24ч')}</span><span className="pt-short">{t('Объём')}</span></th>
+            <th className="pt-num pt-fees"><span className="pt-long">{t('Комиссии 24ч')}</span><span className="pt-short">{t('Комисс.')}</span></th>
+            <th className="pt-num pt-chg">{t('Цена 24ч')}</th>
             {action && <th className="pt-action">{actionTitle}</th>}
           </tr>
         </thead>
@@ -60,8 +63,8 @@ export default function PoolTable({ rows, getKey, onRowClick, onSelect, isActive
                 )}
                 <td className="pt-pair">
                   <div className="pt-pair-name">
-                    <span>{p.base}/{p.quote}{markDisabled && disabled && <span className="pt-mark" title="В избранном"> ✓</span>}</span>
-                    {showAge && <span className="pt-age" title="Возраст пула">{fmtAge(p.createdAt)}</span>}
+                    <span>{p.base}/{p.quote}{markDisabled && disabled && <span className="pt-mark" title={t('В избранном')}> ✓</span>}</span>
+                    {showAge && <span className="pt-age" title={t('Возраст пула')}>{fmtAge(p.createdAt, t, lang === 'en' ? '.' : ',')}</span>}
                     {pairExtra && !selectMode && <span className="pt-extra" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>{pairExtra(p)}</span>}
                   </div>
                 </td>

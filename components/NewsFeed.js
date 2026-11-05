@@ -1,4 +1,5 @@
 'use client';
+import { useT, useLang } from './LangProvider';
 import { useEffect, useState } from 'react';
 
 const FX_FILTERS = [
@@ -32,15 +33,17 @@ const FILTERS = [
   { key: 'all', label: 'Все' },
 ];
 
-function ago(ts) {
+function ago(ts, t) {
   const m = Math.max(0, Math.floor((Date.now() - ts) / 60000));
-  if (m < 60) return `${Math.max(1, m)}м`;
+  if (m < 60) return `${Math.max(1, m)}${t('м')}`;
   const h = Math.floor(m / 60);
-  if (h < 48) return `${h}ч`;
-  return `${Math.floor(h / 24)}д`;
+  if (h < 48) return `${h}${t('ч')}`;
+  return `${Math.floor(h / 24)}${t('д')}`;
 }
 
 export default function NewsFeed({ kind = 'crypto' }) {
+  const t = useT();
+  const { lang } = useLang();
   const filters = kind === 'fx' ? FX_FILTERS : kind === 'com' ? COM_FILTERS : kind === 'pool' ? POOL_FILTERS : FILTERS;
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
@@ -71,24 +74,24 @@ export default function NewsFeed({ kind = 'crypto' }) {
     <div className="news">
       <div className="news-filters">
         {filters.map(f => (
-          <button key={f.key} onClick={() => setFilter(f.key)} className={`news-chip${filter === f.key ? ' active' : ''}`}>{f.label}</button>
+          <button key={f.key} onClick={() => setFilter(f.key)} className={`news-chip${filter === f.key ? ' active' : ''}`}>{t(f.label)}</button>
         ))}
       </div>
       <div className="news-list">
-        {!data && !error && <div className="news-empty">Загрузка новостей…</div>}
-        {error && !data && <div className="news-empty">Новости временно недоступны. Обновятся автоматически.</div>}
-        {data && items.length === 0 && <div className="news-empty">В этом разделе пока ничего нет.</div>}
+        {!data && !error && <div className="news-empty">{t('Загрузка новостей…')}</div>}
+        {error && !data && <div className="news-empty">{t('Новости временно недоступны. Обновятся автоматически.')}</div>}
+        {data && items.length === 0 && <div className="news-empty">{t('В этом разделе пока ничего нет.')}</div>}
         {items.map(it => (
-          <a key={it.id} href={it.link} target="_blank" rel="noopener noreferrer" className="news-item" title={it.titleRu ? it.title : undefined}>
+          <a key={it.id} href={it.link} target="_blank" rel="noopener noreferrer" className="news-item" title={lang === 'ru' && it.titleRu ? it.title : undefined}>
             <div className="news-meta">
               <span>{it.source}</span>
-              {it.label && <span className="news-tag">{it.label}</span>}
-              <span className="news-time">{ago(it.ts)}</span>
+              {it.label && <span className="news-tag">{t(it.label)}</span>}
+              <span className="news-time">{ago(it.ts, t)}</span>
             </div>
-            <div className="news-title">{it.titleRu || it.title}</div>
+            <div className="news-title">{lang === 'ru' ? (it.titleRu || it.title) : it.title}</div>
           </a>
         ))}
-        {data?.failed?.length > 0 && <div className="news-foot">Не ответили: {data.failed.join(', ')}</div>}
+        {data?.failed?.length > 0 && <div className="news-foot">{t('Не ответили')}: {data.failed.join(', ')}</div>}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 'use client';
+import { useT } from './LangProvider';
 import { useEffect, useRef, useState } from 'react';
 import NetworkBadge from './NetworkBadge';
 import PoolTable from './PoolTable';
@@ -25,6 +26,7 @@ const SORTS = [['tvl', 'TVL'], ['apr', 'APR'], ['vol24', 'Объём']];
 // favSet — множество "сеть:адрес" уже добавленных пулов; onAdded() — после успешного добавления;
 // onActiveChange(bool) — сообщает странице, что идёт поиск (чтобы спрятать избранное)
 export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPool, isActivePool }) {
+  const t = useT();
   const [nets, setNets] = useState(['bsc']); // выбранные сети (можно несколько); при открытии — BNB Chain
   const [failed, setFailed] = useState([]);
   const [query, setQuery] = useState('');   // Актив 1
@@ -83,7 +85,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
     const t = setTimeout(async () => {
       const settled = await Promise.allSettled(nets.map(async (net) => {
         const { r, d } = await fetchJsonRetry(`/api/pool-search?network=${net}&q=${encodeURIComponent(q)}${qb ? `&q2=${encodeURIComponent(qb)}` : ''}`);
-        if (!r.ok) throw new Error(d.error || 'Ошибка поиска');
+        if (!r.ok) throw new Error(d.error || t('Ошибка поиска'));
         return d.results || [];
       }));
       if (id !== reqId.current) return;
@@ -91,7 +93,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
       const bad = nets.filter((_, i) => settled[i].status === 'rejected');
       if (bad.length === nets.length) {
         const first = settled.find(x => x.status === 'rejected');
-        setErr(first?.reason?.message || 'Ошибка соединения');
+        setErr(first?.reason?.message || t('Ошибка соединения'));
         setResults([]);
       } else {
         setResults(okRows);
@@ -135,14 +137,14 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
     });
     const d = await r.json();
     setAddingKey(null);
-    if (!r.ok && r.status !== 409) { setErr(d.error || 'Не удалось добавить'); return; }
+    if (!r.ok && r.status !== 409) { setErr(d.error || t('Не удалось добавить')); return; }
     [t1, t2].filter(x => x && x.length < 30).reverse().forEach(rememberCoin);
     onAdded && onAdded();
   }
 
   const starFor = (p) => favSet.has(`${p.network}:${p.address}`)
-    ? <span className="pt-star on" title="В избранном" aria-label="В избранном">★</span>
-    : <button type="button" className="pt-star" title="Добавить в избранное" aria-label="Добавить в избранное" disabled={addingKey === p.address} onClick={() => add(p)}>☆</button>;
+    ? <span className="pt-star on" title={t('В избранном')} aria-label={t('В избранном')}>★</span>
+    : <button type="button" className="pt-star" title={t('Добавить в избранное')} aria-label={t('Добавить в избранное')} disabled={addingKey === p.address} onClick={() => add(p)}>☆</button>;
 
   const base = results.filter(p => (!hideSmall || (p.tvl || 0) >= MIN_TVL) && (!stableOnly || p.hasStable));
   const isDead = (p) => !(p.vol24 >= MIN_VOL);
@@ -157,7 +159,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
 
   return (
     <div style={{ marginBottom: 16 }}>
-      <div className="net-row" role="group" aria-label="Сети">
+      <div className="net-row" role="group" aria-label={t('Сети')}>
         {NETWORKS.map(n => (
           <button key={n.key} type="button" className="net-chip" onClick={() => toggleNetwork(n.key)} aria-pressed={nets.includes(n.key)} aria-label={n.label} title={n.label}>
             <NetworkBadge network={n.key} size="md" />
@@ -167,10 +169,10 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
       </div>
 
       <div className="pool-top">
-        <div className="pool-sort" role="group" aria-label="Сортировка">
-          <span style={{ color: 'var(--text-dim)', fontSize: 14 }}>Сортировка:</span>
-          {SORTS.map(([k, t]) => (
-            <button key={k} type="button" className="pool-sort-chip" aria-pressed={sort === k} onClick={() => pickSort(k)}>{t}</button>
+        <div className="pool-sort" role="group" aria-label={t('Сортировка')}>
+          <span style={{ color: 'var(--text-dim)', fontSize: 14 }}>{t('Сортировка:')}</span>
+          {SORTS.map(([k, lbl]) => (
+            <button key={k} type="button" className="pool-sort-chip" aria-pressed={sort === k} onClick={() => pickSort(k)}>{t(lbl)}</button>
           ))}
         </div>
         <div className="pool-fields">
@@ -179,27 +181,27 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
               ref={inputRef}
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Актив 1"
-              aria-label="Актив 1: тикер или адрес токена"
+              placeholder={t('Актив 1')}
+              aria-label={t('Актив 1: тикер или адрес токена')}
               autoComplete="off"
               autoCapitalize="characters"
               style={input}
             />
-            {query && <button type="button" className="pool-clear" onClick={() => setQuery('')} aria-label="Очистить актив 1">×</button>}
+            {query && <button type="button" className="pool-clear" onClick={() => setQuery('')} aria-label={t('Очистить актив 1')}>×</button>}
           </div>
-          <button type="button" className="pool-swap" onClick={swapAssets} aria-label="Поменять активы местами" title="Поменять местами">⇄</button>
+          <button type="button" className="pool-swap" onClick={swapAssets} aria-label={t('Поменять активы местами')} title={t('Поменять местами')}>⇄</button>
           <div className="pool-field">
             <input
               ref={input2Ref}
               value={query2}
               onChange={e => setQuery2(e.target.value)}
-              placeholder="Актив 2"
-              aria-label="Актив 2 (необязательно): тикер или адрес токена"
+              placeholder={t('Актив 2')}
+              aria-label={t('Актив 2 (необязательно): тикер или адрес токена')}
               autoComplete="off"
               autoCapitalize="characters"
               style={input}
             />
-            {query2 && <button type="button" className="pool-clear" onClick={() => setQuery2('')} aria-label="Очистить актив 2">×</button>}
+            {query2 && <button type="button" className="pool-clear" onClick={() => setQuery2('')} aria-label={t('Очистить актив 2')}>×</button>}
           </div>
         </div>
       </div>
@@ -216,16 +218,16 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
         <div className="pool-filters">
           <label className="filter-chip">
             <input type="checkbox" checked={stableOnly} onChange={e => setStableOnly(e.target.checked)} />
-            Только со стейблом
+            {t('Только со стейблом')}
           </label>
           <div className="pool-filters-right">
-            <label className="filter-chip" title={`Скрыть пулы с TVL меньше ${fmtUsd(MIN_TVL)}`}>
+            <label className="filter-chip" title={t('Скрыть пулы с TVL меньше {v}', { v: fmtUsd(MIN_TVL) })}>
               <input type="checkbox" checked={hideSmall} onChange={e => setHideSmall(e.target.checked)} />
-              Скрыть мелкие
+              {t('Скрыть мелкие')}
             </label>
-            <label className="filter-chip" title={`Скрыть пулы с объёмом за 24ч меньше ${fmtUsd(MIN_VOL)}`}>
+            <label className="filter-chip" title={t('Скрыть пулы с объёмом за 24ч меньше {v}', { v: fmtUsd(MIN_VOL) })}>
               <input type="checkbox" checked={hideDead} onChange={e => setHideDead(e.target.checked)} />
-              Без объёма{hideDead && deadCount > 0 ? ` (${deadCount})` : ''}
+              {t('Без объёма')}{hideDead && deadCount > 0 ? ` (${deadCount})` : ''}
             </label>
           </div>
         </div>
@@ -233,7 +235,7 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
 
       {!q && defRows.length > 0 && (
         <>
-          <div style={{ fontSize: 14, color: 'var(--text-dim)', margin: '14px 0 2px' }}>Основные пары</div>
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', margin: '14px 0 2px' }}>{t('Основные пары')}</div>
           <PoolTable
             rows={defRows}
             getKey={p => `${p.network}:${p.address}`}
@@ -244,18 +246,18 @@ export default function PoolSearch({ favSet, onAdded, onActiveChange, onSelectPo
           />
         </>
       )}
-      {!q && defLoading && defRows.length === 0 && <p style={{ opacity: 0.7 }}>Загружаю основные пары…</p>}
+      {!q && defLoading && defRows.length === 0 && <p style={{ opacity: 0.7 }}>{t('Загружаю основные пары…')}</p>}
       {!q && !defLoading && defFailed.length > 0 && (
-        <p style={{ opacity: 0.8, fontSize: 14 }}>Не загрузились: {defFailed.map(k => networkFor(k).label).join(', ')}. <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>Повторить</button></p>
+        <p style={{ opacity: 0.8, fontSize: 14 }}>{t('Не загрузились')}: {defFailed.map(k => networkFor(k).label).join(', ')}. <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>{t('Повторить')}</button></p>
       )}
       {err && (
-        <p style={{ color: 'var(--danger)' }}>{err} <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>Повторить</button></p>
+        <p style={{ color: 'var(--danger)' }}>{err} <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>{t('Повторить')}</button></p>
       )}
-      {loading && <p style={{ opacity: 0.7 }}>Ищу…</p>}
-      {!loading && failed.length > 0 && <p style={{ opacity: 0.8, fontSize: 14 }}>Не ответили: {failed.map(k => networkFor(k).label).join(', ')}. <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>Повторить</button></p>}
-      {q && q.length < 2 && <p style={{ opacity: 0.7 }}>Введите минимум 2 символа.</p>}
+      {loading && <p style={{ opacity: 0.7 }}>{t('Ищу…')}</p>}
+      {!loading && failed.length > 0 && <p style={{ opacity: 0.8, fontSize: 14 }}>{t('Не ответили')}: {failed.map(k => networkFor(k).label).join(', ')}. <button type="button" className="pool-retry" onClick={() => setRetryTick(t => t + 1)}>{t('Повторить')}</button></p>}
+      {q && q.length < 2 && <p style={{ opacity: 0.7 }}>{t('Введите минимум 2 символа.')}</p>}
       {!loading && q.length >= 2 && !err && shown.length === 0 && (
-        <p style={{ opacity: 0.7 }}>Пулов не найдено{hiddenCount > 0 ? ` (скрыто фильтрами: ${hiddenCount})` : ''}.</p>
+        <p style={{ opacity: 0.7 }}>{t('Пулов не найдено')}{hiddenCount > 0 ? ` (${t('скрыто фильтрами')}: ${hiddenCount})` : ''}.</p>
       )}
 
       {q.length >= 2 && shown.length > 0 && (

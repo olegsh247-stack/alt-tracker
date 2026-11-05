@@ -1,4 +1,5 @@
 'use client';
+import { useT } from './LangProvider';
 import { useEffect, useMemo, useState } from 'react';
 import CoinIcon from './CoinIcon';
 
@@ -7,6 +8,7 @@ const MAX_SHOWN = 100;
 
 // Окно добавления монет: поиск по топ-500 CoinGecko + монеты старого списка. Остаётся открытым — можно набрать несколько подряд.
 export default function AddAssetModal({ onClose, onChange }) {
+  const t = useT();
   const [coins, setCoins] = useState([]);
   const [worker, setWorker] = useState([]);
   const [tracked, setTracked] = useState([]);
@@ -29,7 +31,7 @@ export default function AddAssetModal({ onClose, onChange }) {
       const wl = w.status === 'fulfilled' ? w.value.assets || [] : [];
       setCoins(cl);
       setWorker(wl);
-      if (cl.length === 0 && wl.length === 0) setError('Не удалось загрузить список монет. Попробуйте позже.');
+      if (cl.length === 0 && wl.length === 0) setError(t('Не удалось загрузить список монет. Попробуйте позже.'));
     }).finally(() => setLoading(false));
   }, []);
 
@@ -83,23 +85,23 @@ export default function AddAssetModal({ onClose, onChange }) {
 
   return (
     <div className="modal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-box" role="dialog" aria-modal="true" aria-label="Добавить монету">
+      <div className="modal-box" role="dialog" aria-modal="true" aria-label={t('Добавить монету')}>
         <div className="modal-head">
-          <h2>Добавить монету</h2>
-          <span className="modal-sub">топ-500 по капитализации</span>
-          <button className="modal-close" onClick={onClose} aria-label="Закрыть">✕</button>
+          <h2>{t('Добавить монету')}</h2>
+          <span className="modal-sub">{t('топ-500 по капитализации')}</span>
+          <button className="modal-close" onClick={onClose} aria-label={t('Закрыть')}>✕</button>
         </div>
         <input
           type="search" autoFocus value={query} onChange={e => setQuery(e.target.value)}
-          placeholder="Тикер или название: B, BN, ETH…" autoComplete="off" autoCapitalize="none" spellCheck={false}
+          placeholder={t('Тикер или название: B, BN, ETH…')} autoComplete="off" autoCapitalize="none" spellCheck={false}
           className="modal-search"
         />
         <div className="modal-count">
-          {loading ? 'Загрузка списка…' : error ? '' : `${query.trim() ? 'Найдено' : 'Доступно'}: ${results.length}${results.length > MAX_SHOWN ? ` · показаны первые ${MAX_SHOWN}, уточните запрос` : ''}`}
+          {loading ? t('Загрузка списка…') : error ? '' : `${query.trim() ? t('Найдено') : t('Доступно')}: ${results.length}${results.length > MAX_SHOWN ? ' · ' + t('показаны первые {n}, уточните запрос', { n: MAX_SHOWN }) : ''}`}
         </div>
         <div className="modal-list">
           {error && <div className="modal-empty" style={{ color: 'var(--danger)' }}>{error}</div>}
-          {!loading && !error && results.length === 0 && <div className="modal-empty">Ничего не найдено.</div>}
+          {!loading && !error && results.length === 0 && <div className="modal-empty">{t('Ничего не найдено.')}</div>}
           {results.slice(0, MAX_SHOWN).map(it => {
             const added = tracked.includes(it.key);
             return (
@@ -110,7 +112,7 @@ export default function AddAssetModal({ onClose, onChange }) {
                   <span>{it.name}</span>
                 </div>
                 <div className="modal-rank">{it.rank ? `#${it.rank}` : ''}</div>
-                <button className={`modal-add${added ? ' done' : ''}`} onClick={() => add(it)} disabled={added}>{added ? '✓ Добавлено' : '+ Добавить'}</button>
+                <button className={`modal-add${added ? ' done' : ''}`} onClick={() => add(it)} disabled={added}>{added ? t('✓ Добавлено') : t('+ Добавить')}</button>
               </div>
             );
           })}

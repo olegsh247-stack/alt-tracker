@@ -1,10 +1,12 @@
 'use client';
+import { useT } from './LangProvider';
 import { useEffect, useState } from 'react';
 import NetworkBadge from './NetworkBadge';
 import { fmtFee, fmtPct } from '../lib/format';
 
 // График выбранного пула — официальный встраиваемый график GeckoTerminal (загружается в браузере, без ключей)
 export default function PoolChart({ pool }) {
+  const t = useT();
   const [light, setLight] = useState(false);
   useEffect(() => {
     const read = () => setLight(document.documentElement.getAttribute('data-theme') === 'light');
@@ -34,7 +36,7 @@ export default function PoolChart({ pool }) {
   }
 
   if (!pool) {
-    return <div className="pool-chart pool-chart-empty">Выберите пул в списке, чтобы увидеть график</div>;
+    return <div className="pool-chart pool-chart-empty">{t('Выберите пул в списке, чтобы увидеть график')}</div>;
   }
   const src = `https://www.geckoterminal.com/${pool.network}/pools/${pool.address}?embed=1&info=0&swaps=0&grayscale=0&light_chart=${light ? 1 : 0}&chart_type=price&resolution=4h`;
   const ch = pool.change24;
@@ -49,9 +51,9 @@ export default function PoolChart({ pool }) {
       {(baseAddr || quoteAddr) && (
         <div className="pool-chart-addrs">
           {[[baseAddr, pool.base, 'b'], [quoteAddr, pool.quote, 'q']].map(([a, sym, k]) => (
-            <button key={k} type="button" className={`pc-addr ${k}`} onClick={() => a && copy(a, k)} disabled={!a} title={a ? `${sym}: ${a} (нажмите, чтобы скопировать)` : ''}>
+            <button key={k} type="button" className={`pc-addr ${k}`} onClick={() => a && copy(a, k)} disabled={!a} title={a ? `${sym}: ${a} (${t('нажмите, чтобы скопировать')})` : ''}>
               <span className="pc-sym">{sym}</span>
-              <span className="pc-hex">{a ? (copied === k ? 'скопировано ✓' : short(a)) : '—'}</span>
+              <span className="pc-hex">{a ? (copied === k ? t('скопировано ✓') : short(a)) : '—'}</span>
             </button>
           ))}
         </div>

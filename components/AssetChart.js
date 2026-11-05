@@ -1,4 +1,5 @@
 'use client';
+import { useT } from './LangProvider';
 import { useEffect, useState } from 'react';
 import TvChart from './TvChart';
 
@@ -6,6 +7,7 @@ import TvChart from './TvChart';
 const memo = new Map(); // SYMBOL -> ответ сервера: повторный выбор монеты открывается мгновенно
 
 export default function AssetChart({ symbol, name }) {
+  const t = useT();
   const [res, setRes] = useState(null);
   const [light, setLight] = useState(false);
 
@@ -29,9 +31,9 @@ export default function AssetChart({ symbol, name }) {
     return () => { alive = false; };
   }, [symbol]);
 
-  if (!symbol) return <div className="pool-chart pool-chart-empty">Выберите монету в списке, чтобы увидеть график</div>;
-  if (!res) return <div className="pool-chart pool-chart-empty">Загрузка графика…</div>;
-  if (res.kind === 'stable') return <div className="pool-chart pool-chart-empty">{symbol} — стейблкоин, его цена держится у $1, график не показываем.</div>;
+  if (!symbol) return <div className="pool-chart pool-chart-empty">{t('Выберите монету в списке, чтобы увидеть график')}</div>;
+  if (!res) return <div className="pool-chart pool-chart-empty">{t('Загрузка графика…')}</div>;
+  if (res.kind === 'stable') return <div className="pool-chart pool-chart-empty">{t('{s} — стейблкоин, его цена держится у $1, график не показываем.', { s: symbol })}</div>;
   if (res.kind === 'tv') return (
     <div className="asset-chart">
       <TvChart key={res.symbol} symbols={[res.symbol]} />
@@ -43,11 +45,11 @@ export default function AssetChart({ symbol, name }) {
       <div className="pool-chart">
         <div className="pool-chart-head">
           <span className="pool-chart-name">{res.name}</span>
-          <span className="pool-chart-sub">{[res.chain, res.dex].filter(Boolean).join(' · ')} · главный DEX-пул</span>
+          <span className="pool-chart-sub">{[res.chain, res.dex].filter(Boolean).join(' · ')} · {t('главный DEX-пул')}</span>
         </div>
         <iframe key={`${src}`} title={res.name} src={src} className="pool-chart-frame" loading="lazy" />
       </div>
     );
   }
-  return <div className="pool-chart pool-chart-empty">Для {symbol} график не нашёлся: монета не торгуется на крупных биржах и DEX.</div>;
+  return <div className="pool-chart pool-chart-empty">{t('Для {s} график не нашёлся: монета не торгуется на крупных биржах и DEX.', { s: symbol })}</div>;
 }

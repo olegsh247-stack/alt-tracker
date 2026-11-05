@@ -1,4 +1,5 @@
 'use client';
+import { useT } from '../../components/LangProvider';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -6,6 +7,7 @@ import Flag from '../../components/Flag';
 import { CURRENCIES, DEFAULT_FOREX } from '../../lib/currencies';
 
 export default function AddCurrencyPage() {
+  const t = useT();
   const router = useRouter();
   const [tracked, setTracked] = useState([]);
   const [query, setQuery] = useState('');
@@ -44,29 +46,30 @@ export default function AddCurrencyPage() {
     <div style={{ maxWidth: 760, margin: '0 auto', padding: 16 }}>
       <div style={header}>
         <button onClick={() => router.push('/?tab=forex')} style={backBtn}>← Forex</button>
-        <h1 style={{ margin: 0, fontSize: 26 }}>Валюты</h1>
+        <h1 style={{ margin: 0, fontSize: 26 }}>{t('Валюты')}</h1>
       </div>
 
       <section style={section}>
-        <div style={sectionTitle}><h2 style={h2}>Мои валюты</h2><span style={count}>{mine.length}</span></div>
-        {mine.length === 0 ? <div style={empty}>Пока ничего не добавлено. Найдите валюту ниже.</div> : mine.map(c => <Row key={c.code} c={c} added onToggle={() => toggle(c.code)} />)}
+        <div style={sectionTitle}><h2 style={h2}>{t('Мои валюты')}</h2><span style={count}>{mine.length}</span></div>
+        {mine.length === 0 ? <div style={empty}>{t('Пока ничего не добавлено. Найдите валюту ниже.')}</div> : mine.map(c => <Row key={c.code} c={c} added onToggle={() => toggle(c.code)} />)}
       </section>
 
       <section style={section}>
-        <div style={sectionTitle}><h2 style={h2}>Добавить валюту</h2><span style={count}>{results.length}</span></div>
+        <div style={sectionTitle}><h2 style={h2}>{t('Добавить валюту')}</h2><span style={count}>{results.length}</span></div>
         <input
           type="search" value={query} onChange={e => setQuery(e.target.value)}
-          placeholder="Тикер или название: E, EUR, рубль…" autoComplete="off" autoCapitalize="none" spellCheck={false} style={input}
+          placeholder={t('Тикер или название: E, EUR, рубль…')} autoComplete="off" autoCapitalize="none" spellCheck={false} style={input}
         />
         <div style={{ height: 6 }} />
         {results.map(c => <Row key={c.code} c={c} onToggle={() => toggle(c.code)} />)}
-        {results.length === 0 && <div style={empty}>Ничего не найдено.</div>}
+        {results.length === 0 && <div style={empty}>{t('Ничего не найдено.')}</div>}
       </section>
     </div>
   );
 }
 
 function Row({ c, added, onToggle }) {
+  const t = useT();
   return (
     <div style={row}>
       <Flag cc={c.cc} width={30} />
@@ -74,7 +77,7 @@ function Row({ c, added, onToggle }) {
         <div style={{ fontWeight: 700 }}>{c.code}</div>
         <div style={{ color: 'var(--text-dim)', fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
       </div>
-      <button onClick={onToggle} style={added ? addedBtn : addBtn}>{added ? '✓ Добавлено' : '+ Добавить'}</button>
+      <button onClick={onToggle} style={added ? addedBtn : addBtn}>{added ? t('✓ Добавлено') : t('+ Добавить')}</button>
     </div>
   );
 }

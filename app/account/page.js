@@ -1,4 +1,5 @@
 'use client';
+import { useT } from '../../components/LangProvider';
 import { useEffect, useState } from 'react';
 
 const MSG = {
@@ -12,6 +13,7 @@ const MSG = {
 };
 
 export default function AccountPage() {
+  const t = useT();
   const [info, setInfo] = useState(null);
   const [note, setNote] = useState('');
   const [bad, setBad] = useState(false);
@@ -29,7 +31,7 @@ export default function AccountPage() {
     load();
     const sp = new URLSearchParams(window.location.search);
     const k = sp.get('ok') || sp.get('err');
-    if (k && MSG[k]) { setNote(MSG[k]); setBad(!!sp.get('err')); }
+    if (k && MSG[k]) { setNote(t(MSG[k])); setBad(!!sp.get('err')); }
   }, []);
 
   async function changePwd(e) {
@@ -39,47 +41,47 @@ export default function AccountPage() {
     const d = await r.json();
     setBusy(false);
     setBad(!r.ok);
-    setNote(r.ok ? 'Пароль изменён.' : d.error || 'Ошибка');
+    setNote(r.ok ? t('Пароль изменён.') : t(d.error) || t('Ошибка'));
     if (r.ok) setPwd('');
   }
   async function unlink() {
-    if (!confirm('Отвязать Google? Войти через него и восстановить доступ будет нельзя.')) return;
+    if (!confirm(t('Отвязать Google? Войти через него и восстановить доступ будет нельзя.'))) return;
     const r = await fetch('/api/account', { method: 'DELETE' });
-    setBad(!r.ok); setNote(r.ok ? 'Google отвязан.' : 'Не удалось отвязать.');
+    setBad(!r.ok); setNote(r.ok ? t('Google отвязан.') : t('Не удалось отвязать.'));
     load();
   }
 
   return (
     <div style={box}>
-      <a href="/" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>← Назад</a>
-      <h1 style={{ fontSize: 24, margin: '12px 0' }}>Аккаунт</h1>
+      <a href="/" style={{ color: 'var(--accent-text)', textDecoration: 'none' }}>{t('← Назад')}</a>
+      <h1 style={{ fontSize: 24, margin: '12px 0' }}>{t('Аккаунт')}</h1>
       {note && <p style={{ color: bad ? 'var(--danger)' : 'var(--up)', fontSize: 15 }}>{note}</p>}
-      {!info && loadErr && <p style={{ color: 'var(--danger)' }}>Не удалось загрузить данные аккаунта. Обновите страницу или попробуйте позже.</p>}
-      {!info && !loadErr ? <p style={{ color: 'var(--text-dim)' }}>Загрузка…</p> : !info ? null : (
+      {!info && loadErr && <p style={{ color: 'var(--danger)' }}>{t('Не удалось загрузить данные аккаунта. Обновите страницу или попробуйте позже.')}</p>}
+      {!info && !loadErr ? <p style={{ color: 'var(--text-dim)' }}>{t('Загрузка…')}</p> : !info ? null : (
         <>
           <div style={card}>
-            <div style={label}>Ваш логин</div>
+            <div style={label}>{t('Ваш логин')}</div>
             <div style={{ fontSize: 22, fontVariantNumeric: 'tabular-nums', letterSpacing: 1 }}>{info.login}</div>
           </div>
 
           {info.dbReady === false && (
             <div style={{ ...card, borderColor: 'var(--danger)' }}>
-              <div style={{ color: 'var(--danger)' }}>В базе данных пока нет полей под Google. Выполните SQL из файла sql/migration_4.sql в Supabase (SQL Editor), затем обновите страницу.</div>
+              <div style={{ color: 'var(--danger)' }}>{t('В базе данных пока нет полей под Google. Выполните SQL из файла sql/migration_4.sql в Supabase (SQL Editor), затем обновите страницу.')}</div>
             </div>
           )}
           <div style={card}>
-            <div style={label}>Google — вход и восстановление доступа</div>
+            <div style={label}>{t('Google — вход и восстановление доступа')}</div>
             {info.googleLinked ? (
               <>
-                <p style={{ margin: '6px 0 10px' }}>Привязан{info.googleEmail ? `: ${info.googleEmail}` : ''}</p>
-                <button onClick={unlink} style={btnGhost}>Отвязать</button>
+                <p style={{ margin: '6px 0 10px' }}>{t('Привязан')}{info.googleEmail ? `: ${info.googleEmail}` : ''}</p>
+                <button onClick={unlink} style={btnGhost}>{t('Отвязать')}</button>
               </>
             ) : (
               <>
                 <p style={{ margin: '6px 0 10px', color: 'var(--text-dim)', fontSize: 15 }}>
-                  Привяжите Google, чтобы входить одной кнопкой и вернуть доступ, если забудете пароль или номер.
+                  {t('Привяжите Google, чтобы входить одной кнопкой и вернуть доступ, если забудете пароль или номер.')}
                 </p>
-                <a href="/api/auth/google/start?mode=link" style={btn}>Привязать Google</a>
+                <a href="/api/auth/google/start?mode=link" style={btn}>{t('Привязать Google')}</a>
                 {info.redirectUri && (
                   <p style={{ color: 'var(--text-dim)', fontSize: 13, wordBreak: 'break-all', margin: '6px 0 0' }}>
                     Адрес возврата для Google (должен быть в списке «Разрешённые URI перенаправления» ровно такой): <b style={{ color: 'var(--text)' }}>{info.redirectUri}</b>
@@ -91,9 +93,9 @@ export default function AccountPage() {
           </div>
 
           <form onSubmit={changePwd} style={card}>
-            <div style={label}>Сменить пароль</div>
-            <input type="password" placeholder="Новый пароль (от 4 символов)" value={pwd} onChange={e => setPwd(e.target.value)} style={input} />
-            <button disabled={busy || pwd.length < 4} style={{ ...btn, opacity: busy || pwd.length < 4 ? 0.5 : 1 }}>Сохранить пароль</button>
+            <div style={label}>{t('Сменить пароль')}</div>
+            <input type="password" placeholder={t('Новый пароль (от 4 символов)')} value={pwd} onChange={e => setPwd(e.target.value)} style={input} />
+            <button disabled={busy || pwd.length < 4} style={{ ...btn, opacity: busy || pwd.length < 4 ? 0.5 : 1 }}>{t('Сохранить пароль')}</button>
           </form>
         </>
       )}

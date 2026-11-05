@@ -1,4 +1,5 @@
 'use client';
+import { useT } from './LangProvider';
 import { useEffect, useRef, useState } from 'react';
 
 function fmtPrice(p) {
@@ -9,6 +10,7 @@ function fmtPrice(p) {
 
 // placeholder: подсказка в поле; onPick(asset, exchange): вызывается при выборе строки
 export default function TickerPicker({ placeholder, onPick }) {
+  const t = useT();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -62,8 +64,8 @@ export default function TickerPicker({ placeholder, onPick }) {
       />
       {open && query.trim() && (
         <div style={dropdown}>
-          {loading && <div style={rowMsg}>Ищу…</div>}
-          {!loading && results.length === 0 && <div style={rowMsg}>Ничего не найдено</div>}
+          {loading && <div style={rowMsg}>{t('Ищу…')}</div>}
+          {!loading && results.length === 0 && <div style={rowMsg}>{t('Ничего не найдено')}</div>}
           {!loading && results.map((r, i) => {
             const up = r.changePct >= 0;
             return (

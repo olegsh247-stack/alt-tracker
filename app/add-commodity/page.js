@@ -1,9 +1,11 @@
 'use client';
+import { useT } from '../../components/LangProvider';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { COMMODITIES } from '../../lib/commodities';
 
 export default function AddCommodityPage() {
+  const t = useT();
   const [asset1, setAsset1] = useState(COMMODITIES[0].key);
   const [asset2, setAsset2] = useState(COMMODITIES[1].key);
   const [err, setErr] = useState('');
@@ -24,24 +26,24 @@ export default function AddCommodityPage() {
 
   return (
     <div style={{ maxWidth: 360, margin: '40px auto', padding: 24 }}>
-      <h1 style={{ fontSize: 24 }}>Добавить пару (Commodities)</h1>
+      <h1 style={{ fontSize: 24 }}>{t('Добавить пару (Commodities)')}</h1>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <div style={label}>Актив 1</div>
+          <div style={label}>{t('Актив 1')}</div>
           <select value={asset1} onChange={e => setAsset1(e.target.value)} style={input}>
             {COMMODITIES.map(c => <option key={c.key} value={c.key}>{c.short} - {c.enLabel}</option>)}
           </select>
         </div>
         <div>
-          <div style={label}>Актив 2</div>
+          <div style={label}>{t('Актив 2')}</div>
           <select value={asset2} onChange={e => setAsset2(e.target.value)} style={input}>
             {COMMODITIES.map(c => <option key={c.key} value={c.key}>{c.short} - {c.enLabel}</option>)}
           </select>
         </div>
-        {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
+        {err && <p style={{ color: 'var(--danger)' }}>{t(err)}</p>}
         <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" onClick={() => router.push('/?tab=commodities')} style={cancelBtn}>Отмена</button>
-          <button style={okBtn}>ОК</button>
+          <button type="button" onClick={() => router.push('/?tab=commodities')} style={cancelBtn}>{t('Отмена')}</button>
+          <button style={okBtn}>{t('ОК')}</button>
         </div>
       </form>
     </div>

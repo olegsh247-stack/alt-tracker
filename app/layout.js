@@ -1,4 +1,6 @@
 import './globals.css';
+import { cookies } from 'next/headers';
+import { LangProvider } from '../components/LangProvider';
 
 export const metadata = {
   title: 'Alt Tracker',
@@ -6,8 +8,10 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const c = cookies().get('lang')?.value;
+  const lang = c === 'ru' || c === 'es' || c === 'en' ? c : 'en';
   return (
-    <html lang="ru">
+    <html lang={lang}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -15,7 +19,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body>{children}</body>
+      <body><LangProvider initial={lang}>{children}</LangProvider></body>
     </html>
   );
 }

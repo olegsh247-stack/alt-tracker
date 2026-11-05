@@ -1,9 +1,11 @@
 'use client';
+import { useT } from '../../components/LangProvider';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TickerPicker from '../../components/TickerPicker';
 
 export default function AddPairPage() {
+  const t = useT();
   const [asset1, setAsset1] = useState('');
   const [exchange1, setExchange1] = useState('');
   const [asset2, setAsset2] = useState('');
@@ -15,7 +17,7 @@ export default function AddPairPage() {
     e.preventDefault();
     setErr('');
     if (!asset1 || !exchange1 || !asset2 || !exchange2) {
-      setErr('Выберите оба актива из списка');
+      setErr(t('Выберите оба актива из списка'));
       return;
     }
     const r = await fetch('/api/pairs', {
@@ -30,20 +32,20 @@ export default function AddPairPage() {
 
   return (
     <div style={{ maxWidth: 360, margin: '40px auto', padding: 24 }}>
-      <h1 style={{ fontSize: 24 }}>Добавить пару</h1>
+      <h1 style={{ fontSize: 24 }}>{t('Добавить пару')}</h1>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div>
-          <div style={label}>Актив 1{exchange1 && <span style={pickedNote}> · выбрано на {exchange1}</span>}</div>
-          <TickerPicker placeholder="Например EL" onPick={(a, ex) => { setAsset1(a); setExchange1(ex); }} />
+          <div style={label}>{t('Актив 1')}{exchange1 && <span style={pickedNote}> · {t('выбрано на')} {exchange1}</span>}</div>
+          <TickerPicker placeholder={t('Например EL')} onPick={(a, ex) => { setAsset1(a); setExchange1(ex); }} />
         </div>
         <div>
-          <div style={label}>Актив 2{exchange2 && <span style={pickedNote}> · выбрано на {exchange2}</span>}</div>
-          <TickerPicker placeholder="Например USDT" onPick={(a, ex) => { setAsset2(a); setExchange2(ex); }} />
+          <div style={label}>{t('Актив 2')}{exchange2 && <span style={pickedNote}> · {t('выбрано на')} {exchange2}</span>}</div>
+          <TickerPicker placeholder={t('Например USDT')} onPick={(a, ex) => { setAsset2(a); setExchange2(ex); }} />
         </div>
-        {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
+        {err && <p style={{ color: 'var(--danger)' }}>{t(err)}</p>}
         <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" onClick={() => router.push('/?tab=crypto')} style={cancelBtn}>Отмена</button>
-          <button style={okBtn}>ОК</button>
+          <button type="button" onClick={() => router.push('/?tab=crypto')} style={cancelBtn}>{t('Отмена')}</button>
+          <button style={okBtn}>{t('ОК')}</button>
         </div>
       </form>
     </div>

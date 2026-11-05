@@ -1,9 +1,11 @@
 'use client';
+import { useT } from '../../components/LangProvider';
 import { useState } from 'react';
 import Logo from '../../components/Logo';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const t = useT();
   const [password, setPassword] = useState('');
   const [login, setLogin] = useState(null);
   const [err, setErr] = useState('');
@@ -26,18 +28,18 @@ export default function RegisterPage() {
   return (
     <div style={box}>
       <div style={{ marginBottom: 14 }}><Logo size={56} /></div>
-      <h1 style={{ fontSize: 24 }}>Регистрация</h1>
+      <h1 style={{ fontSize: 24 }}>{t('Регистрация')}</h1>
       {login ? (
-        <p>Ваш логин: <b>{login}</b><br />Запомните его — переходим на главную...</p>
+        <p>{t('Ваш логин:')} <b>{login}</b><br />{t('Запомните его — переходим на главную...')}</p>
       ) : (
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <input
-            type="password" placeholder="Придумайте пароль" value={password}
+            type="password" placeholder={t('Придумайте пароль')} value={password}
             onChange={e => setPassword(e.target.value)} style={input}
           />
-          {err && <p style={{ color: 'var(--danger)' }}>{err}</p>}
-          <button style={btn}>Зарегистрироваться</button>
-          <a href="/login" style={{ color: 'var(--accent-text)', textAlign: 'center' }}>У меня уже есть логин</a>
+          {err && <p style={{ color: 'var(--danger)' }}>{t(err)}</p>}
+          <button style={btn}>{t('Зарегистрироваться')}</button>
+          <a href="/login" style={{ color: 'var(--accent-text)', textAlign: 'center' }}>{t('У меня уже есть логин')}</a>
         </form>
       )}
     </div>
