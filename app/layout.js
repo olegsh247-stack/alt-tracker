@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   const c = cookies().get('lang')?.value;
-  const lang = c === 'ru' || c === 'es' || c === 'en' ? c : 'en';
+  const lang = c === 'ru' ? 'ru' : 'en';
   return (
     <html lang={lang}>
       <head>
