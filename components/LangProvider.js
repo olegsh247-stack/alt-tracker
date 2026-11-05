@@ -3,8 +3,8 @@ import { createContext, useContext, useMemo, useState, useCallback } from 'react
 import { DICT } from '../lib/i18n';
 
 export const LANGS = [
-  { code: 'en', flag: '🇬🇧', name: 'Eng' },
-  { code: 'ru', flag: '🇷🇺', name: 'Ru' },
+  { code: 'en', cc: 'gb', name: 'Eng' },
+  { code: 'ru', cc: 'ru', name: 'Ru' },
 ];
 
 const Ctx = createContext({ lang: 'en', setLang: () => {}, t: (s) => s });
