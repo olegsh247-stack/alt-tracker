@@ -682,7 +682,7 @@ export default function HomePage() {
               <CoinIcon className="pair-icon" symbol={p.asset1} size={24} />
               <CoinIcon className="pair-icon" symbol={p.asset2} size={24} />
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}{!selectMode && <a href={`/pair/${p.id}`} className="open-pair" title={t('Открыть страницу пары')} aria-label={t('Открыть страницу пары')} onClick={(e) => e.stopPropagation()}>↗</a>}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{selectMode ? <>{p.asset1}/{p.asset2}</> : <a href={`/pair/${p.id}`} className="pair-link" title={t('Открыть страницу пары')} onClick={(e) => e.stopPropagation()}>{p.asset1}/{p.asset2}</a>}</div>
             {!selectMode && (
               <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title={t('Поменять местами')}>
                 {swappingId === p.id ? '…' : '⇄'}

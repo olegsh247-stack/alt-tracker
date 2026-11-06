@@ -734,12 +734,12 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 .tab-spot .ex-full { display: none; }
 .tab-spot .ex-info { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: none; background: none; color: var(--text-dim); font-size: 17px; padding: 0; cursor: pointer; }
 .tab-spot .ex-info:hover { color: var(--text); }
-.tab-spot .pair-row.pair-grid { grid-template-columns: 52px 134px 70px 70px minmax(26px, 1fr) 22px 72px 52px; column-gap: 4px !important; }
+.tab-spot .pair-row.pair-grid { grid-template-columns: 52px 120px 70px 70px 26px 22px 90px 56px; column-gap: 4px !important; justify-content: space-between; }
 .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px 134px 70px 70px minmax(26px, 1fr) 22px 72px 52px; }
 .tab-spot .pair-row .cell-name, .tab-spot .spot-head .sp-coin { padding-left: 6px; }
 .tab-spot .pair-row .cell-name .open-pair { margin-left: 4px; }
 .tab-spot .pair-row .cell-pct { font-size: 14px !important; }
-.tab-spot .pair-row .cell-ratio { font-size: 13px !important; }
+.tab-spot .pair-row .cell-ratio { font-size: 15px !important; }
 .tab-spot .ex-info { width: 22px; }
 .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; }
 .tab-spot .pair-row .cell-price { text-align: right !important; white-space: nowrap; }
@@ -776,12 +776,12 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 
 .tab-spot .spot-head .sp-p { text-align: right; font-size: 11px; line-height: 1.1; white-space: normal !important; }
 
-@media (min-width: 1300px) and (max-width: 1439px) {
-  .tab-spot .pair-row.pair-grid { grid-template-columns: 52px 118px 58px 58px minmax(26px, 1fr) 22px 60px 44px; column-gap: 3px !important; }
-  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px 118px 58px 58px minmax(26px, 1fr) 22px 60px 44px; }
+@media (min-width: 1300px) and (max-width: 1699px) {
+  .tab-spot .pair-row.pair-grid { grid-template-columns: 50px 106px 62px 62px 24px 20px 76px 46px; column-gap: 2px !important; }
+  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 50px 106px 62px 62px 24px 20px 76px 46px; }
   .tab-spot .pair-row .cell-name { font-size: 15px; }
   .tab-spot .pair-row .cell-price { font-size: 11px; }
-  .tab-spot .pair-row .cell-ratio { font-size: 12px !important; }
+  .tab-spot .pair-row .cell-ratio { font-size: 13px !important; }
   .tab-spot .pair-row .cell-pct { font-size: 13px !important; }
 }
 
@@ -789,3 +789,6 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 @media (min-width: 641px) {
   .tab-spot .pair-row .cell-price, .tab-spot .spot-head .sp-p { text-align: left !important; }
 }
+
+.tab-spot .pair-row .cell-name a.pair-link { color: inherit; text-decoration: none; }
+.tab-spot .pair-row .cell-name a.pair-link:hover { text-decoration: underline; }
