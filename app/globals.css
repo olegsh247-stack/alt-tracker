@@ -737,11 +737,11 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
   /* Spot на телефоне: пара в одну строку; вместо бирж — значок ⓘ, по тапу окно с источниками */
   .tab-spot .ex-full { display: none; }
   .tab-spot .ex-info { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: none; background: none; color: var(--text-dim); font-size: 17px; padding: 0; cursor: pointer; }
-  .tab-spot .pair-row.pair-grid { grid-template-columns: 28px minmax(max-content, 1fr) 22px 24px minmax(max-content, 0.9fr) 48px; column-gap: 4px !important; }
-  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 28px minmax(max-content, 1fr) 22px 24px minmax(max-content, 0.9fr) 48px; }
-  .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; overflow: visible !important; font-size: 15px !important; }
+  .tab-spot .pair-row.pair-grid { grid-template-columns: 28px minmax(0, 1fr) 24px 24px 82px 48px; column-gap: 4px !important; }
+  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 28px minmax(0, 1fr) 24px 24px 82px 48px; }
+  .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; overflow: hidden !important; text-overflow: ellipsis; font-size: 15px !important; }
   .tab-spot .pair-row .cell-exchange { padding: 0 !important; }
-  .tab-spot .pair-row .cell-ratio { font-size: 13px !important; font-weight: 600; }
+  .tab-spot .pair-row .cell-ratio { font-size: 13px !important; font-weight: 600; text-align: right !important; }
   .tab-spot .pair-row .cell-pct { font-size: 13px !important; }
   .tab-spot .pair-row .open-pair { margin-left: 3px; }
 }
