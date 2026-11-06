@@ -686,7 +686,7 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 /* Spot: колонки как в Assets — Coin, Price (отношение), 24h; цены активов 1 и 2 скрыты */
 .tab-spot .pair-row.pair-grid { grid-template-columns: 52px minmax(0, 1.3fr) 26px minmax(0, 1fr) minmax(0, 1.2fr) 64px; grid-template-areas: "icons name price1 price2 swap exchange ratio pct"; column-gap: 8px !important; row-gap: 0; }
 .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px minmax(0, 1.3fr) 26px minmax(0, 1fr) minmax(0, 1.2fr) 64px; grid-template-areas: "order icons name price1 price2 swap exchange ratio pct"; }
-.tab-spot .pair-row .cell-price { font-size: 14px; font-weight: 400; color: var(--text); opacity: 0.9; }
+.tab-spot .pair-row .cell-price { font-size: 12px; font-weight: 400; color: var(--text); opacity: 0.9; }
 .tab-spot .pair-row .cell-exchange { text-align: left !important; }
 .tab-spot .spot-head { font-size: 12px; color: var(--text-dim); padding: 4px 6px 6px; border-bottom: 1px solid var(--card-border); cursor: default; }
 .tab-spot .spot-head > span { white-space: nowrap; }
@@ -734,12 +734,16 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 .tab-spot .ex-full { display: none; }
 .tab-spot .ex-info { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: none; background: none; color: var(--text-dim); font-size: 17px; padding: 0; cursor: pointer; }
 .tab-spot .ex-info:hover { color: var(--text); }
-.tab-spot .pair-row.pair-grid { grid-template-columns: 52px minmax(0, 1fr) 86px 86px 28px 28px 80px 62px; column-gap: 6px !important; }
-.tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px minmax(0, 1fr) 86px 86px 28px 28px 80px 62px; }
-.tab-spot .pair-row .cell-name, .tab-spot .spot-head .sp-coin { padding-left: 0.5cm; }
+.tab-spot .pair-row.pair-grid { grid-template-columns: 52px minmax(84px, 1fr) minmax(70px, auto) minmax(70px, auto) 26px 22px minmax(64px, auto) 48px; column-gap: 4px !important; }
+.tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px minmax(84px, 1fr) minmax(70px, auto) minmax(70px, auto) 26px 22px minmax(64px, auto) 48px; }
+.tab-spot .pair-row .cell-name, .tab-spot .spot-head .sp-coin { padding-left: 6px; }
+.tab-spot .pair-row .cell-name .open-pair { margin-left: 4px; }
+.tab-spot .pair-row .cell-pct { font-size: 14px !important; }
+.tab-spot .pair-row .cell-ratio { font-size: 13px !important; }
+.tab-spot .ex-info { width: 22px; }
 .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; }
 .tab-spot .pair-row .cell-price { text-align: right !important; white-space: nowrap; }
-.tab-spot .pair-row .cell-ratio, .tab-spot .spot-head .sp-price { padding-right: 18px; }
+.tab-spot .pair-row .cell-ratio, .tab-spot .spot-head .sp-price { padding-right: 6px; }
 @media (max-width: 640px) {
   .tab-spot .pair-row .cell-name, .tab-spot .spot-head .sp-coin { padding-left: 0; }
   .tab-spot .pair-row .cell-ratio, .tab-spot .spot-head .sp-price { padding-right: 0; }
@@ -764,10 +768,19 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 
 /* Spot: три колонки — пары, два графика друг под другом, новости */
 @media (min-width: 1300px) {
-  .app-shell.tab-spot { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 1fr); }
+  .app-shell.tab-spot { grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr); }
   .tab-spot .side-panel { display: contents; }
   .tab-spot .side-chart, .tab-spot .side-news { position: sticky; top: 12px; height: calc(100vh - 88px); flex: none; min-width: 0; margin: 0; display: flex; flex-direction: column; }
   .tab-spot .tv-pair { grid-template-columns: minmax(0, 1fr); grid-auto-rows: minmax(0, 1fr); }
 }
 
 .tab-spot .spot-head .sp-p { text-align: right; font-size: 11px; line-height: 1.1; white-space: normal !important; }
+
+@media (min-width: 1300px) and (max-width: 1439px) {
+  .tab-spot .pair-row.pair-grid { grid-template-columns: 52px minmax(96px, 1fr) minmax(56px, auto) minmax(56px, auto) 26px 22px minmax(58px, auto) 44px; column-gap: 3px !important; }
+  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 52px minmax(96px, 1fr) minmax(56px, auto) minmax(56px, auto) 26px 22px minmax(58px, auto) 44px; }
+  .tab-spot .pair-row .cell-name { font-size: 15px; }
+  .tab-spot .pair-row .cell-price { font-size: 11px; }
+  .tab-spot .pair-row .cell-ratio { font-size: 12px !important; }
+  .tab-spot .pair-row .cell-pct { font-size: 13px !important; }
+}
