@@ -756,3 +756,11 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 .ex-line span { color: var(--text-dim); font-size: 14px; }
 .ex-modal .modal-box { max-height: none; }
 @media (max-width: 640px) { .ex-modal.modal-overlay { padding: 16px; align-items: center; } .ex-modal .modal-box { height: auto !important; border-radius: 14px; border: 1px solid var(--card-border); } }
+
+/* Spot: три колонки — пары, два графика друг под другом, новости */
+@media (min-width: 1300px) {
+  .app-shell.tab-spot { grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 1fr); }
+  .tab-spot .side-panel { display: contents; }
+  .tab-spot .side-chart, .tab-spot .side-news { position: sticky; top: 12px; height: calc(100vh - 88px); flex: none; min-width: 0; margin: 0; display: flex; flex-direction: column; }
+  .tab-spot .tv-pair { grid-template-columns: minmax(0, 1fr); grid-auto-rows: minmax(0, 1fr); }
+}
