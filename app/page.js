@@ -653,6 +653,8 @@ export default function HomePage() {
       {isCrypto && !loading && pairs.length > 0 && (
         <div className="pair-row pair-grid spot-head">
           <span className={`ar-sort sp-coin${sortDir?.startsWith('alpha') ? ' on' : ''}`} role="button" style={{ gridColumn: 'name-start / name-end' }} onClick={() => clickSpotSort('alpha')}>Coin{spotArrow('alpha')}</span>
+          <span className="sp-p" style={{ gridArea: 'price1' }}>{t('Цена 1')} USDT</span>
+          <span className="sp-p" style={{ gridArea: 'price2' }}>{t('Цена 2')} USDT</span>
           <span className="sp-price" style={{ gridArea: 'ratio', textAlign: 'right' }}>Price</span>
           <span className={`ar-sort${sortDir?.startsWith('pct') ? ' on' : ''}`} role="button" style={{ gridArea: 'pct', textAlign: 'right' }} onClick={() => clickSpotSort('pct')}>24h{spotArrow('pct')}</span>
         </div>
