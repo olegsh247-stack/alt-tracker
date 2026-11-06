@@ -689,8 +689,8 @@ export default function HomePage() {
               </button>
             )}
             <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}><span className="ex-full">{p.exchange1}/<wbr />{p.exchange2}</span><button type="button" className="ex-info" aria-label={t('Источники данных')} title={t('Источники данных')} onClick={(e) => { e.stopPropagation(); setExInfo(p); }}>ⓘ</button></div>
-            <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
-            <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
+            <div className="cell-price" style={cell}><PriceValue value={price?.price1} total={7} /></div>
+            <div className="cell-price second" style={cell}><PriceValue value={price?.price2} total={7} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>
             <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 16, color: pctColor }}>
               {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', dec)}%` : '—'}
