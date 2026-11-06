@@ -56,6 +56,7 @@ export default function HomePage() {
   const [assetDetails, setAssetDetails] = useState({});
   const [assetStats, setAssetStats] = useState({});
   const [addOpen, setAddOpen] = useState(false);
+  const [exInfo, setExInfo] = useState(null); // пара, для которой открыто окно «откуда данные»
   const [assetBase, setAssetBase] = useState('USDT');
   const [assetSort, setAssetSort] = useState({ key: 'cap', dir: 'desc' }); // по умолчанию — по капитализации
   const [chartAssetKey, setChartAssetKey] = useState(null);
@@ -507,6 +508,19 @@ export default function HomePage() {
           <button onClick={logout} className="hd-btn">{t('Выйти')}</button>
         </div>
       </header>
+    {exInfo && (
+      <div className="modal-overlay ex-modal" onMouseDown={(e) => { if (e.target === e.currentTarget) setExInfo(null); }}>
+        <div className="modal-box" role="dialog" aria-modal="true" style={{ maxWidth: 360, height: 'auto' }}>
+          <div className="modal-head">
+            <h2>{exInfo.asset1}/{exInfo.asset2}</h2>
+            <button className="modal-close" onClick={() => setExInfo(null)} aria-label={t('Закрыть')}>✕</button>
+          </div>
+          <div className="modal-sub" style={{ display: 'block', marginBottom: 10 }}>{t('Источники данных')}</div>
+          <div className="ex-line"><b>{exInfo.asset1}</b><span>{t('биржа')}: {exInfo.exchange1}</span></div>
+          <div className="ex-line"><b>{exInfo.asset2}</b><span>{t('биржа')}: {exInfo.exchange2}</span></div>
+        </div>
+      </div>
+    )}
     {addOpen && <AddAssetModal onClose={() => setAddOpen(false)} onChange={loadAssets} />}
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '0 16px 16px' }}>
       <div className="list-actions">
@@ -666,7 +680,7 @@ export default function HomePage() {
                 {swappingId === p.id ? '…' : '⇄'}
               </button>
             )}
-            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}><span className="ex-full">{p.exchange1}/<wbr />{p.exchange2}</span><span className="ex-short">{String(p.exchange1).slice(0, 3)}/{String(p.exchange2).slice(0, 3)}</span></div>
+            <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}><span className="ex-full">{p.exchange1}/<wbr />{p.exchange2}</span><button type="button" className="ex-info" aria-label={t('Источники данных')} title={t('Источники данных')} onClick={(e) => { e.stopPropagation(); setExInfo(p); }}>ⓘ</button></div>
             <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
             <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
             <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>

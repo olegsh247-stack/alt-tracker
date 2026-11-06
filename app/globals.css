@@ -731,22 +731,22 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 
 /* Assets: тикер чуть правее значка монеты */
 .asset-row .ar-coin, .asset-head .ar-tk { padding-left: 0.6cm; }
-.tab-spot .ex-short { display: none; }
+.tab-spot .ex-info { display: none; }
 @media (max-width: 640px) {
   .asset-row .ar-coin, .asset-head .ar-tk { padding-left: 0.4cm; }
-  /* Spot на телефоне: пара в одну строку, биржи сокращены до 3 букв */
+  /* Spot на телефоне: пара в одну строку; вместо бирж — значок ⓘ, по тапу окно с источниками */
   .tab-spot .ex-full { display: none; }
-  .tab-spot .ex-short { display: inline; }
-  .tab-spot .pair-row.pair-grid { grid-template-columns: 28px minmax(0, 1fr) 22px 50px 74px 46px; column-gap: 4px !important; }
-  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 28px minmax(0, 1fr) 22px 50px 74px 46px; }
-  .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; font-size: 15px !important; }
-  .tab-spot .pair-row .cell-exchange { font-size: 11px !important; white-space: nowrap !important; overflow-wrap: normal !important; }
-  .tab-spot .pair-row .cell-ratio { font-size: 11px !important; }
+  .tab-spot .ex-info { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: none; background: none; color: var(--text-dim); font-size: 17px; padding: 0; cursor: pointer; }
+  .tab-spot .pair-row.pair-grid { grid-template-columns: 28px minmax(max-content, 1fr) 22px 24px minmax(max-content, 0.9fr) 48px; column-gap: 4px !important; }
+  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 28px minmax(max-content, 1fr) 22px 24px minmax(max-content, 0.9fr) 48px; }
+  .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; overflow: visible !important; font-size: 15px !important; }
+  .tab-spot .pair-row .cell-exchange { padding: 0 !important; }
+  .tab-spot .pair-row .cell-ratio { font-size: 13px !important; font-weight: 600; }
   .tab-spot .pair-row .cell-pct { font-size: 13px !important; }
   .tab-spot .pair-row .open-pair { margin-left: 3px; }
 }
 
-@media (max-width: 640px) {
-  .tab-spot .pair-row.pair-grid { column-gap: 6px !important; }
-  .tab-spot .pair-row .cell-name { overflow: hidden; text-overflow: ellipsis; padding-right: 2px; }
-}
+.ex-line { display: flex; align-items: baseline; gap: 12px; padding: 9px 2px; border-bottom: 1px solid var(--card-border); }
+.ex-line span { color: var(--text-dim); font-size: 14px; }
+.ex-modal .modal-box { max-height: none; }
+@media (max-width: 640px) { .ex-modal.modal-overlay { padding: 16px; align-items: center; } .ex-modal .modal-box { height: auto !important; border-radius: 14px; border: 1px solid var(--card-border); } }
