@@ -652,8 +652,8 @@ export default function HomePage() {
       {isCrypto && !loading && pairs.length === 0 && <p style={{ opacity: 0.7 }}>{t('Пар пока нет — нажмите "+", чтобы добавить первую.')}</p>}
       {isCrypto && !loading && pairs.length > 0 && (
         <div className="pair-row pair-grid spot-head">
-          <span className={`ar-sort${sortDir?.startsWith('alpha') ? ' on' : ''}`} role="button" style={{ gridColumn: 'name-start / name-end' }} onClick={() => clickSpotSort('alpha')}>Coin{spotArrow('alpha')}</span>
-          <span style={{ gridArea: 'ratio', textAlign: 'right' }}>Price</span>
+          <span className={`ar-sort sp-coin${sortDir?.startsWith('alpha') ? ' on' : ''}`} role="button" style={{ gridColumn: 'name-start / name-end' }} onClick={() => clickSpotSort('alpha')}>Coin{spotArrow('alpha')}</span>
+          <span className="sp-price" style={{ gridArea: 'ratio', textAlign: 'right' }}>Price</span>
           <span className={`ar-sort${sortDir?.startsWith('pct') ? ' on' : ''}`} role="button" style={{ gridArea: 'pct', textAlign: 'right' }} onClick={() => clickSpotSort('pct')}>24h{spotArrow('pct')}</span>
         </div>
       )}
