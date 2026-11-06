@@ -2,6 +2,7 @@
 import { useT } from './LangProvider';
 import { useEffect, useMemo, useState } from 'react';
 import CoinIcon from './CoinIcon';
+import { saveSetting } from '../lib/settingsSync';
 
 const API = 'https://crypto-api.olegsh247.workers.dev';
 const MAX_SHOWN = 100;
@@ -61,8 +62,8 @@ export default function AddAssetModal({ onClose, onChange }) {
     setTracked(next);
     setMeta(nextMeta);
     try {
-      localStorage.setItem('cryptoTrackedAssets', JSON.stringify(next));
-      localStorage.setItem('cryptoTrackedMeta', JSON.stringify(nextMeta));
+      saveSetting('cryptoTrackedAssets', JSON.stringify(next));
+      saveSetting('cryptoTrackedMeta', JSON.stringify(nextMeta));
     } catch {}
     onChange && onChange();
   }

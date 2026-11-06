@@ -4,6 +4,7 @@ import { useT } from '../../components/LangProvider';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Flag from '../../components/Flag';
+import { saveSetting } from '../../lib/settingsSync';
 import { CURRENCIES, DEFAULT_FOREX } from '../../lib/currencies';
 
 export default function AddCurrencyPage() {
@@ -22,7 +23,7 @@ export default function AddCurrencyPage() {
   function toggle(code) {
     const next = tracked.includes(code) ? tracked.filter(c => c !== code) : [...tracked, code];
     setTracked(next);
-    try { localStorage.setItem('forexCodes', JSON.stringify(next)); } catch {}
+    saveSetting('forexCodes', JSON.stringify(next));
   }
 
   const results = useMemo(() => {

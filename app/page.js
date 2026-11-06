@@ -18,6 +18,7 @@ import TvCalendar from '../components/TvCalendar';
 import { CURRENCIES, currencyOf, currencyName, DEFAULT_FOREX, DEFAULT_BASE } from '../lib/currencies';
 import PoolChart from '../components/PoolChart';
 import AddAssetModal from '../components/AddAssetModal';
+import { saveSetting, pullSettings } from '../lib/settingsSync';
 
 export default function HomePage() {
   const t = useT();
@@ -74,7 +75,7 @@ export default function HomePage() {
   const [fxAmt, setFxAmt] = useState('1');
   const [fxFrom, setFxFrom] = useState(null);
   const [fxTo, setFxTo] = useState(null);
-  useEffect(() => {
+  function applyLocalSettings() {
     try {
       const c = localStorage.getItem('forexCodes');
       if (c) { const v = JSON.parse(c); if (Array.isArray(v)) setForexCodes(v); }
@@ -86,7 +87,12 @@ export default function HomePage() {
       const calc = JSON.parse(localStorage.getItem('fxCalc') || 'null');
       if (calc) { if (calc.amt) setFxAmt(String(calc.amt)); if (calc.from) setFxFrom(calc.from); if (calc.to) setFxTo(calc.to); }
     } catch {}
+  }
+  useEffect(() => {
+    applyLocalSettings();
     setForexLoaded(true);
+    // подтягиваем списки и основные валюты с сервера (общие для всех устройств)
+    pullSettings().then((changed) => { if (changed) { applyLocalSettings(); loadAssets(); } });
   }, []);
   const [assetSelectMode, setAssetSelectMode] = useState(false);
   const [assetSelected, setAssetSelected] = useState(new Set());
@@ -177,7 +183,7 @@ export default function HomePage() {
   function changeForexBase(code) {
     setForexBase(code);
     setForexRates({});
-    try { localStorage.setItem('forexBase', code); } catch {}
+    saveSetting('forexBase', code);
   }
   function pickFxChart(code) {
     setFxChartCode(code);
@@ -198,7 +204,7 @@ export default function HomePage() {
     if (!confirm(t('Удалить выбранные валюты ({n})?', { n: fxSelected.size }))) return;
     const next = forexCodes.filter(c => !fxSelected.has(c));
     setForexCodes(next);
-    try { localStorage.setItem('forexCodes', JSON.stringify(next)); } catch {}
+    saveSetting('forexCodes', JSON.stringify(next));
     setFxSelected(new Set());
     setFxSelectMode(false);
   }
@@ -248,7 +254,7 @@ export default function HomePage() {
     setAssetDeleting(true);
     const tracked = JSON.parse(localStorage.getItem('cryptoTrackedAssets') || '[]');
     const next = tracked.filter(id => !assetSelected.has(id));
-    localStorage.setItem('cryptoTrackedAssets', JSON.stringify(next));
+    saveSetting('cryptoTrackedAssets', JSON.stringify(next));
     setAssets(prev => prev.filter(a => !assetSelected.has(a.asset_id)));
     setAssetSelected(new Set());
     setAssetSelectMode(false);
@@ -450,7 +456,7 @@ export default function HomePage() {
       change24h: chg(st.change24h, baseStat.change24h), change30d: chg(st.change30d, baseStat.change30d), change1y: chg(st.change1y, baseStat.change1y),
     };
   };
-  function changeAssetBase(v) { setAssetBase(v); try { localStorage.setItem('assetBase', v); } catch {} }
+  function changeAssetBase(v) { setAssetBase(v); saveSetting('assetBase', v); }
   const ASSET_SORT_VAL = { ticker: a => String(a.symbol || ''), y1: a => statOf(a)?.change1y, m1: a => statOf(a)?.change30d, h24: a => statOf(a)?.change24h, cap: a => statOf(a)?.marketCap };
   function clickAssetSort(key) {
     setAssetSort(cur => !cur || cur.key !== key ? { key, dir: key === 'ticker' ? 'asc' : 'desc' } : cur.dir === (key === 'ticker' ? 'asc' : 'desc') ? { key, dir: key === 'ticker' ? 'desc' : 'asc' } : null);
