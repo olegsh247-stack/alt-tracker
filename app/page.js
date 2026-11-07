@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import LangSwitch from '../components/LangSwitch';
 import ThemeToggle from '../components/ThemeToggle';
 import PriceValue from '../components/PriceValue';
+import CrossTab from '../components/CrossTab';
 import { shortTickerFor, enLabelFor, tvSymbolFor } from '../lib/commodities';
 import PoolSearch from '../components/PoolSearch';
 import PoolTable from '../components/PoolTable';
@@ -37,6 +38,8 @@ export default function HomePage() {
     const normalized = raw === 'crypto' ? 'pair' : raw === 'dex' ? 'pool' : raw;
     setTab(normalized);
   }, []);
+
+  useEffect(() => { try { document.querySelector('.hd-tab.on')?.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch {} }, [tab]);
 
   function changeTab(next) {
     setTab(next);
@@ -410,6 +413,7 @@ export default function HomePage() {
   const isCommodities = tab === 'commodities';
   const isPool = tab === 'pool';
   const isForex = tab === 'forex';
+  const isCross = tab === 'cross';
   const isCrypto = isPair;
   const curSelectMode = isForex ? fxSelectMode : isPool ? poolSelectMode : isAssets ? assetSelectMode : (isCrypto ? selectMode : cSelectMode);
   const curSelected = isForex ? fxSelected : isPool ? poolSelected : isAssets ? assetSelected : (isCrypto ? selected : cSelected);
@@ -490,7 +494,7 @@ export default function HomePage() {
   const curConfirmDelete = isForex ? confirmDeleteForex : isPool ? confirmDeletePools : isAssets ? confirmDeleteAssets : (isCrypto ? confirmDeleteSelected : cConfirmDeleteSelected);
 
   return (
-    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}${isAssets ? ' tab-assets' : ''}${isForex ? ' tab-forex' : ''}`}>
+    <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}${isAssets ? ' tab-assets' : ''}${isForex ? ' tab-forex' : ''}${isCross ? ' tab-spot tab-cross' : ''}`}>
     <header className="app-header">
         <div className="hd-lt">
         <a href="/" className="hd-logo" title={t('На главную (Assets)')} aria-label={t('На главную')} onClick={(e) => { e.preventDefault(); changeTab('assets'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>
@@ -500,6 +504,7 @@ export default function HomePage() {
           <button onClick={() => changeTab('pool')} className={`hd-tab${tab === 'pool' ? ' on' : ''}`}>Pool</button>
           <button onClick={() => changeTab('commodities')} className={`hd-tab${tab === 'commodities' ? ' on' : ''}`}>Commodities</button>
           <button onClick={() => changeTab('forex')} className={`hd-tab${tab === 'forex' ? ' on' : ''}`}>Forex</button>
+          <button onClick={() => changeTab('cross')} className={`hd-tab${tab === 'cross' ? ' on' : ''}`}>Cross</button>
         </nav>
         </div>
         <div className="hd-right">
@@ -528,6 +533,7 @@ export default function HomePage() {
       </div>
     )}
     {addOpen && <AddAssetModal onClose={() => setAddOpen(false)} onChange={loadAssets} />}
+    {isCross ? <CrossTab /> : (<>
     <div className="page-wrap" style={{ maxWidth: 860, margin: '0 auto', padding: '0 16px 16px' }}>
       <div className="list-actions">
         {isAssets && (
@@ -851,6 +857,7 @@ export default function HomePage() {
         <section className="side-news"><div className="side-title">{t('Новости')}</div>{isCommodities ? <NewsFeed key="com" kind="com" /> : isPool ? <NewsFeed key="pool" kind="pool" /> : <NewsFeed key="crypto" />}</section>
       )}
     </aside>
+    </>)}
     </div>
   );
 }
