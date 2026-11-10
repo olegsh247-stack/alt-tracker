@@ -35,7 +35,7 @@ function SidePicker({ title, value, onChange }) {
         <div className="cp-grid">
           {CROSS_COMMODITIES.map(c => {
             const on = value && value.exchange === 'COM' && value.asset === c.key;
-            const name = lang === 'ru' ? c.label : c.enLabel;
+            const name = c.enLabel;
             return <button key={c.key} type="button" className={`cp-chip${on ? ' on' : ''}`} onClick={() => onChange({ asset: c.key, exchange: 'COM', label: name })}><span>{c.emoji}</span>{name}</button>;
           })}
         </div>

@@ -23,7 +23,7 @@ export function legInfo(asset, exchange, lang) {
   if (exchange === 'COM') {
     const c = COMMODITIES.find(x => x.key === asset);
     return {
-      text: c ? (lang === 'ru' ? c.label : c.enLabel) : asset,
+      text: c ? c.enLabel : asset,
       icon: <span className="cx-emoji pair-icon">{c?.emoji || '◆'}</span>,
       src: 'Yahoo Finance',
     };
