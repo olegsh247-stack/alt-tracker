@@ -191,8 +191,7 @@ export default function CrossTab() {
               {selectMode && <input type="checkbox" checked={isSel} onChange={() => toggleSelected(p.id)} onClick={(e) => e.stopPropagation()} className="cell-order" style={{ width: 18, height: 18 }} />}
               <div className="cell-icons" style={{ display: 'flex', gap: 4 }}>{l1.icon}{l2.icon}</div>
               <div className="cell-name" title={nm} style={{ minWidth: 90 }}>
-                {selectMode ? nm : <a href={`/cross-pair/${p.id}`} className="pair-link" title={t('Открыть страницу пары')} onClick={(e) => e.stopPropagation()}>{nm}</a>}
-              </div>
+                {nm}</div>
               {!selectMode && <button onClick={(e) => swap(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title={t('Поменять местами')}>{swappingId === p.id ? '…' : '⇄'}</button>}
               <div className="cell-exchange" style={{ opacity: 0.6, fontSize: 14, minWidth: 90, textTransform: 'lowercase' }}>
                 <span className="ex-full">{l1.src}/<wbr />{l2.src}</span>
