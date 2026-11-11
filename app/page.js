@@ -9,6 +9,7 @@ import { shortTickerFor, enLabelFor, tvSymbolFor } from '../lib/commodities';
 import PoolSearch from '../components/PoolSearch';
 import PoolTable from '../components/PoolTable';
 import TvChart from '../components/TvChart';
+import CrossChart from '../components/CrossChart';
 import NewsFeed from '../components/NewsFeed';
 import Logo from '../components/Logo';
 import CoinIcon from '../components/CoinIcon';
@@ -391,7 +392,7 @@ export default function HomePage() {
     });
     return out.length ? out : ['BINANCE:BTCUSDT', 'BINANCE:ETHUSDT'];
   }
-  const chartPair = pairs.find(p => String(p.id) === chartPairId) || null;
+  const chartPair = pairs.find(p => String(p.id) === chartPairId) || pairs[0] || null;
   const chartSymbols = chartSymbolsFor(chartPair);
 
   // график пула (вкладка Pool): выбранная строка, по умолчанию — первое избранное
@@ -688,7 +689,7 @@ export default function HomePage() {
               <CoinIcon className="pair-icon" symbol={p.asset1} size={24} />
               <CoinIcon className="pair-icon" symbol={p.asset2} size={24} />
             </div>
-            <div className="cell-name" style={{ minWidth: 90 }}>{selectMode ? <>{p.asset1}/{p.asset2}</> : <a href={`/pair/${p.id}`} className="pair-link" title={t('Открыть страницу пары')} onClick={(e) => e.stopPropagation()}>{p.asset1}/{p.asset2}</a>}</div>
+            <div className="cell-name" style={{ minWidth: 90 }}>{p.asset1}/{p.asset2}</div>
             {!selectMode && (
               <button onClick={(e) => swapPair(e, p.id)} disabled={swappingId === p.id} className="cell-swap" style={swapBtn} title={t('Поменять местами')}>
                 {swappingId === p.id ? '…' : '⇄'}
@@ -814,7 +815,10 @@ export default function HomePage() {
       })}
     </div>
     <aside className="side-panel">
-      {isCrypto && <section className="side-chart"><TvChart symbols={chartSymbols} /></section>}
+      {isCrypto && <section className="side-chart spot-chart">
+        <TvChart symbols={chartSymbols} />
+        <CrossChart endpoint="/api/klines" pairId={chartPair?.id} sig={chartPair ? `${chartPair.asset1}:${chartPair.exchange1}:${chartPair.asset2}:${chartPair.exchange2}` : ''} title={chartPair ? `${chartPair.asset1}/${chartPair.asset2}` : ''} sub={chartPair ? `${chartPair.exchange1} / ${chartPair.exchange2}` : ''} />
+      </section>}
       {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} name={chartAsset?.name} /></section>}
       {isAssets && (() => {
         const st = chartAsset ? assetStats[chartAsset.ext ? chartAsset.asset_id : String(chartAsset.symbol || '').toUpperCase()] : null;
