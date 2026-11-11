@@ -3,11 +3,12 @@ import { useT } from './LangProvider';
 import { useEffect, useRef, useState } from 'react';
 import { createChart } from 'lightweight-charts';
 
-const RANGES = [['1m', '1M'], ['1y', '1Y'], ['all', 'All']];
+const LABEL = { '4h': '4H', '1d': '1D', '1w': '1W', '1y': '1Y', all: 'All' };
+const DEFAULT_RANGES = ['1w', '1y', 'all'];
 const memo = new Map(); // pairId:range -> свечи (мгновенное повторное открытие)
 
 // Наш график пары Cross: линия (по умолчанию) или свечи, период 1M / 1Y / All.
-export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/api/cross-klines' }) {
+export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/api/cross-klines', ranges = DEFAULT_RANGES }) {
   const t = useT();
   const boxRef = useRef(null);
   const [range, setRange] = useState('1y');
@@ -17,7 +18,7 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
 
   useEffect(() => {
     try {
-      const r = localStorage.getItem('crossRange'); if (['1m', '1y', 'all'].includes(r)) setRange(r);
+      const r = localStorage.getItem(`crossRange:${endpoint}`); if (ranges.includes(r)) setRange(r);
       const m = localStorage.getItem('crossMode'); if (m === 'line' || m === 'candle') setMode(m);
     } catch {}
   }, []);
@@ -49,7 +50,7 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
       autoSize: true,
       layout: { background: { color: light ? '#ffffff' : '#060f11' }, textColor: light ? '#333' : '#ccc' },
       grid: { vertLines: { color: light ? '#eee' : '#102224' }, horzLines: { color: light ? '#eee' : '#102224' } },
-      timeScale: { timeVisible: range === '1m', borderVisible: false },
+      timeScale: { timeVisible: ['1w', '1d', '4h'].includes(range), borderVisible: false },
       rightPriceScale: { borderVisible: false },
       localization: { priceFormatter: (p) => (Math.abs(p) >= 100 ? p.toFixed(2) : Math.abs(p) >= 1 ? p.toFixed(4) : p.toPrecision(4)) },
     });
@@ -65,7 +66,7 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
     return () => chart.remove();
   }, [candles, mode, range]);
 
-  function pickRange(r) { setRange(r); try { localStorage.setItem('crossRange', r); } catch {} }
+  function pickRange(r) { setRange(r); try { localStorage.setItem(`crossRange:${endpoint}`, r); } catch {} }
   function pickMode(m) { setMode(m); try { localStorage.setItem('crossMode', m); } catch {} }
 
   return (
@@ -73,7 +74,7 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
       <div className="cc-head">
         <div className="cc-title"><b>{title || ''}</b>{sub && <span>{sub}</span>}</div>
         <div className="cc-ctrl">
-          {RANGES.map(([k, l]) => <button key={k} className={`cc-btn${range === k ? ' on' : ''}`} onClick={() => pickRange(k)}>{l}</button>)}
+          {ranges.map((k) => <button key={k} className={`cc-btn${range === k ? ' on' : ''}`} onClick={() => pickRange(k)}>{LABEL[k]}</button>)}
           <span className="cc-sep" />
           <button className={`cc-btn${mode === 'line' ? ' on' : ''}`} onClick={() => pickMode('line')} title={t('Линия')}>{t('Линия')}</button>
           <button className={`cc-btn${mode === 'candle' ? ' on' : ''}`} onClick={() => pickMode('candle')} title={t('Свечи')}>{t('Свечи')}</button>

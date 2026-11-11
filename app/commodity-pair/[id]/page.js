@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Chart from '../../../components/Chart';
 
-const RANGES = [{ key: 'all', label: 'All' }, { key: '1y', label: '1 год' }, { key: '1m', label: '1 месяц' }];
+const RANGES = [{ key: 'all', label: 'All' }, { key: '1y', label: '1 год' }, { key: '1w', label: '1 неделя' }];
 
 export default function CommodityPairChartPage() {
   const t = useT();

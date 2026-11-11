@@ -816,7 +816,7 @@ export default function HomePage() {
     </div>
     <aside className="side-panel">
       {isCrypto && <section className="side-chart spot-chart">
-        <CrossChart endpoint="/api/klines" pairId={chartPair?.id} sig={chartPair ? `${chartPair.asset1}:${chartPair.exchange1}:${chartPair.asset2}:${chartPair.exchange2}` : ''} title={chartPair ? `${chartPair.asset1}/${chartPair.asset2}` : ''} />
+        <CrossChart endpoint="/api/klines" ranges={['4h', '1d', '1w', '1y', 'all']} pairId={chartPair?.id} sig={chartPair ? `${chartPair.asset1}:${chartPair.exchange1}:${chartPair.asset2}:${chartPair.exchange2}` : ''} title={chartPair ? `${chartPair.asset1}/${chartPair.asset2}` : ''} />
       </section>}
       {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} name={chartAsset?.name} /></section>}
       {isAssets && (() => {

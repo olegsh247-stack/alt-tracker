@@ -10,7 +10,7 @@ export async function GET(req) {
   const userId = getUserId();
   if (!userId) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 });
   const sp = new URL(req.url).searchParams;
-  const range = ['all', '1y', '1m'].includes(sp.get('range')) ? sp.get('range') : '1y';
+  const range = ['all', '1y', '1m', '1w'].includes(sp.get('range')) ? sp.get('range') : '1y';
   const { data: p, error } = await supabase.from('pairs').select('*').eq('id', sp.get('pairId')).eq('user_id', userId).eq('category', 'cross').single();
   if (error || !p) return NextResponse.json({ error: 'Пара не найдена' }, { status: 404 });
   try {
