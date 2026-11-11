@@ -38,6 +38,7 @@ export default function HomePage() {
     const raw = fromUrl || 'pair'; // главная страница сайта — Spot; другая вкладка открывается только по ссылке ?tab=
     const normalized = raw === 'crypto' ? 'pair' : raw === 'dex' ? 'pool' : raw;
     setTab(normalized);
+    if (fromUrl) { try { window.history.replaceState(null, '', '/'); } catch {} } // ссылка ?tab= срабатывает один раз, обновление страницы открывает Spot
   }, []);
 
   useEffect(() => { try { document.querySelector('.hd-tab.on')?.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch {} }, [tab]);
