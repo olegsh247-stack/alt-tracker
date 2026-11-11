@@ -7,7 +7,7 @@ const RANGES = [['1m', '1M'], ['1y', '1Y'], ['all', 'All']];
 const memo = new Map(); // pairId:range -> свечи (мгновенное повторное открытие)
 
 // Наш график пары Cross: линия (по умолчанию) или свечи, период 1M / 1Y / All.
-export default function CrossChart({ pairId, title, sub }) {
+export default function CrossChart({ pairId, sig = '', title, sub }) {
   const t = useT();
   const boxRef = useRef(null);
   const [range, setRange] = useState('1y');
@@ -24,7 +24,7 @@ export default function CrossChart({ pairId, title, sub }) {
 
   useEffect(() => {
     if (!pairId) { setCandles(null); return; }
-    const key = `${pairId}:${range}`;
+    const key = `${pairId}:${sig}:${range}`;
     let alive = true;
     setErr('');
     if (memo.has(key)) setCandles(memo.get(key)); else setCandles(null);
@@ -38,7 +38,7 @@ export default function CrossChart({ pairId, title, sub }) {
       })
       .catch(() => { if (alive) setErr('Не удалось получить историю цен'); });
     return () => { alive = false; };
-  }, [pairId, range]);
+  }, [pairId, sig, range]);
 
   useEffect(() => {
     const el = boxRef.current;
