@@ -11,14 +11,13 @@ const memo = new Map(); // pairId:range -> свечи (мгновенное по
 export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/api/cross-klines', ranges = DEFAULT_RANGES }) {
   const t = useT();
   const boxRef = useRef(null);
-  const [range, setRange] = useState('1y');
+  const [range, setRange] = useState(ranges[0]);
   const [mode, setMode] = useState('line');
   const [candles, setCandles] = useState(null);
   const [err, setErr] = useState('');
 
   useEffect(() => {
     try {
-      const r = localStorage.getItem(`crossRange:${endpoint}`); if (ranges.includes(r)) setRange(r);
       const m = localStorage.getItem('crossMode'); if (m === 'line' || m === 'candle') setMode(m);
     } catch {}
   }, []);
@@ -50,7 +49,9 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
       autoSize: true,
       layout: { background: { color: light ? '#ffffff' : '#060f11' }, textColor: light ? '#333' : '#ccc' },
       grid: { vertLines: { color: light ? '#eee' : '#102224' }, horzLines: { color: light ? '#eee' : '#102224' } },
-      timeScale: { timeVisible: ['1w', '1d', '4h'].includes(range), borderVisible: false },
+      timeScale: { timeVisible: ['1w', '1d', '4h'].includes(range), borderVisible: false, rightOffset: 0, fixRightEdge: true, fixLeftEdge: true, rightBarStaysOnScroll: true },
+      handleScroll: { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
+      handleScale: { mouseWheel: true, pinch: true, axisPressedMouseMove: true },
       rightPriceScale: { borderVisible: false },
       localization: { priceFormatter: (p) => (Math.abs(p) >= 100 ? p.toFixed(2) : Math.abs(p) >= 1 ? p.toFixed(4) : p.toPrecision(4)) },
     });
@@ -66,7 +67,7 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
     return () => chart.remove();
   }, [candles, mode, range]);
 
-  function pickRange(r) { setRange(r); try { localStorage.setItem(`crossRange:${endpoint}`, r); } catch {} }
+  function pickRange(r) { setRange(r); }
   function pickMode(m) { setMode(m); try { localStorage.setItem('crossMode', m); } catch {} }
 
   return (
