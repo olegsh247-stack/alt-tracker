@@ -28,14 +28,14 @@ export default function HomePage() {
   const dec = lang === 'en' ? '.' : ',';
   const [login, setLogin] = useState('');
   const [googleLinked, setGoogleLinked] = useState(null);
-  const [tab, setTab] = useState('assets');
+  const [tab, setTab] = useState('pair');
   const [loading, setLoading] = useState(true);
 
   // При первой загрузке — вкладка из ссылки (?tab=...), иначе последняя использованная, иначе Crypto
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get('tab');
-    const raw = fromUrl || 'assets'; // главная страница сайта — Assets; другая вкладка открывается только по ссылке ?tab=
+    const raw = fromUrl || 'pair'; // главная страница сайта — Spot; другая вкладка открывается только по ссылке ?tab=
     const normalized = raw === 'crypto' ? 'pair' : raw === 'dex' ? 'pool' : raw;
     setTab(normalized);
   }, []);
@@ -498,7 +498,7 @@ export default function HomePage() {
     <div className={`app-shell${isCrypto ? ' tab-spot' : ''}${isPool ? ' tab-pool' : ''}${isAssets ? ' tab-assets' : ''}${isForex ? ' tab-forex' : ''}${isCross ? ' tab-spot tab-cross' : ''}`}>
     <header className="app-header">
         <div className="hd-lt">
-        <a href="/" className="hd-logo" title={t('На главную (Assets)')} aria-label={t('На главную')} onClick={(e) => { e.preventDefault(); changeTab('assets'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>
+        <a href="/" className="hd-logo" title={t('На главную')} aria-label={t('На главную')} onClick={(e) => { e.preventDefault(); changeTab('pair'); try { window.history.replaceState(null, '', '/'); } catch {} window.scrollTo({ top: 0 }); }}><Logo size={30} /></a>
         <nav className="hd-tabs" aria-label={t('Разделы')}>
           <button onClick={() => changeTab('assets')} className={`hd-tab${tab === 'assets' ? ' on' : ''}`}>Assets</button>
           <button onClick={() => changeTab('pair')} className={`hd-tab${tab === 'pair' ? ' on' : ''}`}>Spot</button>
@@ -816,8 +816,7 @@ export default function HomePage() {
     </div>
     <aside className="side-panel">
       {isCrypto && <section className="side-chart spot-chart">
-        <TvChart symbols={chartSymbols} />
-        <CrossChart endpoint="/api/klines" pairId={chartPair?.id} sig={chartPair ? `${chartPair.asset1}:${chartPair.exchange1}:${chartPair.asset2}:${chartPair.exchange2}` : ''} title={chartPair ? `${chartPair.asset1}/${chartPair.asset2}` : ''} sub={chartPair ? `${chartPair.exchange1} / ${chartPair.exchange2}` : ''} />
+        <CrossChart endpoint="/api/klines" pairId={chartPair?.id} sig={chartPair ? `${chartPair.asset1}:${chartPair.exchange1}:${chartPair.asset2}:${chartPair.exchange2}` : ''} title={chartPair ? `${chartPair.asset1}/${chartPair.asset2}` : ''} />
       </section>}
       {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} name={chartAsset?.name} /></section>}
       {isAssets && (() => {
