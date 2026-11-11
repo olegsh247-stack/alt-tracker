@@ -49,7 +49,7 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
       autoSize: true,
       layout: { background: { color: light ? '#ffffff' : '#060f11' }, textColor: light ? '#333' : '#ccc' },
       grid: { vertLines: { color: light ? '#eee' : '#102224' }, horzLines: { color: light ? '#eee' : '#102224' } },
-      timeScale: { timeVisible: ['1w', '1d', '4h'].includes(range), borderVisible: false, rightOffset: 0, fixRightEdge: true, fixLeftEdge: true, rightBarStaysOnScroll: true },
+      timeScale: { timeVisible: ['1w', '1d', '4h'].includes(range), borderVisible: false, rightOffset: 0, rightBarStaysOnScroll: true },
       handleScroll: { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
       handleScale: { mouseWheel: true, pinch: true, axisPressedMouseMove: true },
       rightPriceScale: { borderVisible: false },
