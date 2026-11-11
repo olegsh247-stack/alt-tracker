@@ -846,3 +846,8 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 }
 .spot-chart .cc-body { min-height: 120px; }
 @media (max-width: 1299px) { .spot-chart .cc-body { min-height: 300px; } }
+@media (min-width: 1300px) {
+  .tab-spot .spot-chart > .tv-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 12px; flex: 1 1 0; }
+  .spot-chart > .cross-chart { flex: 1.3 1 0; }
+}
+@media (min-width: 1300px) { .tab-spot .spot-chart > .tv-pair:has(.tv-box:only-child) { grid-template-columns: minmax(0, 1fr); } }
