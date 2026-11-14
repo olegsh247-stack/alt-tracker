@@ -852,8 +852,8 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 }
 @media (min-width: 1300px) { .tab-spot .spot-chart > .tv-pair:has(.tv-box:only-child) { grid-template-columns: minmax(0, 1fr); } }
 
-.cc-title .cc-price { color: var(--text); font-weight: 700; font-size: 24px; }
-.cc-title .cc-pct { font-weight: 700; font-size: 22px; }
+.cc-title .cc-price { color: var(--text); font-weight: 700; font-size: 20px; margin-left: 10px; }
+.cc-title .cc-pct { font-weight: 700; font-size: 18px; }
 .cc-title .cc-sub { flex-basis: 100%; }
 
 /* Чуть шире интервал между цифрами в таблицах */
