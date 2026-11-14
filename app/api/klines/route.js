@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../lib/supabaseClient';
 import { getUserId } from '../../../lib/getUser';
-import { getKlines, buildRatioCandles } from '../../../lib/exchanges';
+import { getKlinesTF, buildRatioCandles } from '../../../lib/exchanges';
 
 export async function GET(req) {
   const userId = getUserId();
@@ -9,7 +9,8 @@ export async function GET(req) {
 
   const { searchParams } = new URL(req.url);
   const pairId = searchParams.get('pairId');
-  const range = searchParams.get('range') || 'all'; // all | 1y | 1m
+  const tfIn = searchParams.get('range');
+  const range = ['4h', '1d', '1w', '1mo'].includes(tfIn) ? tfIn : '4h'; // таймфрейм свечи
 
   const { data: pair, error } = await supabase
     .from('pairs')
@@ -23,8 +24,8 @@ export async function GET(req) {
 
   try {
     const [series1, series2] = await Promise.all([
-      getKlines(pair.exchange1, pair.asset1, range),
-      getKlines(pair.exchange2, pair.asset2, range),
+      getKlinesTF(pair.exchange1, pair.asset1, range),
+      getKlinesTF(pair.exchange2, pair.asset2, range),
     ]);
     const candles = buildRatioCandles(series1, series2);
     return NextResponse.json({ candles });

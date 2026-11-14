@@ -3,15 +3,15 @@ import { useT } from './LangProvider';
 import { useEffect, useRef, useState } from 'react';
 import { createChart } from 'lightweight-charts';
 
-const LABEL = { '4h': '4H', '1d': '1D', '1w': '1W', '1y': '1Y', all: 'All' };
-const DEFAULT_RANGES = ['1w', '1y', 'all'];
+const LABEL = { '4h': '4H', '1d': '1D', '1w': '1W', '1mo': '1M' };
+const DEFAULT_RANGES = ['1d', '1w', '1mo'];
 const memo = new Map(); // pairId:range -> свечи (мгновенное повторное открытие)
 
-// Наш график пары Cross: линия (по умолчанию) или свечи, период 1M / 1Y / All.
-export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/api/cross-klines', ranges = DEFAULT_RANGES }) {
+// Наш график пары: линия (по умолчанию) или свечи. Кнопки — таймфрейм свечи (4H / 1D / 1W / 1M).
+export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/api/cross-klines', ranges = DEFAULT_RANGES, defaultRange, priceNode, pct, pctText }) {
   const t = useT();
   const boxRef = useRef(null);
-  const [range, setRange] = useState(ranges[0]);
+  const [range, setRange] = useState(defaultRange || ranges[0]);
   const [mode, setMode] = useState('line');
   const [candles, setCandles] = useState(null);
   const [err, setErr] = useState('');
@@ -49,7 +49,7 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
       autoSize: true,
       layout: { background: { color: light ? '#ffffff' : '#060f11' }, textColor: light ? '#333' : '#ccc' },
       grid: { vertLines: { color: light ? '#eee' : '#102224' }, horzLines: { color: light ? '#eee' : '#102224' } },
-      timeScale: { timeVisible: ['1w', '1d', '4h'].includes(range), borderVisible: false, rightOffset: 0, rightBarStaysOnScroll: true },
+      timeScale: { timeVisible: range === '4h', borderVisible: false, rightOffset: 0, rightBarStaysOnScroll: true },
       handleScroll: { mouseWheel: false, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
       handleScale: { mouseWheel: true, pinch: true, axisPressedMouseMove: true },
       rightPriceScale: { borderVisible: false },
@@ -73,7 +73,10 @@ export default function CrossChart({ pairId, sig = '', title, sub, endpoint = '/
   return (
     <div className="cross-chart">
       <div className="cc-head">
-        <div className="cc-title"><b>{title || ''}</b>{sub && <span>{sub}</span>}</div>
+        <div className="cc-title"><b>{title || ''}</b>
+          {pairId && priceNode != null && <span className="cc-price">{priceNode}</span>}
+          {pairId && <span className="cc-pct" style={{ color: pct == null ? 'var(--text-dim)' : pct >= 0 ? 'var(--up)' : 'var(--down)' }}>{pctText || '—'}</span>}
+          {sub && <span className="cc-sub">{sub}</span>}</div>
         <div className="cc-ctrl">
           {ranges.map((k) => <button key={k} className={`cc-btn${range === k ? ' on' : ''}`} onClick={() => pickRange(k)}>{LABEL[k]}</button>)}
           <span className="cc-sep" />

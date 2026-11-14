@@ -817,7 +817,7 @@ export default function HomePage() {
     </div>
     <aside className="side-panel">
       {isCrypto && <section className="side-chart spot-chart">
-        <CrossChart endpoint="/api/klines" ranges={['4h', '1d', '1w', '1y', 'all']} pairId={chartPair?.id} sig={chartPair ? `${chartPair.asset1}:${chartPair.exchange1}:${chartPair.asset2}:${chartPair.exchange2}` : ''} title={chartPair ? `${chartPair.asset1}/${chartPair.asset2}` : ''} />
+        <CrossChart endpoint="/api/klines" ranges={['4h', '1d', '1w', '1mo']} defaultRange="4h" priceNode={chartPair && prices[chartPair.id]?.ratio ? prices[chartPair.id].ratio.toFixed(8) : '—'} pct={sparks[chartPair?.id]?.changePct} pctText={sparks[chartPair?.id]?.changePct != null ? `${sparks[chartPair.id].changePct >= 0 ? '+' : ''}${sparks[chartPair.id].changePct.toFixed(1).replace('.', dec)}%` : null} pairId={chartPair?.id} sig={chartPair ? `${chartPair.asset1}:${chartPair.exchange1}:${chartPair.asset2}:${chartPair.exchange2}` : ''} title={chartPair ? `${chartPair.asset1}/${chartPair.asset2}` : ''} />
       </section>}
       {isAssets && <section className="side-chart"><AssetChart symbol={chartAsset?.symbol} name={chartAsset?.name} /></section>}
       {isAssets && (() => {

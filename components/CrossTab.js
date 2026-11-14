@@ -209,7 +209,7 @@ export default function CrossTab() {
       </div>
       <aside className="side-panel">
         <section className="side-chart">
-          <CrossChart pairId={active?.id} sig={active ? `${active.asset1}:${active.exchange1}:${active.asset2}:${active.exchange2}` : ''} title={active ? nameOf(active) : ''} sub={active ? `${legInfo(active.asset1, active.exchange1, lang).src} / ${legInfo(active.asset2, active.exchange2, lang).src}` : ''} />
+          <CrossChart ranges={['1d', '1w', '1mo']} defaultRange="1w" priceNode={active ? <PriceValue value={prices[active.id]?.ratio} total={9} /> : null} pct={prices[active?.id]?.changePct} pctText={prices[active?.id]?.changePct != null ? `${prices[active.id].changePct >= 0 ? '+' : ''}${prices[active.id].changePct.toFixed(1).replace('.', dec)}%` : null} pairId={active?.id} sig={active ? `${active.asset1}:${active.exchange1}:${active.asset2}:${active.exchange2}` : ''} title={active ? nameOf(active) : ''} sub={active ? `${legInfo(active.asset1, active.exchange1, lang).src} / ${legInfo(active.asset2, active.exchange2, lang).src}` : ''} />
         </section>
         <section className="side-news"><div className="side-title">{t('Новости')}</div><NewsFeed key="crypto" /></section>
       </aside>

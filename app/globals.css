@@ -851,3 +851,7 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
   .spot-chart > .cross-chart { flex: 1.3 1 0; }
 }
 @media (min-width: 1300px) { .tab-spot .spot-chart > .tv-pair:has(.tv-box:only-child) { grid-template-columns: minmax(0, 1fr); } }
+
+.cc-title .cc-price { color: var(--text); font-weight: 600; font-size: 17px; }
+.cc-title .cc-pct { font-weight: 600; font-size: 15px; }
+.cc-title .cc-sub { flex-basis: 100%; }
