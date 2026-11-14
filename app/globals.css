@@ -752,11 +752,11 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
   .tab-spot .pair-row.pair-grid.sort-active { grid-template-areas: "order icons name swap exchange ratio pct"; }
   .asset-row .ar-coin, .asset-head .ar-tk { padding-left: 0.4cm; }
   /* Spot на телефоне: пара в одну строку; вместо бирж — значок ⓘ, по тапу окно с источниками */
-  .tab-spot .pair-row.pair-grid { grid-template-columns: 28px minmax(0, 1fr) 24px 24px 82px 48px; column-gap: 4px !important; }
-  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 28px minmax(0, 1fr) 24px 24px 82px 48px; }
-  .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; overflow: hidden !important; text-overflow: ellipsis; font-size: 15px !important; }
+  .tab-spot .pair-row.pair-grid { grid-template-columns: 28px minmax(0, 1fr) 24px 24px 98px 48px; column-gap: 4px !important; }
+  .tab-spot .pair-row.pair-grid.sort-active { grid-template-columns: 22px 28px minmax(0, 1fr) 24px 24px 98px 48px; }
+  .tab-spot .pair-row .cell-name { white-space: nowrap !important; overflow-wrap: normal !important; overflow: hidden !important; text-overflow: ellipsis; font-size: 13px !important; }
   .tab-spot .pair-row .cell-exchange { padding: 0 !important; }
-  .tab-spot .pair-row .cell-ratio { font-size: 13px !important; font-weight: 600; text-align: right !important; }
+  .tab-spot .pair-row .cell-ratio { font-size: 15px !important; font-weight: 600; text-align: right !important; }
   .tab-spot .pair-row .cell-pct { font-size: 13px !important; }
   .tab-spot .pair-row .open-pair { margin-left: 3px; }
 }
