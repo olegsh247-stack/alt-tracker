@@ -488,6 +488,13 @@ export default function HomePage() {
     try { next ? localStorage.setItem('pairSortDir', next) : localStorage.removeItem('pairSortDir'); } catch {}
   }
   const spotArrow = (kind) => (sortDir && sortDir.startsWith(kind) ? (sortDir.endsWith('asc') ? ' ↑' : ' ↓') : '');
+  function clickCSort(kind) {
+    const first = kind === 'alpha' ? 'alpha_asc' : 'pct_desc', second = kind === 'alpha' ? 'alpha_desc' : 'pct_asc';
+    const next = cSortDir === first ? second : cSortDir === second ? null : first;
+    setCSortDir(next);
+    try { localStorage.setItem('commoditySortDir', next || 'off'); } catch {}
+  }
+  const cArrow = (kind) => (cSortDir && cSortDir.startsWith(kind) ? (cSortDir.endsWith('asc') ? ' ↑' : ' ↓') : '');
   const cChartPair = cPairs.find(p => String(p.id) === cChartPairId) || null;
   const cChartSymbols = cChartSymbolsFor(cChartPair);
   const chartAsset = assets.find(a => a.asset_id === chartAssetKey) || assets[0] || null;
@@ -776,6 +783,13 @@ export default function HomePage() {
       })()}
 
       {isCommodities && !loading && cPairs.length === 0 && <p style={{ opacity: 0.7 }}>{t('Пар пока нет — нажмите "+", чтобы добавить первую.')}</p>}
+      {isCommodities && !loading && cPairs.length > 0 && (
+        <div className={`pair-row pair-grid comm-grid comm-head${cSelectMode ? ' sort-active' : ''}`}>
+          <span className={`ar-sort${cSortDir?.startsWith('alpha') ? ' on' : ''}`} role="button" style={{ gridArea: 'name' }} onClick={() => clickCSort('alpha')}>Coin{cArrow('alpha')}</span>
+          <span className="ch-price" style={{ gridArea: 'ratio', textAlign: 'right' }}>Price</span>
+          <span className={`ar-sort${cSortDir?.startsWith('pct') ? ' on' : ''}`} role="button" style={{ gridArea: 'pct', textAlign: 'right' }} onClick={() => clickCSort('pct')}>24h{cArrow('pct')}</span>
+        </div>
+      )}
       {isCommodities && displayCPairs.map((p) => {
         const price = cPrices[p.id];
         const spark = cSparks[p.id];
@@ -805,9 +819,7 @@ export default function HomePage() {
                 {cSwappingId === p.id ? '…' : '⇄'}
               </button>
             )}
-            <div className="cell-price" style={cell}><PriceValue value={price?.price1} /></div>
-            <div className="cell-price second" style={cell}><PriceValue value={price?.price2} /></div>
-            <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}>{price?.ratio ? price.ratio.toFixed(8) : '—'}</div>
+            <div className="cell-ratio" style={{ ...cell, fontWeight: 600 }}><PriceValue value={price?.ratio} total={9} /></div>
             <div className="cell-pct" style={{ minWidth: 56, textAlign: 'right', fontWeight: 600, fontSize: 16, color: pctColor }}>
               {pct != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(1).replace('.', dec)}%` : '—'}
             </div>

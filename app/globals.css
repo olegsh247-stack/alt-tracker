@@ -507,25 +507,35 @@ input, select, textarea, button { font-family: inherit; font-size: 16px; }
 .tv-calendar { height: 100%; width: 100%; }
 @media (min-width: 1300px) { .cal-box { flex: 1; height: auto; min-height: 0; } }
 
-/* Commodities: шире название пары, кнопка «поменять местами» — справа */
+/* Commodities: как Spot — Coin, Price (отношение), 24h; цены активов 1 и 2 скрыты */
 .pair-row.pair-grid.comm-grid {
-  grid-template-columns: 80px minmax(0, 2.6fr) minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.4fr) 62px 30px;
-  grid-template-areas: "icons name price1 price2 ratio pct swap";
+  grid-template-columns: 70px minmax(0, 1fr) 30px 130px 62px; column-gap: 8px !important;
+  grid-template-areas: "icons name swap ratio pct";
 }
 .pair-row.pair-grid.comm-grid.sort-active {
-  grid-template-columns: 24px 80px minmax(0, 2.6fr) minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.4fr) 62px 30px;
-  grid-template-areas: "order icons name price1 price2 ratio pct swap";
+  grid-template-columns: 24px 70px minmax(0, 1fr) 30px 130px 62px;
+  grid-template-areas: "order icons name swap ratio pct";
 }
 .comm-grid .cell-swap { justify-self: end; }
+.comm-grid .cell-name { white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+.comm-grid .cell-ratio { padding-right: 6px; }
+.pair-row.comm-head { font-size: 12px; color: var(--text-dim); padding: 4px 6px 6px; border-bottom: 1px solid var(--card-border); cursor: default; }
+.comm-head > span { white-space: nowrap; }
+.comm-head [style*="name"] { padding-left: 6px; }
 @media (max-width: 640px) {
   .pair-row.pair-grid.comm-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2.6fr) minmax(0, 0.9fr) 26px;
-    grid-template-areas: "icons name pct swap" "price1 price2 ratio ratio";
+    grid-template-columns: 34px minmax(0, 1fr) 24px 98px 48px; column-gap: 4px !important;
+    grid-template-areas: "icons name swap ratio pct";
   }
   .pair-row.pair-grid.comm-grid.sort-active {
-    grid-template-columns: 24px minmax(0, 1fr) minmax(0, 2.6fr) minmax(0, 0.9fr) 26px;
-    grid-template-areas: "order icons name pct swap" "order price1 price2 ratio ratio";
+    grid-template-columns: 22px 34px minmax(0, 1fr) 24px 98px 48px;
+    grid-template-areas: "order icons name swap ratio pct";
   }
+  .comm-grid .commodity-icon:nth-child(2) { display: none; }
+  .comm-grid .cell-name { font-size: 13px !important; padding-left: 0; }
+  .comm-grid .cell-ratio { font-size: 15px !important; font-weight: 600; text-align: right !important; padding-right: 0; }
+  .comm-grid .cell-pct { font-size: 13px !important; min-width: 0 !important; }
+  .comm-head [style*="name"] { padding-left: 0; }
 }
 
 /* Pool: адреса контрактов монет над графиком (рядом: первая, затем вторая) */
