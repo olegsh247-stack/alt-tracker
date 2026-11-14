@@ -855,3 +855,10 @@ body:has(.app-shell), body:has(.lp) { background: var(--page-bg); }
 .cc-title .cc-price { color: var(--text); font-weight: 700; font-size: 24px; }
 .cc-title .cc-pct { font-weight: 700; font-size: 22px; }
 .cc-title .cc-sub { flex-basis: 100%; }
+
+/* Чуть шире интервал между цифрами в таблицах */
+.cell-price, .cell-ratio, .cell-pct, .ar-r, .sp-p, .sp-price, .pool-table td.pt-num { letter-spacing: .4px; }
+
+/* Цифры в таблицах: чуть шире интервал между знаками */
+.cell-price, .cell-pct, .ar-r, .pt-num, .sp-price { letter-spacing: 0.05em; }
+.cell-ratio { letter-spacing: 0.03em; }
